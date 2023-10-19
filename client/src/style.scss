@@ -1,0 +1,120 @@
+.app {
+    display: flex;
+    justify-content: center;
+
+    h1 {
+        font-weight: 700;
+        font-size: 54px;
+    }
+
+    .container {
+        width: 100%;
+        margin: 0 24px;
+
+        // NAVBAR
+        .navbar {
+            border-bottom: 1px solid #dfe3e6;
+
+            .container {
+                height: 80px;
+
+                display: flex;
+                justify-content: space-between;
+                flex-direction: center;
+                align-items: center;
+
+                .logo {
+                    display: flex;
+
+                    img {
+                        height: 50px;
+
+                    }
+                }
+
+                .links {
+                    height: 60px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    a {
+                        color: black;
+                        text-decoration: none;
+
+                        &:focus {
+                            color: blueviolet;
+                            background-color: #ededfc;
+                            border-radius: 34px;
+
+                        }
+
+                        &:hover {
+                            background-color: #ededfc;
+                            border-radius: 34px;
+                            padding: -10px;
+                        }
+                    }
+
+                    h6 {
+                        font-size: 16px;
+                        font-weight: 900;
+                        margin: 14px 10px;
+                    }
+
+                    span {
+                        cursor: pointer;
+                    }
+
+
+                }
+
+                .content {
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+
+                    a {
+                        text-decoration: none;
+                        color: #fff;
+                        background-color: blueviolet;
+                        font-size: 16px;
+                        font-weight: 900;
+                        padding: 10px 20px;
+                        border: 0;
+                        border-radius: 34px;
+
+                        &:hover {
+                            background-color: #9b2d2d;
+                        }
+                    }
+
+                }
+            }
+        }
+        // FOOTER
+        footer {
+            border-top: 1px solid #dfe3e6;
+            padding: 20px 0px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 20px;
+            
+
+            img {
+                height: 50px;
+
+            }
+        }
+    }
+
+}
+.single-img{
+    width: 50%;
+}
+body{
+    margin: 0;
+    padding: 0;
+}
