@@ -10,14 +10,10 @@ import DOMPurify from "dompurify";
 
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const Single = () => {
   const [chapterData, setChapterData] = useState([]);
@@ -76,17 +72,6 @@ const Single = () => {
     setOpenIndex((prevOpenIndex) => (prevOpenIndex === index ? null : index));
   };
 
-  const handleEdit = (event, chapterId) => {
-    event.stopPropagation();
-    // Xử lý khi nhấp vào biểu tượng sửa
-    console.log("Sửa chương có ID:", chapterId);
-  };
-  
-  const handleDeleteChapter = (event, chapterId) => {
-    event.stopPropagation();
-    // Xử lý khi nhấp vào biểu tượng xóa
-    console.log("Xóa chương có ID:", chapterId);
-  };
   return (
     <div className="single">
       <div className="content">
@@ -122,28 +107,8 @@ const Single = () => {
             aria-labelledby="nested-list-subheader"
           >
             <ListItemButton onClick={() => handleClick(index, item)}>
-              <ListItemIcon>
-                {/* Biểu tượng sửa */}
-                <IconButton
-                  edge="start"
-                  color="inherit"
-                  aria-label="edit"
-                  onClick={(event) => handleEdit(event, item.ChapterId)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </ListItemIcon>
-              <ListItemIcon>
-                {/* Biểu tượng xóa */}
-                <IconButton
-                  edge="end"
-                  color="inherit"
-                  aria-label="delete"
-                  onClick={(event) => handleDeleteChapter(event, item.ChapterId)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemIcon>
+             
+          
               <ListItemText
                 primary={`Chương ${index + 1}: ${item.ChapterTitle}`}
               />

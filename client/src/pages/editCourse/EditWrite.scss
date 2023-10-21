@@ -1,0 +1,20 @@
+.write-course{
+    display: flex;
+    height: calc(100vh - 180px);
+}
+.container-left{
+    flex:2;
+    border-right: 1px solid #dfe3e6;
+    margin-right: 20px;
+}
+.container-right{
+    flex:5;
+}
+.course-container{
+    margin-top: 20px;
+    margin-left: 20px;
+}
+.course-title{
+    border: none;
+    border-bottom: 1px solid #dfe3e6;
+}

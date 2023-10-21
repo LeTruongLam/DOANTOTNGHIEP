@@ -10,7 +10,7 @@ import Home from "./pages/home/Home.jsx";
 import Course from "./pages/course/Course.jsx"
 import Single from "./pages/Single";
 import Navbar from "./components/Navbar";
-import Write from "./pages/editCourse/Write.jsx";
+import Write from "./pages/EditCourse/Write.jsx";
 import Footer from "./components/Footer";
 import Infor from "./pages/Info/Info.jsx"
 import "./style.scss"

@@ -68,7 +68,6 @@ export const addCourse = (req, res) => {
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
-    console.log(userInfo.role);
     // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
     if (userInfo.role !== "admin") {
       return res.status(403).json("Unauthorized!");
