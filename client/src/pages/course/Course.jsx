@@ -2,30 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import "./course.scss";
 import { AuthContext } from "../../context/authContext";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import EditIcon from "@mui/icons-material/Edit";
+import { format } from "date-fns";
 
 const Course = () => {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const cat = useLocation().search;
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (isAdmin()) {
-          const res = await axios.get(`/courses/all/${cat}`);
-          setCourses(res.data);
-        } else {
-          const res = await axios.get(`/courses/${cat}`);
-          setCourses(res.data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [cat]);
+  const formatDate = (date) => {
+    return format(new Date(date), "dd/MM/yyyy");
+  };
 
   const isAdmin = () => {
     return currentUser && currentUser.Role === "admin";
@@ -43,12 +41,54 @@ const Course = () => {
     return str.substring(0, maxLength) + "...";
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        if (isAdmin()) {
+          const res = await axios.get(`/courses/all/${cat}`);
+          setCourses(res.data);
+        } else {
+          const res = await axios.get(`/courses/${cat}`);
+          setCourses(res.data);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [cat]);
+  const handleWrite = () => {
+    navigate("/write");
+  };
+
   return (
     <div className="section-row">
       <div className="title-course">
         <h1>My Course</h1>
-        {isAdmin() && <Link to="/write">Add Course</Link>}
+        {isAdmin() && (
+          <SpeedDial
+            ariaLabel="SpeedDial openIcon example"
+            icon={
+              <SpeedDialIcon openIcon={<EditIcon />} onClick={handleWrite} />
+            }
+            sx={{ position: "fixed", bottom: 16, right: 16 }}
+          >
+          </SpeedDial>
+        )}
       </div>
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
       <div className="section-items">
         {courses.map((course) => (
@@ -60,7 +100,24 @@ const Course = () => {
               <div className="course-content">
                 <div className="course-glimpse-wrapper">
                   <div className="course-glimpse-info">
-                    <p>{truncateString(getText(course.title), 20)}</p>
+                    <p className="course-title">{truncateString(getText(course.title), 35)}</p>
+                    <p className="course-desc">{truncateString(getText(course.desc), 250)}</p>
+                  </div>
+                  <div className="course-datetime">
+                    <Chip
+                      color="primary"
+                      variant="outlined"
+                      icon={<DateRangeIcon />}
+                      label={`Starts: ${formatDate(course.StartDate)}`}
+                      style={{ width: "100%", justifyContent: "flex-start" }}
+                    />
+                    <Chip
+                      color="primary"
+                      variant="outlined"
+                      icon={<DateRangeIcon />}
+                      label={`End: ${formatDate(course.EndDate)}`}
+                      style={{ width: "100%", justifyContent: "flex-start",margin:"10px 0" }}
+                    />
                   </div>
                   <div className="course-glimpse-footer">
                     <p className="course-glimpse-footer-btn">Xem khóa học</p>

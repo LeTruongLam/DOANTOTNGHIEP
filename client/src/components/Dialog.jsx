@@ -26,7 +26,7 @@ export default function AlertDialog(props) {
 
   const handleAdd = () => {
     props.addEvent(chapterName);
-    handleClose();
+    handleCloseDialog();
   };
 
   const handleClose = () => {
@@ -35,6 +35,7 @@ export default function AlertDialog(props) {
 
   const handleClickOpen = () => {
     setOpen(true);
+    handleClose();
   };
 
   const handleCloseDialog = () => {

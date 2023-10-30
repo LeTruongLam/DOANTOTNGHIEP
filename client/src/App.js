@@ -7,13 +7,13 @@ import {
 import Login from "./pages/login/Login.jsx";
 import Register from "./pages/register/Register.jsx";
 import Home from "./pages/home/Home.jsx";
-import Course from "./pages/course/Course.jsx"
-import Single from "./pages/Single";
+import Course from "./pages/course/Course.jsx";
+import Single from "./pages/single/Single.jsx";
 import Navbar from "./components/Navbar";
 import Write from "./pages/EditCourse/Write.jsx";
 import Footer from "./components/Footer";
-import Infor from "./pages/Info/Info.jsx"
-import "./style.scss"
+import Infor from "./pages/Info/Info.jsx";
+import "./style.scss";
 
 const Layout = () => {
   return (
@@ -51,13 +51,14 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path:"/write",
-        element: <Write/>
+        path: "/write",
+        element: <Write />,
       },
       {
         path: "/info",
-        element: <Infor />
+        element: <Infor />,
       },
+    
     ],
   },
   {
@@ -82,8 +83,9 @@ const router = createBrowserRouter([
   },
   {
     path: "/info",
-    element: <Infor />
+    element: <Infor />,
   },
+
 ]);
 function App() {
   return (

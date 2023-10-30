@@ -2,7 +2,8 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import image from "../../img/login_2.jpg";
-import "./login.scss"
+import "./login.scss";
+import Button from "@mui/material/Button";
 
 const Login = () => {
   const [inputs, setInputs] = useState({
@@ -21,6 +22,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!inputs.username || !inputs.password) {
+      setError("Please enter both username and password");
+      return;
+    }
+    
     try {
       await login(inputs);
       navigate("/course");
@@ -28,6 +35,7 @@ const Login = () => {
       setError(err.response.data);
     }
   };
+
   return (
     <div className="auth">
       <div className="image">
@@ -55,7 +63,10 @@ const Login = () => {
               onChange={handleChange}
             />
             <a href="/">Forgot password</a>
-            <button onClick={handleSubmit}>Login</button>
+            <Button variant="contained" onClick={handleSubmit}>
+              Login
+            </Button>
+
             {err && <p>{err}</p>}
             <span>
               Don't you have an account? <Link to="/register">Register</Link>

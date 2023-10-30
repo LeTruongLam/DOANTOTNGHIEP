@@ -1,114 +1,149 @@
  // COURSE
  .section-row {
 
-    .section-items {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
+     .section-items {
+         display: flex;
+         flex-wrap: wrap;
+         justify-content: flex-start;
 
 
-        .course-glimpse {
-            text-decoration: none;
-            flex-grow: 1;
-            flex-shrink: 0;
-            flex-basis: calc(25% - 32px);
-            max-width: calc(25% - 32px);
-            position: relative;
-            margin: 16px 16px;
-            min-width: 16rem;
-            overflow: hidden;
+         .course-glimpse {
+             text-decoration: none;
+             flex-grow: 1;
+             flex-shrink: 0;
+             flex-basis: calc(33% - 40px);
+             max-width: calc(33% - 40px);
+             position: relative;
+             margin: 16px 16px;
+             min-width: 16rem;
+             overflow: hidden;
+             border: 1px solid #dfe3e6;
+             border-radius: 14px;
 
-            .link {
-                text-decoration: none;
-                .course-image {
-                    border-radius: 14px;
-                    overflow: hidden;
-                    flex-basis: auto;
-                    display: block;
-                    position: relative;
-                    margin: 0;
-                    flex-grow: 0;
-                    
-                    flex-shrink: 1;
-                    max-width: none;
 
-                    img {
-                        height: 170px;
-                        width: 100%;
-                        object-fit: cover;
-                        object-position: center top;
-                        border-radius: 14px;
-                        transition: .5s all ease-in-out;
-                    }
+             .link {
+                 text-decoration: none;
+                 display: flex;
+                 flex-direction: column;
+                 justify-content: space-between;
+                 height: 100%;
 
-                    &:hover {
-                        transform: scale(1.05);
-                        transition: .5s all ease-in-out;
+                 .course-image {
+                     border-radius: 14px;
+                     overflow: hidden;
+                     flex-basis: auto;
+                     display: block;
+                     position: relative;
+                     margin: 0;
+                     flex-grow: 0;
 
-                    }
-                }
+                     flex-shrink: 1;
+                     max-width: none;
 
-                .course-content {
+                     img {
+                         width: 100%;
+                         object-fit: cover;
+                         object-position: center top;
+                         border-radius: 14px;
+                         transition: .5s all ease-in-out;
+                     }
 
-                    font-size: .9rem;
-                    display: flex;
-                    position: relative;
-                    flex-direction: column;
-                    justify-content: space-between;
+                     &:hover {
+                         transform: scale(1.05);
+                         transition: .5s all ease-in-out;
 
-                    .course-glimpse-wrapper {
-                        position: relative;
-                        flex: 1;
-                        display: flex;
-                        flex-direction: column;
-                        // padding: 1.7rem 0.7rem 3rem;
-                        color: #222b30;
-                        font-weight: 300;
-                        transition: .4s;
+                     }
+                 }
 
-                        .course-glimpse-info {
-                            font-weight: 700;
-                            color: black;
-                            font-size: 20px;
-                            line-height: 1.4;
-                            font-family: "Inter", sans-serif;
+                 .course-content {
 
-                            &:hover {
+                     font-size: .9rem;
+                     display: flex;
+                     position: relative;
+                     flex-direction: column;
+                     justify-content: space-between;
+
+                     .course-glimpse-wrapper {
+                         position: relative;
+                         flex: 1;
+                         display: flex;
+                         flex-direction: column;
+                         color: #222b30;
+                         font-weight: 300;
+                         transition: .4s;
+                         margin: 0 10px 10px 10px;
+
+                         .course-glimpse-info {
+
+                             color: black;
+                             font-size: 14px;
+
+                            
+                         }
+
+                         .course-title {
+                             font-weight: 700;
+                             color: black;
+                             font-size: 20px;
+                             line-height: 1.4;
+                             font-family: "Inter", sans-serif;
+                             &:hover {
                                 color: #3738e2;
 
                             }
-                        }
 
-                        .course-glimpse-footer-btn {
+                         }
 
-                            color: #3738e2;
-                            font-size: 16px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 10px 0;
-                            border: 1px solid #3738e2;
-                            border-radius: 8px;
-                            font-weight: 500;
-                            width: 144px;
-                            background: transparent;
-                            margin-bottom: 0;
+                         .course-desc {
+                             color: black;
+                             font-size: 14px;
+                             &:hover {
+                                color: #3738e2;
 
-                            &:hover {
-                                background: #ededfc;
                             }
-                        }
-
-                    }
+                         }
 
 
-                }
+                         .course-glimpse-footer-btn {
 
-            }
+                             color: #3738e2;
+                             font-size: 16px;
+                             display: flex;
+                             align-items: center;
+                             justify-content: center;
+                             padding: 10px 0;
+                             border: 1px solid #3738e2;
+                             border-radius: 8px;
+                             font-weight: 500;
+                             width: 144px;
+                             background: transparent;
+                             margin-bottom: 0;
+
+                             &:hover {
+                                 background: #ededfc;
+                             }
+                         }
+
+                     }
 
 
-        }
+                 }
+
+             }
 
 
-    }
-}
+         }
+
+
+     }
+ }
+
+ .course-datetime {
+     width: 50%;
+ }
+
+ .title-course {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+ }

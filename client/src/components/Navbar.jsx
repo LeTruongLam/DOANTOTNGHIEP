@@ -1,13 +1,21 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import Logo from "../img/logo.png";
+import Button from "@mui/material/Button";
+
 const Navbar = () => {
   const { currentUser, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/"); // Redirect to "/" after logout
+  };
 
   return (
     <div className="navbar">
-      <div className="container">
+      <div className="navbar-container">
         <div className="logo">
           <Link to="/">
             <img src={Logo} alt="" />
@@ -26,16 +34,20 @@ const Navbar = () => {
           <Link className="link" to="/teachers">
             <h6>Giảng viên</h6>
           </Link>
-          <span><Link to="/info">{currentUser?.UserName}</Link></span>
+          <span>
+            <Link to="/info">{currentUser?.UserName}</Link>
+          </span>
           {currentUser ? (
-            <a href="/" onClick={logout}>Logout</a>
+            <Link to="/" onClick={handleLogout}>
+              <Button variant="contained">Logout</Button>
+            </Link>
           ) : (
             <div className="content">
-              <Link className="link" to="/login">
-                Login
+              <Link to="/login">
+                <Button variant="contained">Login</Button>
               </Link>
-              <Link className="link" to="/register">
-                Register
+              <Link to="/register">
+                <Button variant="contained">Register</Button>
               </Link>
             </div>
           )}

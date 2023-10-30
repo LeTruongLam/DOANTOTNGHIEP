@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import image from "../../img/register_2.jpg";
-import "./register.scss"
-
+import "../login/Login";
+import Button from "@mui/material/Button";
 const Register = () => {
   const [inputs, setInputs] = useState({
     username: "",
@@ -65,7 +65,9 @@ const Register = () => {
               name="password"
               onChange={handleChange}
             />
-            <button onClick={handleSubmit}>Register</button>
+            <Button variant="contained" onClick={handleSubmit}>
+              Register
+            </Button>
             {err && <p>{err}</p>}
             <span>
               Do you have an account? <Link to="/login">Login</Link>

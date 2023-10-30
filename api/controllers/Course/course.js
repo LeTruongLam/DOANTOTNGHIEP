@@ -33,7 +33,6 @@ export const getAllCourses = (req, res) => {
   });
 };
 
-
 export const getCourses = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
@@ -54,7 +53,7 @@ export const getCourses = (req, res) => {
 
 export const getCourse = (req, res) => {
   const q =
-    "SELECT p.CourseId, `username`, `title`, `desc`, p.img, u.img AS userImg, `cat`,`date` FROM users u JOIN courses p ON u.UserId = p.UserId WHERE p.CourseId = ? ";
+    "SELECT p.CourseId, `username`, `title`, `desc`, p.img, u.img  AS userImg, `cat`,`date`,`StartDate`,`EndDate` FROM users u JOIN courses p ON u.UserId = p.UserId WHERE p.CourseId = ? ";
 
   db.query(q, [req.params.id], (err, data) => {
     if (err) return res.status(500).json(err);
@@ -64,29 +63,30 @@ export const getCourse = (req, res) => {
 
 export const addCourse = (req, res) => {
   const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  if (!token) return res.status(401).json({ message: "Not authenticated!" });
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+    if (err) return res.status(403).json({ message: "Token is not valid!" });
     // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
     if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
+      return res.status(403).json({ message: "Unauthorized!" });
     }
-
     const q =
-      "INSERT INTO courses(`title`, `desc`, `img`, `cat`, `date`,`UserId`) VALUES (?)";
+      "INSERT INTO courses(`title`, `desc`, `img`, `cat`, `date`,`StartDate`,`EndDate`,`UserId`) VALUES (?)";
     const values = [
       req.body.title,
       req.body.desc,
       req.body.img,
       req.body.cat,
       req.body.date,
+      req.body.StartDate,
+      req.body.EndDate,
       userInfo.id,
     ];
 
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
-      return res.json("Post has been created.");
+      return res.status(201).json({ message: "Post has been created." });
     });
   });
 };
@@ -121,9 +121,9 @@ export const updateCourse = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const courseId = req.params.id;
-    
+
     const q =
-      "UPDATE courses SET `title`=?, `desc`=?, `img`=?, `cat`=?, `date`=? WHERE `courseId` = ? ";
+      "UPDATE courses SET `title`=?, `desc`=?, `img`=?, `cat`=?, `date`=? , `StartDate`=?, `EndDate`=? WHERE `courseId` = ? ";
 
     const values = [
       req.body.title,
@@ -131,6 +131,8 @@ export const updateCourse = (req, res) => {
       req.body.img,
       req.body.cat,
       req.body.date,
+      req.body.StartDate,
+      req.body.EndDate,
       courseId,
     ];
 

@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 import "./EditWrite.scss";
 import Dialog from "../../components/Dialog";
+import AddIcon from "@mui/icons-material/Add";
 
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -20,10 +21,17 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import SaveIcon from "@mui/icons-material/Save";
+
+import dayjs from "dayjs";
 
 const Write = () => {
   const location = useLocation();
@@ -36,10 +44,12 @@ const Write = () => {
   const [chapterVideo, setChapterVideo] = useState("");
   const [chapterPosition, setChapterPosition] = useState("");
 
+  const [startDate, setStartDate] = useState(location.state?.StartDate || "");
+  const [endDate, setEndDate] = useState(location.state?.EndDate || "");
+
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
 
-  const courseId = location.state.CourseId;
   const navigate = useNavigate();
 
   const [age, setAge] = useState("");
@@ -54,61 +64,77 @@ const Write = () => {
       const formData = new FormData();
       formData.append("file", file);
       const response = await axios.post("/upload", formData);
+      setFile(response.data);
       return response.data;
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const reschapter = await axios.get(`/courses/${courseId}/chapters`);
-        setChapterData(reschapter.data);
-        console.log(reschapter.data);
-      } catch (err) {
-        console.log(err);
-      }
+      if (location.state) {
+        try {
+          const reschapter = await axios.get(
+            `/courses/${location.state.CourseId}/chapters`
+          );
+          setChapterData(reschapter.data);
+        } catch (err) {
+          console.log(err);
+        }
+      } else return;
     };
     fetchData();
-  }, [courseId]);
+  }, []);
 
   const addChapter = async () => {
-    try {
-      const response = await axios.post(
-        `/courses/${location.state?.CourseId}/chapters`,
-        {
+    if (location.state) {
+      const courseId = location.state.CourseId;
+      try {
+        await axios.post(`/courses/${location.state?.CourseId}/chapters`, {
           chapterTitle,
           chapterDesc,
           chapterVideo,
           chapterPosition,
           courseId,
-        }
-      );
-      setChapterTitle("");
-      setChapterDesc("");
-      setChapterVideo("");
-      setChapterPosition("");
-    } catch (error) {
-      console.log(error);
+        });
+        setChapterTitle("");
+        setChapterDesc("");
+        setChapterVideo("");
+        setChapterPosition("");
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
-
   const handleClick = async (e) => {
+    e.preventDefault();
     const imgUrl = await upload();
-
     try {
-      const updatedTitle = title || location.state?.title;
-      const updatedDesc = value || location.state?.desc;
-      const updatedCat = cat || location.state?.cat;
-      const updatedImg = file ? imgUrl : location.state?.img || "";
-      const updatedDate = moment(Date.now()).format("YYYY-MM-DD HH:mm:ss");
+      const updatedTitle = title || (location.state && location.state.title);
+      const updatedDesc = value || (location.state && location.state.desc);
+      const updatedCat = cat || (location.state && location.state.cat);
+      const updatedStartDate = startDate
+        ? moment(startDate).format("YYYY-MM-DD HH:mm:ss")
+        : (location.state && location.state.startDate) || "";
+      const updatedEndDate = endDate
+        ? moment(endDate).format("YYYY-MM-DD HH:mm:ss")
+        : (location.state && location.state.endDate) || "";
+      const updatedImg = file
+        ? imgUrl
+        : (location.state && location.state.img) || "";
 
+      console.log(updatedTitle);
+      const updatedDate = moment().format("YYYY-MM-DD HH:mm:ss");
       if (location.state) {
         await axios.put(`/courses/${location.state.CourseId}`, {
           title: updatedTitle,
           desc: updatedDesc,
           cat: updatedCat,
           img: updatedImg,
+          date: updatedDate,
+          StartDate: updatedStartDate,
+          EndDate: updatedEndDate,
         });
       } else {
         await axios.post(`/courses/`, {
@@ -117,6 +143,8 @@ const Write = () => {
           cat: updatedCat,
           img: updatedImg,
           date: updatedDate,
+          StartDate: updatedStartDate,
+          EndDate: updatedEndDate,
         });
       }
       await addChapter();
@@ -141,16 +169,15 @@ const Write = () => {
   const handleAddChapter = async (chapterTitle) => {
     console.log("Thêm chương");
     try {
-      const response = await axios.post(
-        `/courses/${location.state?.CourseId}/chapters`,
-        {
-          chapterTitle,
-          chapterDesc,
-          chapterVideo,
-          chapterPosition,
-          courseId,
-        }
-      );
+      const courseId = location.state.CourseId;
+
+      await axios.post(`/courses/${location.state?.CourseId}/chapters`, {
+        chapterTitle,
+        chapterDesc,
+        chapterVideo,
+        chapterPosition,
+        courseId,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -171,6 +198,10 @@ const Write = () => {
           <ListItemButton onClick={handleClickMenu}>
             <ListItemText primary={"Danh sách chương"} />
             {openIndex ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <ListItemButton sx={{ display: "flex", justifyContent: "center" }}>
+            <AddIcon sx={{ fontSize: 24 }} />
+            <Dialog addEvent={handleAddChapter}></Dialog>
           </ListItemButton>
           <Collapse in={openIndex} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
@@ -203,19 +234,27 @@ const Write = () => {
               variant="standard"
               onChange={(e) => setTitle(e.target.value)}
               value={title}
-              style={{ minWidth: "100%" }} // Thiết lập chiều ngang tối thiểu là 200px
+              style={{ minWidth: "50%" }} // Thiết lập chiều ngang tối thiểu là 200px
             />
 
-            <div className="course-date">
+            <div className="course-date" style={{ width: "50%" }}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker"]}>
-                  <DatePicker label="Ngày bắt đầu" />
-                  <DatePicker label="Ngày kết thúc" />
+                  <DatePicker
+                    label="Ngày bắt đầu"
+                    value={dayjs(startDate)}
+                    onChange={(newStartDate) => setStartDate(newStartDate)}
+                  />
+                  <DatePicker
+                    label="Ngày kết thúc"
+                    value={dayjs(endDate)}
+                    onChange={(newEndDate) => setEndDate(newEndDate)}
+                  />
                 </DemoContainer>
               </LocalizationProvider>
             </div>
             <div className="course-chapter">
-              <Box sx={{ width: "400px" }}>
+              <Box sx={{ width: "50%" }}>
                 <FormControl fullWidth>
                   <InputLabel id="demo-simple-select-label">
                     Tên chương học
@@ -224,14 +263,14 @@ const Write = () => {
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     value={age}
-                    label="Age"
+                    label="Tên chương học"
                     onChange={handleChange}
                   >
                     <MenuItem value="">
                       <em>None</em>
                     </MenuItem>
                     {chapterData.map((chapter, chapterIndex) => (
-                      <MenuItem key={chapterIndex} value={chapter.ChapterTitle}>
+                      <MenuItem key={chapterIndex} value={chapter.ChapterId}>
                         {chapter.ChapterTitle}
                       </MenuItem>
                     ))}
@@ -244,9 +283,31 @@ const Write = () => {
                 id="outlined-basic"
                 label="Nhập tên bài học"
                 variant="outlined"
+                style={{ minWidth: "50%" }}
               />
             </div>
+            <div className="course-img">
+              <div className="item">
+                <span>
+                  <b>Chọn hình ảnh: </b>
+                </span>
+                <input
+                  style={{ display: "none" }}
+                  type="file"
+                  id="file"
+                  name=""
+                  onChange={(e) => setFile(e.target.files[0])}
+                />
+                <label className="file" htmlFor="file">
+                  {file ? file.name : location.state?.img || "Chọn ảnh"}
+                </label>
+              </div>
+              {/* <img src={`../upload/${location.state.img}`} alt="" /> */}
+            </div>
             <div className="editorContainer">
+              <span>
+                <b>Mô tả môn học </b>
+              </span>
               <ReactQuill
                 className="editor"
                 theme="snow"
@@ -255,58 +316,12 @@ const Write = () => {
               />
             </div>
           </div>
-          <div className="menu">
-            <div className="item">
-              <h1>Publish</h1>
-              <span>
-                <b>Status: </b> Draft
-              </span>
-              <span>
-                <b>Visibility: </b> Public
-              </span>
-              <input
-                style={{ display: "none" }}
-                type="file"
-                id="file"
-                name=""
-                onChange={(e) => setFile(e.target.files[0])}
-              />
-              <label className="file" htmlFor="file">
-                Upload Image
-              </label>
-              <div className="buttons">
-                <button>Save as a draft</button>
-                <button onClick={handleClick}>Publish</button>
-              </div>
-            </div>
-          </div>
-          <div className="chapter">
-            <h2>Add Chapter</h2>
-            <input
-              type="text"
-              placeholder="Chapter Title"
-              value={chapterTitle}
-              onChange={(e) => setChapterTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="Chapter Description"
-              value={chapterDesc}
-              onChange={(e) => setChapterDesc(e.target.value)}
-            ></textarea>
-            <input
-              type="text"
-              placeholder="Chapter Video URL"
-              value={chapterVideo}
-              onChange={(e) => setChapterVideo(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Chapter Position"
-              value={chapterPosition}
-              onChange={(e) => setChapterPosition(e.target.value)}
-            />
-            <button onClick={addChapter}>Add Chapter</button>
-          </div>
+          <SpeedDial
+            ariaLabel="SpeedDial openIcon example"
+            icon={<SaveIcon />}
+            onClick={handleClick}
+            sx={{ position: "fixed", bottom: 16, right: 16 }}
+          ></SpeedDial>
         </div>
       </div>
     </div>
