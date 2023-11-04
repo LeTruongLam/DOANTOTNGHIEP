@@ -49,7 +49,20 @@ export const addChapter = (req, res) => {
     }
   );
 };
+export const editChapter = (req, res) => {
+  const { chapterTitle, chapterId } = req.body;
+  const courseId = req.params.id;
+  const query = `
+    UPDATE chapters
+    SET ChapterTitle = ?, CourseId = ?
+    WHERE ChapterId = ?
+  `;
 
+  db.query(query, [chapterTitle, courseId, chapterId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json({ message: "Cập nhật chương thành công" });
+  });
+};
 export const deleteChapter = (req, res) => {
   const chapterId = req.params.chapterId;
   const q = `
@@ -63,26 +76,3 @@ export const deleteChapter = (req, res) => {
     return res.status(200).json({ message: "Chapter deleted successfully" });
   });
 };
-
-//   export const editChapter = (req, res) => {
-//     const { title, content } = req.body;
-//     const chapterId = req.params.id;
-
-//     const q = "UPDATE chapters SET title = ?, content = ? WHERE chapterId = ?";
-
-//     db.query(q, [title, content, chapterId], (err, result) => {
-//       if (err) return res.status(500).json(err);
-//       return res.status(200).json({ message: "Chapter updated successfully" });
-//     });
-//   };
-
-//   export const deleteChapter = (req, res) => {
-//     const chapterId = req.params.id;
-
-//     const q = "DELETE FROM chapters WHERE chapterId = ?";
-
-//     db.query(q, [chapterId], (err, result) => {
-//       if (err) return res.status(500).json(err);
-//       return res.status(200).json({ message: "Chapter deleted successfully" });
-//     });
-//   };

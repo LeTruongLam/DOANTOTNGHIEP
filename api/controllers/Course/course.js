@@ -121,7 +121,7 @@ export const updateCourse = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const courseId = req.params.id;
-
+    console.log(req.body)
     const q =
       "UPDATE courses SET `title`=?, `desc`=?, `img`=?, `cat`=?, `date`=? , `StartDate`=?, `EndDate`=? WHERE `courseId` = ? ";
 

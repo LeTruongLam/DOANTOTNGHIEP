@@ -21,14 +21,11 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import Button from "@mui/material/Button";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import SaveIcon from "@mui/icons-material/Save";
 
 import dayjs from "dayjs";
@@ -46,7 +43,7 @@ const Write = () => {
 
   const [startDate, setStartDate] = useState(location.state?.StartDate || "");
   const [endDate, setEndDate] = useState(location.state?.EndDate || "");
-
+  const [selectedChapterId, setSelectedChapterId] = useState(null);
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
 
@@ -58,55 +55,37 @@ const Write = () => {
     setAge(event.target.value);
     console.log(event.target.value);
   };
-
+  const handleChapterClick = (chapterId) => {
+    setSelectedChapterId(chapterId);
+    console.log(chapterId);
+  };
   const upload = async () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await axios.post("/upload", formData);
+      const response = await axios.post("/users/upload", formData);
       setFile(response.data);
       return response.data;
     } catch (error) {
       console.log(error);
     }
   };
-
+  const fetchData = async () => {
+    if (location.state) {
+      try {
+        const reschapter = await axios.get(
+          `/courses/${location.state.CourseId}/chapters`
+        );
+        setChapterData(reschapter.data);
+      } catch (err) {
+        console.log(err);
+      }
+    } else return;
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      if (location.state) {
-        try {
-          const reschapter = await axios.get(
-            `/courses/${location.state.CourseId}/chapters`
-          );
-          setChapterData(reschapter.data);
-        } catch (err) {
-          console.log(err);
-        }
-      } else return;
-    };
     fetchData();
   }, []);
 
-  const addChapter = async () => {
-    if (location.state) {
-      const courseId = location.state.CourseId;
-      try {
-        await axios.post(`/courses/${location.state?.CourseId}/chapters`, {
-          chapterTitle,
-          chapterDesc,
-          chapterVideo,
-          chapterPosition,
-          courseId,
-        });
-        setChapterTitle("");
-        setChapterDesc("");
-        setChapterVideo("");
-        setChapterPosition("");
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
   const handleClick = async (e) => {
     e.preventDefault();
     const imgUrl = await upload();
@@ -123,8 +102,6 @@ const Write = () => {
       const updatedImg = file
         ? imgUrl
         : (location.state && location.state.img) || "";
-
-      console.log(updatedTitle);
       const updatedDate = moment().format("YYYY-MM-DD HH:mm:ss");
       if (location.state) {
         await axios.put(`/courses/${location.state.CourseId}`, {
@@ -147,21 +124,32 @@ const Write = () => {
           EndDate: updatedEndDate,
         });
       }
-      await addChapter();
-      navigate("/");
+      navigate(`/course/${location.state.CourseId}`);
     } catch (error) {
       console.log(error);
     }
   };
-  const handleEdit = (event, chapterId) => {
-    // Xử lý khi nhấp vào biểu tượng sửa
-    console.log("Sửa chương có ID:", chapterId);
+  const handleEdit = async (chapterTitle, chapterId) => {
+    setChapterTitle(chapterTitle);
+    try {
+      await axios.put(`/courses/${location.state?.CourseId}/chapters`, {
+        chapterTitle,
+        // chapterDesc,
+        // chapterVideo,
+        // chapterPosition,
+        chapterId,
+      });
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleDeleteChapter = async (chapterId) => {
     // Xử lý khi nhấp vào biểu tượng xóa
     console.log("Xóa chương có ID:", chapterId);
     try {
       await axios.delete(`/courses/${chapterId}/chapters`);
+      fetchData();
     } catch (err) {
       console.log(err);
     }
@@ -170,7 +158,6 @@ const Write = () => {
     console.log("Thêm chương");
     try {
       const courseId = location.state.CourseId;
-
       await axios.post(`/courses/${location.state?.CourseId}/chapters`, {
         chapterTitle,
         chapterDesc,
@@ -178,11 +165,19 @@ const Write = () => {
         chapterPosition,
         courseId,
       });
+      fetchData();
     } catch (error) {
       console.log(error);
     }
   };
-
+  const setStartDateFunction = (startDate) => {
+    const newStartDate = startDate.format("YYYY-MM-DD HH:mm:ss");
+    setStartDate(newStartDate);
+  };
+  const setEndDateFunction = (endDate) => {
+    const newEndDate = endDate.format("YYYY-MM-DD HH:mm:ss");
+    setEndDate(newEndDate);
+  };
   const handleClickMenu = () => {
     setOpenIndex(!openIndex);
   };
@@ -206,7 +201,11 @@ const Write = () => {
           <Collapse in={openIndex} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {chapterData.map((chapter, chapterIndex) => (
-                <ListItemButton key={chapterIndex} sx={{ pl: 4 }}>
+                <ListItemButton
+                  key={chapterIndex}
+                  sx={{ pl: 4 }}
+                  onClick={() => handleChapterClick(chapter.ChapterId)}
+                >
                   <ListItemText
                     primary={`Chương ${chapterIndex + 1}: ${
                       chapter.ChapterTitle
@@ -214,7 +213,9 @@ const Write = () => {
                   />
                   <ListItemIcon>
                     <Dialog
-                      onClick={(event) => handleEdit(event, chapter.ChapterId)}
+                      editEvent={(chapterTitle) =>
+                        handleEdit(chapterTitle, chapter.ChapterId)
+                      }
                       deleteEvent={() => handleDeleteChapter(chapter.ChapterId)}
                       addEvent={handleAddChapter}
                     ></Dialog>
@@ -243,12 +244,14 @@ const Write = () => {
                   <DatePicker
                     label="Ngày bắt đầu"
                     value={dayjs(startDate)}
-                    onChange={(newStartDate) => setStartDate(newStartDate)}
+                    onChange={(newStartDate) =>
+                      setStartDateFunction(newStartDate)
+                    }
                   />
                   <DatePicker
                     label="Ngày kết thúc"
                     value={dayjs(endDate)}
-                    onChange={(newEndDate) => setEndDate(newEndDate)}
+                    onChange={(newEndDate) => setEndDateFunction(newEndDate)}
                   />
                 </DemoContainer>
               </LocalizationProvider>
@@ -302,7 +305,9 @@ const Write = () => {
                   {file ? file.name : location.state?.img || "Chọn ảnh"}
                 </label>
               </div>
-              {/* <img src={`../upload/${location.state.img}`} alt="" /> */}
+              {location.state && location.state.img && (
+                <img src={`../upload/${location.state.img}`} alt="" />
+              )}
             </div>
             <div className="editorContainer">
               <span>

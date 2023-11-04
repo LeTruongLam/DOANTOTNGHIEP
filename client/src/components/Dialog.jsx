@@ -28,6 +28,14 @@ export default function AlertDialog(props) {
     props.addEvent(chapterName);
     handleCloseDialog();
   };
+  const handleEditChapter = () => {
+    console.log("Dialog");
+
+    console.log(chapterName);
+
+    props.editEvent(chapterName);
+    handleCloseDialog();
+  };
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -49,7 +57,7 @@ export default function AlertDialog(props) {
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={handleClickOpen}>Thêm</MenuItem>
-        <MenuItem onClick={handleClose}>Sửa</MenuItem>
+        <MenuItem onClick={handleClickOpen}>Sửa</MenuItem>
         <MenuItem onClick={handleDelete}>Xóa</MenuItem>
       </Menu>
 
@@ -70,7 +78,9 @@ export default function AlertDialog(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Hủy</Button>
+
           <Button onClick={handleAdd}>Đồng ý</Button>
+          <Button onClick={handleEditChapter}>Sửa</Button>
         </DialogActions>
       </Dialog>
     </div>

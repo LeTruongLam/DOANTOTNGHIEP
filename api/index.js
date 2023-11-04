@@ -4,6 +4,7 @@ import userRoutes from "./routes/users.js";
 import courseRoutes from "./routes/courses.js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import routeUpload from "./routes/routeUpload.js";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/auth", authRoutes);
 // app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/students", userRoutes);
+app.use("/api/users" , routeUpload);
 
 app.listen(8800, () => {
   console.log("Connected!");
