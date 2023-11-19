@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 import "./EditWrite.scss";
-import Dialog from "../../components/Dialog";
-import AddIcon from "@mui/icons-material/Add";
+import { AuthContext } from "../../context/authContext";
 
+import AlertDialog from "../../components/AlertDialog";
+import AddIcon from "@mui/icons-material/Add";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -27,26 +28,34 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SpeedDial from "@mui/material/SpeedDial";
 import SaveIcon from "@mui/icons-material/Save";
-
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Button from "@mui/material/Button";
 import dayjs from "dayjs";
+import ChapterForm from "./ChapterForm";
 
 const Write = () => {
+  const { fetchChapter } = useContext(AuthContext);
+
   const location = useLocation();
   const [title, setTitle] = useState(location.state?.title || "");
   const [value, setValue] = useState(location.state?.desc || "");
   const [file, setFile] = useState(null);
   const [cat, setCat] = useState(location.state?.cat || "");
-  const [chapterTitle, setChapterTitle] = useState("");
-  const [chapterDesc, setChapterDesc] = useState("");
-  const [chapterVideo, setChapterVideo] = useState("");
-  const [chapterPosition, setChapterPosition] = useState("");
-
   const [startDate, setStartDate] = useState(location.state?.StartDate || "");
   const [endDate, setEndDate] = useState(location.state?.EndDate || "");
   const [selectedChapterId, setSelectedChapterId] = useState(null);
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
 
+  const [openForm, setOpenForm] = useState(false);
+
+  const onShowForm = () => {
+    setOpenForm(true);
+  };
+  const onCloseForm = () => {
+    fetchData();
+    setOpenForm(false);
+  };
   const navigate = useNavigate();
 
   const [age, setAge] = useState("");
@@ -71,16 +80,12 @@ const Write = () => {
     }
   };
   const fetchData = async () => {
-    if (location.state) {
-      try {
-        const reschapter = await axios.get(
-          `/courses/${location.state.CourseId}/chapters`
-        );
-        setChapterData(reschapter.data);
-      } catch (err) {
-        console.log(err);
-      }
-    } else return;
+    try {
+      const data = await fetchChapter(location.state.CourseId);
+      setChapterData(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
   useEffect(() => {
     fetchData();
@@ -129,21 +134,7 @@ const Write = () => {
       console.log(error);
     }
   };
-  const handleEdit = async (chapterTitle, chapterId) => {
-    setChapterTitle(chapterTitle);
-    try {
-      await axios.put(`/courses/${location.state?.CourseId}/chapters`, {
-        chapterTitle,
-        // chapterDesc,
-        // chapterVideo,
-        // chapterPosition,
-        chapterId,
-      });
-      fetchData();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   const handleDeleteChapter = async (chapterId) => {
     // Xử lý khi nhấp vào biểu tượng xóa
     console.log("Xóa chương có ID:", chapterId);
@@ -154,22 +145,7 @@ const Write = () => {
       console.log(err);
     }
   };
-  const handleAddChapter = async (chapterTitle) => {
-    console.log("Thêm chương");
-    try {
-      const courseId = location.state.CourseId;
-      await axios.post(`/courses/${location.state?.CourseId}/chapters`, {
-        chapterTitle,
-        chapterDesc,
-        chapterVideo,
-        chapterPosition,
-        courseId,
-      });
-      fetchData();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   const setStartDateFunction = (startDate) => {
     const newStartDate = startDate.format("YYYY-MM-DD HH:mm:ss");
     setStartDate(newStartDate);
@@ -184,6 +160,9 @@ const Write = () => {
 
   return (
     <div className="write-course">
+      {openForm && (
+        <ChapterForm isOpen={openForm} isClose={onCloseForm}></ChapterForm>
+      )}
       <div className="container-left">
         <List
           sx={{ width: "100%", maxWidth: 500, bgcolor: "background.paper" }}
@@ -195,30 +174,25 @@ const Write = () => {
             {openIndex ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
           <ListItemButton sx={{ display: "flex", justifyContent: "center" }}>
-            <AddIcon sx={{ fontSize: 24 }} />
-            <Dialog addEvent={handleAddChapter}></Dialog>
+            <AddIcon onClick={onShowForm} />
           </ListItemButton>
           <Collapse in={openIndex} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {chapterData.map((chapter, chapterIndex) => (
-                <ListItemButton
-                  key={chapterIndex}
-                  sx={{ pl: 4 }}
-                  onClick={() => handleChapterClick(chapter.ChapterId)}
-                >
+                <ListItemButton key={chapterIndex} sx={{ pl: 4 }}>
                   <ListItemText
                     primary={`Chương ${chapterIndex + 1}: ${
                       chapter.ChapterTitle
                     }`}
                   />
-                  <ListItemIcon>
-                    <Dialog
-                      editEvent={(chapterTitle) =>
-                        handleEdit(chapterTitle, chapter.ChapterId)
-                      }
+                  <ListItemIcon
+                    onClick={() => handleChapterClick(chapter.ChapterId)}
+                  >
+                    <AlertDialog
+                      fetchData={fetchData}
                       deleteEvent={() => handleDeleteChapter(chapter.ChapterId)}
-                      addEvent={handleAddChapter}
-                    ></Dialog>
+                      chapterId={selectedChapterId}
+                    ></AlertDialog>
                   </ListItemIcon>
                 </ListItemButton>
               ))}
@@ -291,9 +265,9 @@ const Write = () => {
             </div>
             <div className="course-img">
               <div className="item">
-                <span>
+                {/* <span>
                   <b>Chọn hình ảnh: </b>
-                </span>
+                </span> */}
                 <input
                   style={{ display: "none" }}
                   type="file"
@@ -302,8 +276,38 @@ const Write = () => {
                   onChange={(e) => setFile(e.target.files[0])}
                 />
                 <label className="file" htmlFor="file">
-                  {file ? file.name : location.state?.img || "Chọn ảnh"}
+                  {/* {file ? file.name : location.state?.img || "Chọn ảnh"} */}
                 </label>
+                <>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    id="upload-file"
+                    onChange={(e) => setFile(e.target.files[0])}
+                  />
+                  <label htmlFor="upload-file">
+                    {file
+                      ? file.name
+                      : location.state?.img || (
+                          <Button
+                            variant="contained"
+                            component="span"
+                            startIcon={<CloudUploadIcon />}
+                          >
+                            Chọn hình ảnh
+                          </Button>
+                        )}
+
+                    {/* <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Chọn hình ảnh
+                    </Button> */}
+                  </label>
+                </>
               </div>
               {location.state && location.state.img && (
                 <img src={`../upload/${location.state.img}`} alt="" />

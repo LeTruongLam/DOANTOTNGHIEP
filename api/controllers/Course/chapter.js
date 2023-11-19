@@ -17,7 +17,33 @@ export const authorize = (req, res, next) => {
   }
 };
 
-export const getChapter = (req, res) => {
+export const getChapterById = (req, res) => {
+  const courseId = req.params.courseId;
+  const chapterId = req.params.chapterId;
+  console.log(req.params.courseId);
+  console.log(req.params.chapterId);
+  const q = `
+    SELECT *
+    FROM chapters
+    WHERE CourseId = ? AND ChapterId = ?
+  `;
+
+  db.query(q, [courseId, chapterId], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "An unexpected error occurred." });
+    }
+
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Chapter not found." });
+    }
+    const chapter = data[0];
+
+    return res.status(200).json(chapter);
+  });
+};
+
+export const getAllChapter = (req, res) => {
   const q = `
       SELECT *
       FROM chapters
@@ -63,6 +89,8 @@ export const editChapter = (req, res) => {
     return res.status(200).json({ message: "Cập nhật chương thành công" });
   });
 };
+
+
 export const deleteChapter = (req, res) => {
   const chapterId = req.params.chapterId;
   const q = `

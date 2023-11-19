@@ -72,8 +72,7 @@
                          color: #222b30;
                          font-weight: 300;
                          transition: .4s;
-                         margin: 0 10px 10px 10px;
-
+                         margin: 0 20px 20px 20px;
                          .course-glimpse-info {
 
                              color: black;
@@ -150,3 +149,36 @@
      justify-content: space-between;
      align-items: center;
  }
+ .course-video{
+    min-height: calc( 100vh - 60px);
+    display: flex;
+
+ }
+ .container-left{
+    border-right: 1px solid #dfe3e6;
+    width: max-content;
+ }
+ .container-right{
+    width:  calc( 100% - 410px);
+ }
+ .video-player {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid #dfe3e6;
+    margin-top: 16px ;
+
+
+  }
+  .chapter-content .chapter-title{
+    margin: 16px 0;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid #dfe3e6;
+  }
+  .chapter-content .chapter-desc{
+    margin: 16px 0;
+    padding:  16px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #dfe3e6;
+  }

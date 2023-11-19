@@ -13,17 +13,31 @@ export const AuthContexProvider = ({ children }) => {
     setCurrentUser(res.data);
 
     // Thiết lập thời gian tồn tại của phiên đăng nhập là 30 phút (1800000 milliseconds)
-    const sessionTimeout = 180000000;
+    const sessionTimeout = 1800000;
 
     // Lưu thời gian hết hạn của phiên đăng nhập vào localStorage
     const expirationTime = Date.now() + sessionTimeout;
     localStorage.setItem("expirationTime", expirationTime);
   };
+  const fetchChapter = async (CourseId) => {
+      try {
+        const reschapter = await axios.get(
+          `/courses/${CourseId}/chapters`
+        );
+    // console.log(reschapter.data)
 
-  const logout = async (inputs) => {
+        return reschapter.data
+      } catch (err) {
+        console.log(err);
+      }
+  };
+
+  
+  const logout = async () => {
     await axios.post("/auth/logout");
     setCurrentUser(null);
     localStorage.removeItem("expirationTime");
+    localStorage.removeItem("user"); // Xóa thông tin người dùng từ localStorage
   };
 
   useEffect(() => {
@@ -39,7 +53,7 @@ export const AuthContexProvider = ({ children }) => {
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, fetchChapter }}>
       {children}
     </AuthContext.Provider>
   );

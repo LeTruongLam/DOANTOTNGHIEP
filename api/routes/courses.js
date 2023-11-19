@@ -8,10 +8,11 @@ import {
   getAllCourses,
 } from "../controllers/Course/course.js";
 import {
-  getChapter,
+  getAllChapter,
   addChapter,
   deleteChapter,
   editChapter,
+  getChapterById
 } from "../controllers/Course/chapter.js";
 
 const router = express.Router();
@@ -23,9 +24,10 @@ router.post("/", addCourse);
 router.delete("/:id", deleteCourse);
 router.put("/:id", updateCourse);
 
-router.get("/:id/chapters", getChapter);
+router.get("/:id/chapters", getAllChapter);
 router.post("/:id/chapters", addChapter);
 router.put("/:id/chapters", editChapter);
 router.delete("/:chapterId/chapters/", deleteChapter);
 
+router.get("/:courseId/chapters/:chapterId", getChapterById);
 export default router;

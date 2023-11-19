@@ -9,16 +9,20 @@ import Register from "./pages/register/Register.jsx";
 import Home from "./pages/home/Home.jsx";
 import Course from "./pages/course/Course.jsx";
 import Single from "./pages/single/Single.jsx";
-import Navbar from "./components/Navbar";
-import Write from "./pages/EditCourse/Write.jsx";
+import TheHeader from "./components/TheHeader.jsx";
+import Write from "./pages/editCourse/Write.jsx";
 import Footer from "./components/Footer";
 import Infor from "./pages/Info/Info.jsx";
+import CourseVideo from "./pages/course/CourseVideo.jsx"
 import "./style.scss";
-
+import { useLocation } from "react-router-dom";
+import HeaderVideo from "./pages/course/HeaderVideo.jsx"
 const Layout = () => {
+  const location = useLocation();
+  const isCourseChapterPage = location.pathname === "/course/:courseId/video/:chapterId";
   return (
     <>
-      <Navbar />
+      {isCourseChapterPage ? <HeaderVideo /> : <TheHeader />}
       <Outlet />
       <Footer />
     </>
@@ -33,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/course/:courseId/video/:chapterId",
+        element: <CourseVideo />,
       },
       {
         path: "/course/:id",
@@ -58,6 +66,7 @@ const router = createBrowserRouter([
         path: "/info",
         element: <Infor />,
       },
+   
     
     ],
   },
@@ -85,7 +94,7 @@ const router = createBrowserRouter([
     path: "/info",
     element: <Infor />,
   },
-
+ 
 ]);
 function App() {
   return (

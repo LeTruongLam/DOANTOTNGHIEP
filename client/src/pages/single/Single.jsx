@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
-
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -74,6 +73,11 @@ const Single = () => {
   };
   const handleEdit = async () => {
     navigate(`/write?edit=${courseId}`, { state: course });
+  };
+  const handleToVideo = async (ChapterId) => {
+    navigate(`/course/${courseId}/video/${ChapterId}`, {
+      state: { chapterData: chapterData, chapterId: ChapterId },
+    });
   };
 
   const getText = (html) => {
@@ -227,7 +231,7 @@ const Single = () => {
                       </ListItemIcon>
                       <ListItemText primary="Bài tập cuối chương" />
                     </ListItemButton>
-                    <ListItemButton>
+                    <ListItemButton onClick={() => handleToVideo(item.ChapterId)}>
                       <ListItemIcon>
                         <OndemandVideoIcon />
                       </ListItemIcon>
