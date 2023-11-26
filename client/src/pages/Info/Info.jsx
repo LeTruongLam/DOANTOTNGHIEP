@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./Info.scss"; // Import file CSS tùy chỉnh
-
 const formatDate = (dateString) => {
   const options = { day: "numeric", month: "numeric", year: "numeric" };
   return new Date(dateString).toLocaleDateString("vi-VN", options);
@@ -44,43 +43,8 @@ const Info = () => {
       console.log(err);
     }
   };
+  
 
-
-
-  const [selectedVideo, setSelectedVideo] = useState(null);
-  const [previewVideo, setPreviewVideo] = useState(null);
-
-  const handleVideoChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedVideo(file);
-    setPreviewVideo(URL.createObjectURL(file));
-  };
-
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-
-    if (selectedVideo) {
-      const formData = new FormData();
-      formData.append("video", selectedVideo);
-
-      axios
-        .post("/users/uploadVideo", formData)
-        .then((response) => {
-          const data = response.data;
-          if (data.success) {
-            // Upload successful
-            const videoURL = data.data.url;
-            alert("Video URL:", videoURL);
-          } else {
-            // Upload failed
-            console.log("Error:", data.message);
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-  };
 
 
   return (
@@ -149,24 +113,7 @@ const Info = () => {
           </div>
         </div>
       </div>
-      <div>
-        <h1>Video Upload</h1>
-        <form onSubmit={handleFormSubmit}>
-          <input
-            type="file"
-            onChange={handleVideoChange}
-            accept="video/*"
-            required
-          />
-          <button type="submit">Upload</button>
-        </form>
-        {previewVideo && (
-          <video controls width="640" height="480">
-            <source src={previewVideo} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        )}
-      </div>
+
     </div>
   );
 };

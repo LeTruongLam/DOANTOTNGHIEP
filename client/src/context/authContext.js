@@ -20,19 +20,26 @@ export const AuthContexProvider = ({ children }) => {
     localStorage.setItem("expirationTime", expirationTime);
   };
   const fetchChapter = async (CourseId) => {
-      try {
-        const reschapter = await axios.get(
-          `/courses/${CourseId}/chapters`
-        );
-    // console.log(reschapter.data)
+    try {
+      const reschapter = await axios.get(`/courses/${CourseId}/chapters`);
+      // console.log(reschapter.data)
 
-        return reschapter.data
-      } catch (err) {
-        console.log(err);
-      }
+      return reschapter.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const fetchLesson = async (ChapterId) => {
+    try {
+      const reschapter = await axios.get(
+        `/courses/chapters/${ChapterId}/lessons`
+      );
+      return reschapter.data;
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  
   const logout = async () => {
     await axios.post("/auth/logout");
     setCurrentUser(null);
@@ -53,7 +60,9 @@ export const AuthContexProvider = ({ children }) => {
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, fetchChapter }}>
+    <AuthContext.Provider
+      value={{ currentUser, login, logout, fetchChapter, fetchLesson }}
+    >
       {children}
     </AuthContext.Provider>
   );

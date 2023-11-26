@@ -121,7 +121,7 @@ export const updateCourse = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const courseId = req.params.id;
-    console.log(req.body)
+    console.log(req.body);
     const q =
       "UPDATE courses SET `title`=?, `desc`=?, `img`=?, `cat`=?, `date`=? , `StartDate`=?, `EndDate`=? WHERE `courseId` = ? ";
 
@@ -144,6 +144,81 @@ export const updateCourse = (req, res) => {
     db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);
       return res.json("Post has been updated.");
+    });
+  });
+};
+
+export const updateCourseTitle = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.id;
+
+    const q = "UPDATE courses SET `title`=? WHERE `courseId` = ? ";
+    const values = [req.body.title, courseId];
+
+    // Check user role and course update permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json("Course title has been updated.");
+    });
+  });
+};
+
+export const updateCourseDesc = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.id;
+
+    const q = "UPDATE courses SET `desc`=? WHERE `courseId` = ? ";
+    const values = [req.body.desc, courseId];
+
+    // Check user role and course update permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json("Course title has been updated.");
+    });
+  });
+};
+
+
+
+export const updateCourseDate = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.id;
+  
+    const q =
+      "UPDATE courses SET `StartDate`=? ,`EndDate` = ?  WHERE `courseId` = ? ";
+    const values = [req.body.StartDate, req.body.EndDate, courseId];
+
+    // Check user role and course update permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json("Course title has been updated.");
     });
   });
 };

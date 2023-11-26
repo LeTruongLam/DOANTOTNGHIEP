@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import routeUpload from "./routes/routeUpload.js";
 import moment from "moment";
-
+import {db} from "./db.js"
 const app = express();
 
 app.use(express.json());
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post("/api/upload", upload.single("file"), function (req, res) {
+app.post("/api/upload/:chapterId", upload.single("file"), function (req, res) {
   try {
     const file = req.file;
     if (!file) {
@@ -34,12 +34,58 @@ app.post("/api/upload", upload.single("file"), function (req, res) {
 
     // Truy cập thuộc tính filename
     const filename = file.filename;
+    const chapterId = req.params.chapterId;
 
-    res.status(200).json(filename);
+    // Lưu tên tệp vào cơ sở dữ liệu
+    db.query(
+      "UPDATE chapters SET ChapterDocument = ? WHERE ChapterId = ?",
+      [filename, chapterId],
+      (err, data) => {
+        if (err) {
+          // Xử lý lỗi truy vấn cơ sở dữ liệu
+          console.error(err);
+          res.status(500).json({ error: "Failed to save file to database" });
+          return;
+        }
+
+        // Trả về tên tệp đã lưu thành công
+        res.status(200).json({ filename });
+      }
+    );
   } catch (err) {
     // Xử lý lỗi và ngoại lệ
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+app.get("/api/chapters/:chapterId/document", function (req, res) {
+  const chapterId = req.params.chapterId;
+
+  // Truy vấn cơ sở dữ liệu để lấy tên tệp ChapterDocument dựa trên chapterId
+  db.query(
+    "SELECT ChapterDocument FROM chapters WHERE ChapterId = ?",
+    [chapterId],
+    (err, results) => {
+      if (err) {
+        // Xử lý lỗi truy vấn cơ sở dữ liệu
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch ChapterDocument from database" });
+        return;
+      }
+
+      if (results.length === 0 || !results[0].ChapterDocument) {
+        // Nếu không tìm thấy tên tệp ChapterDocument trong cơ sở dữ liệu
+        res.status(404).json({ error: "ChapterDocument not found" });
+        return;
+      }
+
+      // Trả về tên tệp ChapterDocument
+      const filename = results[0].ChapterDocument;
+      console.log(filename)
+      res.status(200).json({ filename });
+    }
+  );
 });
 
 app.use("/api/auth", authRoutes);

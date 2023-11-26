@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-import ChapterFrom from "../pages/editCourse/ChapterForm";
+import ChapterFrom from "../pages/editCourse/CourseForm/ChapterForm";
 
-export default function AlertDialog({deleteEvent,fetchData, chapterId}) {
+export default function AlertDialog({ deleteEvent, fetchChapter, chapterId }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("");
@@ -16,22 +16,21 @@ export default function AlertDialog({deleteEvent,fetchData, chapterId}) {
   };
 
   const handleDelete = () => {
-   deleteEvent();
+    deleteEvent();
     handleClose();
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const handleAdd =()=>{
-    handleClickOpen()
-    setType("add")
-  }
-  const handleEdit =()=>{
-    handleClickOpen()
-    setType("edit")
-
-  }
+  const handleAdd = () => {
+    handleClickOpen();
+    setType("add");
+  };
+  const handleEdit = () => {
+    handleClickOpen();
+    setType("edit");
+  };
   const handleClickOpen = () => {
     setOpen(true);
     handleClose();
@@ -52,7 +51,13 @@ export default function AlertDialog({deleteEvent,fetchData, chapterId}) {
       </Menu>
 
       {open && (
-        <ChapterFrom isOpen={open} fetchChapter={fetchData} chapterId={chapterId} isClose={handleCloseDialog} type={type}></ChapterFrom>
+        <ChapterFrom
+          isOpen={open}
+          fetchChapter={fetchChapter}
+          chapterId={chapterId}
+          isClose={handleCloseDialog}
+          type={type}
+        ></ChapterFrom>
       )}
     </div>
   );

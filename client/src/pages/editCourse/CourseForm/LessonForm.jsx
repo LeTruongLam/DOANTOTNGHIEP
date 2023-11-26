@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import InputLabel from "@mui/material/InputLabel";
-import "./EditWrite.scss";
+import "../EditWrite.scss";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
 import FormControl from "@mui/material/FormControl";
@@ -17,7 +17,7 @@ import { useLocation } from "react-router-dom";
 
 import axios from "axios";
 
-export default function ChapterForm({
+export default function LessonForm({
   isOpen,
   isClose,
   chapterId,
@@ -30,26 +30,6 @@ export default function ChapterForm({
   const [previewVideo, setPreviewVideo] = useState(null);
 
   const location = useLocation();
-  useEffect(() => {
-    console.log(type);
-    const fetchData = async () => {
-      if (chapterId && type === "edit") {
-        try {
-          const response = await axios.get(
-            `/courses/${location.state.CourseId}/chapters/${chapterId}`
-          );
-          const chapterData = response.data;
-          setChapterTitle(chapterData.ChapterTitle);
-          setVideoUrl(chapterData.ChapterVideo);
-          setChapterDesc(chapterData.ChapterDesc);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [chapterId, location.state.CourseId]);
 
   const handleChapterTitle = (event) => {
     setChapterTitle(event.target.value);
@@ -64,7 +44,6 @@ export default function ChapterForm({
 
   const handleSubmitForm = async (event) => {
     event.preventDefault();
-
     if (location.state) {
       const courseId = location.state.CourseId;
       const formData = new FormData();
@@ -78,12 +57,13 @@ export default function ChapterForm({
           formData.append("video", videoUrl);
         }
       }
-      if (chapterId && type === "add") {
+      if (type === "add") {
         await axios
           .post("/users/uploadVideo", formData)
           .then((response) => {
             const data = response.data;
             if (data.success) {
+              alert("Thanh cong");
             } else {
               console.log("Error:", data.message);
             }
@@ -108,11 +88,10 @@ export default function ChapterForm({
             console.error("Error:", error);
           });
       }
+      fetchChapter(courseId);
     } else {
       console.log("Chưa có môn học");
     }
-    fetchChapter();
-
   };
 
   const handleClose = () => {

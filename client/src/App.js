@@ -13,16 +13,24 @@ import TheHeader from "./components/TheHeader.jsx";
 import Write from "./pages/editCourse/Write.jsx";
 import Footer from "./components/Footer";
 import Infor from "./pages/Info/Info.jsx";
-import CourseVideo from "./pages/course/CourseVideo.jsx"
+import CourseVideo from "./pages/course/CourseVideo.jsx";
 import "./style.scss";
-import { useLocation } from "react-router-dom";
-import HeaderVideo from "./pages/course/HeaderVideo.jsx"
+import HeaderVideo from "./pages/course/HeaderVideo.jsx";
+import FileViewer from "./pages/FileViewer.jsx"
 const Layout = () => {
-  const location = useLocation();
-  const isCourseChapterPage = location.pathname === "/course/:courseId/video/:chapterId";
   return (
     <>
-      {isCourseChapterPage ? <HeaderVideo /> : <TheHeader />}
+      <TheHeader />
+      <Outlet />
+      <Footer />
+    </>
+  );
+};
+
+const LayoutVideo = () => {
+  return (
+    <>
+      <HeaderVideo />
       <Outlet />
       <Footer />
     </>
@@ -37,10 +45,6 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
-      },
-      {
-        path: "/course/:courseId/video/:chapterId",
-        element: <CourseVideo />,
       },
       {
         path: "/course/:id",
@@ -66,8 +70,10 @@ const router = createBrowserRouter([
         path: "/info",
         element: <Infor />,
       },
-   
-    
+      {
+        path: "/news",
+        element: <FileViewer />,
+      },
     ],
   },
   {
@@ -94,7 +100,16 @@ const router = createBrowserRouter([
     path: "/info",
     element: <Infor />,
   },
- 
+  {
+    path: "/course/:courseId/video/:chapterId",
+    element: <LayoutVideo />,
+    children: [
+      {
+        path: "/course/:courseId/video/:chapterId",
+        element: <CourseVideo />,
+      },
+    ],
+  },
 ]);
 function App() {
   return (

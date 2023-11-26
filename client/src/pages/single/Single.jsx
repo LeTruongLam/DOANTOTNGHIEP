@@ -32,19 +32,24 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 const Single = () => {
+  const location = useLocation();
+  const courseId = location.pathname.split("/")[2];
+  const navigate = useNavigate();
+  const currentPath = location.pathname;
+
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
+  const [course, setCourse] = useState({});
 
   const nestedItems = [
-    { text: "Starred" },
-    { text: "Starred" },
-    { text: "Starred" },
-    { text: "Starred" },
+    { text: "Bài 1" },
+    { text: "Bài 2" },
+    { text: "Bài 3" },
+    { text: "Bài 4" },
   ];
-  const [course, setCourse] = useState({});
-  const location = useLocation();
-  const navigate = useNavigate();
-  const courseId = location.pathname.split("/")[2];
+
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -71,12 +76,19 @@ const Single = () => {
       console.log(err);
     }
   };
+
   const handleEdit = async () => {
     navigate(`/write?edit=${courseId}`, { state: course });
   };
+  
   const handleToVideo = async (ChapterId) => {
     navigate(`/course/${courseId}/video/${ChapterId}`, {
-      state: { chapterData: chapterData, chapterId: ChapterId },
+      state: {
+        course: course,
+        chapterData: chapterData,
+        chapterId: ChapterId,
+        currentPath: currentPath,
+      },
     });
   };
 
@@ -231,7 +243,9 @@ const Single = () => {
                       </ListItemIcon>
                       <ListItemText primary="Bài tập cuối chương" />
                     </ListItemButton>
-                    <ListItemButton onClick={() => handleToVideo(item.ChapterId)}>
+                    <ListItemButton
+                      onClick={() => handleToVideo(item.ChapterId)}
+                    >
                       <ListItemIcon>
                         <OndemandVideoIcon />
                       </ListItemIcon>

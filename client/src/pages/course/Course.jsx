@@ -15,11 +15,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import { format } from "date-fns";
 
 const Course = () => {
+  const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
+  const cat = useLocation().search;
+
+
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const cat = useLocation().search;
-  const { currentUser } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const formatDate = (date) => {
     return format(new Date(date), "dd/MM/yyyy");

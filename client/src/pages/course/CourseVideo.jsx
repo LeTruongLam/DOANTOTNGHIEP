@@ -6,25 +6,42 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SpeedDial from "@mui/material/SpeedDial";
+import axios from "axios";
 
 const CourseVideo = () => {
-  const [chapterData, setChapterData] = useState([]);
   const location = useLocation();
-  const courseId = location.pathname.split("/")[2];
-  const videoRef = useRef(null);
+  const navigate = useNavigate();
+
+  const [chapterData, setChapterData] = useState([]);
+  const [chapterById, setChapterById] = useState();
+  const [currentPath, setCurrentPath] = useState(location.state.currentPath);
   const [progress, setProgress] = useState(0);
   const [showNextChapterButton, setShowNextChapterButton] = useState(false);
 
+  const courseId = location.pathname.split("/")[2];
+  const videoRef = useRef(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `/courses/${courseId}/chapters/${location.state.chapterId}`
+      );
+      setChapterById(response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
-    // Tiến hành xử lý dữ liệu
     if (location.state) {
       setChapterData(location.state.chapterData);
     }
+    fetchData();
   }, [location.state.chapterId]);
 
   useEffect(() => {
     const video = videoRef.current;
-
     const updateProgress = () => {
       const currentTime = video.currentTime;
       const duration = video.duration;
@@ -45,11 +62,15 @@ const CourseVideo = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
-
   const handleToVideo = async (ChapterId) => {
+    console.log();
     navigate(`/course/${courseId}/video/${ChapterId}`, {
-      state: { chapterData: chapterData, chapterId: ChapterId },
+      state: {
+        chapterData: chapterData,
+        chapterId: ChapterId,
+        course: location.state.course,
+        currentPath: currentPath,
+      },
     });
   };
 
@@ -104,38 +125,28 @@ const CourseVideo = () => {
         </List>
       </div>
       <div className="container-right">
-        <video
-          className="video-player"
+        <iframe
           ref={videoRef}
-          src="https://res.cloudinary.com/ddwapzxdc/video/upload/v1699848550/CourseVideo/diweokdqqn69zgfpfzvr.mp4"
-          controls
+          src={chapterById?.ChapterVideo}
+          title="Chapter Video"
+          className="video-player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
         />
         <div className="chapter-content">
           <div className="chapter-title">
-            <h2>1. Intro to Data and Data Science Big data</h2>
+            <h2>{chapterById?.ChapterTitle}</h2>
           </div>
           <div className="chapter-desc">
-            <span>
-              Intro to Data and Data Science Big data, business intelligence,
-              business analytics, machine learning and artificial intelligence.
-              We know these buzzwords belong to the field of data science but
-              what do they all mean? Why learn it? As a candidate data
-              scientist, you must understand the ins and outs of each of these
-              areas and recognise the appropriate approach to solving a problem.
-              This ‘Intro to data and data science’ will give you a
-              comprehensive look at all these buzzwords and where they fit in
-              the realm of data science.
-            </span>
+            <span>{chapterById?.ChapterDesc}</span>
           </div>
-          <div className="progress-bar">
-            <div
-              className="progress-bar-fill"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          <p className="progress-text">{progress.toFixed(2)}%</p>
           {showNextChapterButton && (
-            <button onClick={handleNextChapter}>Chuyển đến chương tiếp theo</button>
+            <SpeedDial
+              ariaLabel="SpeedDial openIcon example"
+              onClick={handleNextChapter}
+              icon={<SkipNextIcon />}
+              sx={{ position: "fixed", bottom: 16, right: 16 }}
+            ></SpeedDial>
           )}
         </div>
       </div>

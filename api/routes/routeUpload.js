@@ -18,6 +18,11 @@ cloudinary.config({
   api_secret: 'hjuus8X3RczPHUlpy0RW46RtRFc',
   secure: true,
 });
+
+
+
+
+
 router.post("/uploadVideo", upload.single("video"), (req, res) => {
   const { chapterTitle, chapterDesc, courseId } = req.body;
   let videoUrl = "";
@@ -41,6 +46,7 @@ router.post("/uploadVideo", upload.single("video"), (req, res) => {
   }
 });
 
+
 function insertChapterData(chapterTitle, chapterDesc, videoUrl, courseId, res) {
   const query = `INSERT INTO Chapters (ChapterTitle, ChapterDesc, ChapterVideo, CourseId) VALUES (?, ?, ?, ?)`;
 
@@ -61,6 +67,11 @@ function insertChapterData(chapterTitle, chapterDesc, videoUrl, courseId, res) {
     }
   });
 }
+
+
+
+
+
 router.put("/updateChapter/:chapterId", upload.single("video"), (req, res) => {
   const chapterId = req.params.chapterId;
   const { chapterTitle, chapterDesc } = req.body;
@@ -95,5 +106,43 @@ router.put("/updateChapter/:chapterId", upload.single("video"), (req, res) => {
     }
   );
 });
+
+
+
+
+router.post("/uploadImage", upload.single("image"), (req, res) => {
+  if (req.file) {
+    cloudinary.uploader
+      .upload(req.file.path, { folder: "CourseImage" })
+      .then((result) => {
+        const imageUrl = result.url;
+        res.status(201).json({
+          success: true,
+          message: "Image uploaded!",
+          imageUrl: imageUrl,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          success: false,
+          message: "Error",
+        });
+      });
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "No image file provided",
+    });
+  }
+});
+
+
+
+
+
+
+
+
 
 export default router;
