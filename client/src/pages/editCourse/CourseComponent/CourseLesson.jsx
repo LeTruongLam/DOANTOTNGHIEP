@@ -8,16 +8,15 @@ import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
 import "../EditWrite.scss";
-import LessonForm from "../CourseForm/LessonForm";
-
-
+import LessonForm from "../CustomerLesson/LessonForm";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 export default function TheLesson({ title, subTitle, selectedChapterId }) {
   const { fetchLesson } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [lessonTitle, setLessonTitle] = useState("");
   const [openForm, setOpenForm] = useState(false);
-
+  const [selectedLessonId, setSelectedLessonId] = useState();
   const fetchLessonData = async () => {
     try {
       if (selectedChapterId) {
@@ -33,21 +32,27 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
 
   useEffect(() => {
     fetchLessonData();
-
   }, [selectedChapterId]);
 
   const lessonItems = lessons.map((lesson) => (
-    <div className="bg-sub lesson-content" key={lesson.id}>
+    <div className="bg-sub lesson-content" key={lesson.LessonId}>
       <div className="lesson-content-left">
         <DragIndicatorOutlinedIcon />
         {lesson.LessonTitle}
       </div>
-      <EditIcon
-        onClick={(e) => {
-          setOpenForm(true);
-        }}
-        fontSize="small"
-      />
+      <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <EditIcon
+          onClick={() => {
+            onShowForm(lesson.LessonId);
+          }}
+          fontSize="small"
+        />
+        <DeleteOutlineOutlinedIcon
+          onClick={() => {
+            handleDeleteClick(lesson.LessonId);
+          }}
+        />
+      </span>
     </div>
   ));
 
@@ -65,23 +70,45 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
         lessonTitle: lessonTitle,
         chapterId: selectedChapterId,
       });
+      fetchLessonData();
     } catch (error) {
       console.log(error);
     }
 
     setIsEditing(false);
   };
+  const handleDeleteClick = async (lessonId) => {
+    try {
+      await axios.delete(
+        `/courses/chapters/${selectedChapterId}/lessons/${lessonId}`
+      );
+    fetchLessonData();
+
+      alert("Xóa thành công");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onShowForm = async (lessonId) => {
+    setSelectedLessonId(lessonId);
+    setOpenForm(true);
+  };
+
   const onCloseForm = () => {
     setOpenForm(false);
   };
 
   return (
     <div className="course-title">
-      {openForm &&  (
+      {openForm && (
         <LessonForm
           isOpen={openForm}
           isClose={onCloseForm}
-          type="add"
+          selectedLessonId={selectedLessonId}
+          chapterId={selectedChapterId}
+          lessonId={selectedLessonId}
+          fetchLessonData={fetchLessonData}
         ></LessonForm>
       )}
 

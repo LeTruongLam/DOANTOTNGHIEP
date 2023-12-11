@@ -1,20 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
-
-import "./EditWrite.scss";
+import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import "./EditWrite.scss";
+
 import DropFileInput from "../../components/drop-file-input/DropFileInput";
-import CourseFile from "./CourseComponent/CourseFile";
-import AlertDialog from "../../components/AlertDialog";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ChecklistOutlinedIcon from "@mui/icons-material/ChecklistOutlined";
 import ChapterForm from "./CourseForm/ChapterForm";
@@ -22,23 +13,22 @@ import CourseTitle from "./CourseComponent/CourseTitle";
 import CourseDate from "./CourseComponent/CourseDate";
 import CourseDesc from "./CourseComponent/CourseDesc";
 import CourseChapter from "./CourseComponent/CourseChapter";
-import TheLesson from "./CourseComponent/TheLesson";
-const Write = () => {
+import CourseLesson from "./CourseComponent/CourseLesson";
+import CourseCode from "./CourseComponent/CourseCode";
+import CourseClass from "./CourseComponent/CourseClass";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+const CustomerCourse = () => {
   const { fetchChapter } = useContext(AuthContext);
-
   const location = useLocation();
+
   const [selectedChapterId, setSelectedChapterId] = useState(null);
   const [chapterData, setChapterData] = useState([]);
-  const [openIndex, setOpenIndex] = useState(null);
-
   const [openForm, setOpenForm] = useState(false);
-
   const [imageUrl, setImageUrl] = useState("");
 
   const onFileChange = (files) => {
     const formData = new FormData();
     formData.append("image", files[0]);
-
     axios
       .post("/users/uploadImage", formData)
       .then((response) => {
@@ -71,21 +61,18 @@ const Write = () => {
     }
   };
   useEffect(() => {
+    console.log(location.state);
     fetchData();
   }, []);
 
-  const handleDeleteChapter = async (chapterId) => {
-    try {
-      await axios.delete(`/courses/${chapterId}/chapters`);
-      fetchData();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleClickMenu = () => {
-    setOpenIndex(!openIndex);
-  };
+  // const handleDeleteChapter = async (chapterId) => {
+  //   try {
+  //     await axios.delete(`/courses/${chapterId}/chapters`);
+  //     fetchData();
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   return (
     <div className="write-course">
@@ -99,38 +86,14 @@ const Write = () => {
         ></ChapterForm>
       )}
       <div className="container-left">
-        <List
-          sx={{ width: "100%", maxWidth: 500, bgcolor: "background.paper" }}
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-        >
-          <ListItemButton onClick={handleClickMenu}>
-            <ListItemText primary={"Danh sách chương"} />
-            {openIndex ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <Collapse in={openIndex} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {chapterData.map((chapter, chapterIndex) => (
-                <ListItemButton key={chapterIndex} sx={{ pl: 4 }}>
-                  <ListItemText
-                    primary={`Chương ${chapterIndex + 1}: ${
-                      chapter.ChapterTitle
-                    }`}
-                  />
-                  <ListItemIcon
-                    onClick={() => handleChapterClick(chapter.ChapterId)}
-                  >
-                    <AlertDialog
-                      fetchChapter={fetchData}
-                      deleteEvent={() => handleDeleteChapter(chapter.ChapterId)}
-                      chapterId={selectedChapterId}
-                    ></AlertDialog>
-                  </ListItemIcon>
-                </ListItemButton>
-              ))}
-            </List>
-          </Collapse>
-        </List>
+        <div className="course-custom-title">
+          <div className="course-custom-icon">
+            <GroupsOutlinedIcon />
+          </div>
+          <p>Class Course</p>
+        </div>
+        <CourseClass title="Course Classes" subTitle="Add Class" />
+
       </div>
       <div className="container-right">
         <div className="course-container">
@@ -141,8 +104,9 @@ const Write = () => {
               </div>
               <p>Customer your course</p>
             </div>
-            <CourseTitle title="Course Title" subTitle="Edit title" />
-            <CourseDate title="Course Date" subTitle="Edit date" />
+            <CourseTitle title="Course Title" subTitle="Edit Title" />
+            <CourseCode title="Course Code" subTitle="Edit Code" />
+            <CourseDate title="Course Date" subTitle="Edit Date" />
             <div className="course-img">
               <DropFileInput onFileChange={onFileChange} />
             </div>
@@ -167,16 +131,14 @@ const Write = () => {
                 onShowForm={onShowForm}
                 selectChapter={handleChapterClick}
                 selectedChapterId={selectedChapterId}
-
               />
             </div>
             <div className="course-lesson">
-              <TheLesson
-                title="Lesson"
+              <CourseLesson
+                title="Course Lesson"
                 subTitle=" Add Lesson"
                 selectedChapterId={selectedChapterId}
               />
-              <CourseFile onFileChange={(files) => onFileChange(files)} />
             </div>
           </div>
         </div>
@@ -185,4 +147,4 @@ const Write = () => {
   );
 };
 
-export default Write;
+export default CustomerCourse;

@@ -1,29 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import ClassOutlinedIcon from "@mui/icons-material/ClassOutlined";
 import "../EditWrite.scss";
-
-export default function CourseTitle({ title, subTitle }) {
+export default function CourseClass({ title, subTitle }) {
   const location = useLocation();
-  const [courseTitle, setCourseTitle] = useState(
-    localStorage.getItem("courseTitle") || location.state?.title || ""
-  );
-  const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    console.log(location.state.title)
-    const storedCourseTitle = localStorage.getItem("courseTitle");
-    if (storedCourseTitle) {
-      setCourseTitle(storedCourseTitle);
-    } else {
-      setCourseTitle(location.state?.title || "");
+  const [isEditing, setIsEditing] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const [classCode, setClassCode] = useState("");
+
+  const fetchClasses = async () => {
+    try {
+      const res = await axios.get(`/classes/${location.state.CourseId}`);
+      setClasses(res.data);
+    } catch (error) {
+      console.error(error);
     }
-  }, [location.state?.title]);
+  };
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  const classItems = classes.map((classItem) => (
+    <div className="bg-sub lesson-content" key={classItem.ClassId}>
+      <div className="lesson-content-left">
+        <ClassOutlinedIcon />
+        {classItem.ClassCode}
+      </div>
+    </div>
+  ));
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -31,19 +41,18 @@ export default function CourseTitle({ title, subTitle }) {
 
   const handleCancelClick = () => {
     setIsEditing(false);
-    setCourseTitle(localStorage.getItem("courseTitle") || "");
   };
 
   const handleSaveClick = async () => {
-    const updatedTitle = courseTitle;
     try {
-      await axios.put(`/courses/title/${location.state.CourseId}`, {
-        title: updatedTitle,
+      await axios.post(`/classes/${location.state.CourseId}`, {
+        classCode: classCode,
+        teacherId: location.state.TeacherId,
       });
-      localStorage.setItem("courseTitle", updatedTitle);
     } catch (error) {
       console.log(error);
     }
+    fetchClasses();
     setIsEditing(false);
   };
 
@@ -54,7 +63,7 @@ export default function CourseTitle({ title, subTitle }) {
           <p>{title}</p>
           {!isEditing ? (
             <div onClick={handleIconClick} className="course-title-action">
-              <EditIcon fontSize="small" />
+              <AddCircleOutlineOutlinedIcon fontSize="small" />
               <span>{subTitle}</span>
             </div>
           ) : (
@@ -65,19 +74,17 @@ export default function CourseTitle({ title, subTitle }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div>{courseTitle}</div>
+            <>{classItems}</>
           ) : (
             <div className="grid">
               <TextField
-                value={courseTitle}
                 className="bg-main"
-                onChange={(e) => setCourseTitle(e.target.value)}
+                onChange={(e) => setClassCode(e.target.value)}
               />
               <Button
                 style={{
                   marginTop: "12px",
                   width: "max-content",
-                  
                 }}
                 variant="contained"
                 onClick={handleSaveClick}

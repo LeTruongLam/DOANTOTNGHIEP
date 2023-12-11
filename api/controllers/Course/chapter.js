@@ -126,7 +126,6 @@ export const insertChapterTitle = (req, res) => {
 };
 export const getChapterTitle = (req, res) => {
   const chapterId = req.params.chapterId;
-  console.log(chapterId);
   const q = `
     SELECT ChapterTitle
     FROM chapters
@@ -236,6 +235,67 @@ export const updateChapterDesc = (req, res) => {
       }
 
       return res.json("Chapter description has been updated.");
+    });
+  });
+};
+
+export const getChapterDocument = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const chapterId = req.params.chapterId;
+
+    const q = "SELECT * FROM documents WHERE ChapterId = ? ";
+    const values = [chapterId];
+
+    // Check user role and course access permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: "An unexpected error occurred." });
+
+      if (data.length === 0) {
+        return res.status(404).json({ error: "Chapter not found." });
+      }
+      const chapter = data[0];
+
+      return res.json(data);
+    });
+  });
+};
+export const deleteChapterDocument = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const chapterId = req.params.chapterId;
+    const documentId = req.params.documentId;
+
+    const q = "DELETE FROM documents WHERE ChapterId = ? AND DocumentId = ?";
+    const values = [chapterId, documentId];
+
+    // Check user role and course access permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, result) => {
+      if (err)
+        return res.status(500).json({ error: "An unexpected error occurred." });
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Chapter or document not found." });
+      }
+
+      return res.json({ message: "Document deleted successfully." });
     });
   });
 };

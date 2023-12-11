@@ -8,22 +8,22 @@ import Button from "@mui/material/Button";
 
 import "../EditWrite.scss";
 
-export default function ChapterDesc({ title, subTitle, chapterId }) {
+export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [chapterDesc, setChapterDesc] = useState("");
+  const [lessonDesc, setLessonDesc] = useState("");
 
 
   const getChapterDesc = async () => {
     try {
-      const res = await axios.get(`/courses/chapters/desc/${chapterId}`);
-      setChapterDesc(res.data.chapterDesc);
+      const res = await axios.get(`/courses/chapters/${chapterId}/lessons/desc/${lessonId}`);
+      setLessonDesc(res.data.lessonDesc);
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
     getChapterDesc();
-  }, []);
+  }, [lessonId]);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -35,8 +35,8 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`/courses/chapters/desc/${chapterId}`, {
-        chapterDesc: chapterDesc,
+      await axios.put(`/courses/chapters/${chapterId}/lessons/desc/${lessonId}`, {
+        lessonDesc: lessonDesc,
       });
     } catch (error) {
       console.log(error);
@@ -67,15 +67,15 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
           {!isEditing ? (
             <div
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(chapterDesc),
+                __html: DOMPurify.sanitize(lessonDesc),
               }}
             ></div>
           ) : (
             <ReactQuill
               className="editor bg-main"
               theme="snow"
-              value={chapterDesc}
-              onChange={setChapterDesc}
+              value={lessonDesc}
+              onChange={setLessonDesc}
             />
           )}
         </div>

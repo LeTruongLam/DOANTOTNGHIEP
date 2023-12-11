@@ -1,7 +1,9 @@
 import express from "express";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
+import studentRoutes from "./routes/students.js"
 import courseRoutes from "./routes/courses.js";
+import classRoutes from "./routes/class.js"
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import routeUpload from "./routes/routeUpload.js";
@@ -91,7 +93,9 @@ app.get("/api/chapters/:chapterId/document", function (req, res) {
 app.use("/api/auth", authRoutes);
 // app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
-app.use("/api/students", userRoutes);
+app.use("/api/infor", userRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/classes", classRoutes);
 app.use("/api/users", routeUpload);
 
 app.listen(8800, () => {

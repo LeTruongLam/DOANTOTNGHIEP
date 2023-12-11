@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -8,39 +7,37 @@ import TextField from "@mui/material/TextField";
 
 import "../EditWrite.scss";
 
-export default function CourseTitle({ title, subTitle }) {
-  const location = useLocation();
-  const [courseTitle, setCourseTitle] = useState(
-    localStorage.getItem("courseTitle") || location.state?.title || ""
-  );
+export default function LessonTitle({ title, subTitle, chapterId, lessonId, fetchLessonData }) {
+  const [chapterTitle, setChapterTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const getChapterTitle = async () => {
+    try {
+      const res = await axios.get(
+        `/courses/chapters/${chapterId}/lessons/title/${lessonId}`
+      );
+      setChapterTitle(res.data.lessonTitle);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    console.log(location.state.title)
-    const storedCourseTitle = localStorage.getItem("courseTitle");
-    if (storedCourseTitle) {
-      setCourseTitle(storedCourseTitle);
-    } else {
-      setCourseTitle(location.state?.title || "");
-    }
-  }, [location.state?.title]);
-
+    getChapterTitle();
+  }, [lessonId]);
   const handleIconClick = () => {
     setIsEditing(!isEditing);
   };
 
   const handleCancelClick = () => {
     setIsEditing(false);
-    setCourseTitle(localStorage.getItem("courseTitle") || "");
   };
 
   const handleSaveClick = async () => {
-    const updatedTitle = courseTitle;
     try {
-      await axios.put(`/courses/title/${location.state.CourseId}`, {
-        title: updatedTitle,
+      await axios.put( `/courses/chapters/${chapterId}/lessons/title/${lessonId}`, {
+        lessonTitle: chapterTitle,
       });
-      localStorage.setItem("courseTitle", updatedTitle);
+      fetchLessonData()
     } catch (error) {
       console.log(error);
     }
@@ -65,19 +62,18 @@ export default function CourseTitle({ title, subTitle }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div>{courseTitle}</div>
+            <div>{chapterTitle}</div>
           ) : (
             <div className="grid">
               <TextField
-                value={courseTitle}
+                value={chapterTitle}
                 className="bg-main"
-                onChange={(e) => setCourseTitle(e.target.value)}
+                onChange={(e) => setChapterTitle(e.target.value)}
               />
               <Button
                 style={{
                   marginTop: "12px",
                   width: "max-content",
-                  
                 }}
                 variant="contained"
                 onClick={handleSaveClick}

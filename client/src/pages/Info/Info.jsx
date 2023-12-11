@@ -15,7 +15,7 @@ const Info = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`/students${cat}`);
+        const res = await axios.get(`/infor${cat}`);
         setInfo(res.data);
         console.log(res.data);
       } catch (err) {

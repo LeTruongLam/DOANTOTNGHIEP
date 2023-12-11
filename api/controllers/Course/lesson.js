@@ -16,30 +16,28 @@ export const authorize = (req, res, next) => {
     return res.status(403).json("Token is not valid!");
   }
 };
+export const getLesson = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
 
-// export const getLesson = (req, res) => {
-//   const lessonId = req.body.lessonId;
-//   const q = `
-//   SELECT *
-//   FROM lessons
-//   JOIN chapters ON lessons.ChapterId = chapters.ChapterId
-//   WHERE LessonId = ?;
-//   `;
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+    const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
+    const lessonId = req.params.lessonId;
+    const q = `
+      SELECT lessons.*
+      FROM lessons
+      JOIN chapters ON lessons.ChapterId = chapters.ChapterId
+      WHERE lessons.ChapterId = ? AND lessons.LessonId = ?`;
 
-//   db.query(q, [lessonId], (err, data) => {
-//     if (err) {
-//       console.error(err);
-//       return res.status(500).json({ error: "An unexpected error occurred." });
-//     }
+    db.query(q, [chapterId, lessonId], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json(data);
+    });
+  });
+};
 
-//     if (data.length === 0) {
-//       return res.status(404).json({ error: "Chapter not found." });
-//     }
-//     const chapter = data[0];
 
-//     return res.status(200).json(chapter);
-//   });
-// };
 
 export const getLessons = (req, res) => {
   const token = req.cookies.access_token;
@@ -62,24 +60,21 @@ export const getLessons = (req, res) => {
   });
 };
 
-// export const addLesson = (req, res) => {
-//   const { chapterTitle, chapterDesc, chapterVideo, chapterPosition, courseId } =
-//     req.body;
+export const deleteLesson = (req, res) => {
+  const chapterId = req.params.chapterId;
+  const lessonId = req.params.lessonId;
+  const q = `
+      DELETE FROM lessons
+      WHERE ChapterId = ? AND LessonId = ?
+    `;
 
-//   const q = `
-//       INSERT INTO chapters (ChapterTitle, ChapterDesc, ChapterVideo, ChapterPosition, CourseId)
-//       VALUES (?, ?, ?, ?, ?)
-//     `;
+  db.query(q, [chapterId, lessonId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    console.log("Lesson deleted successfully");
+    return res.status(200).json({ message: "Lesson deleted successfully" });
+  });
+};
 
-//   db.query(
-//     q,
-//     [chapterTitle, chapterDesc, chapterVideo, chapterPosition, courseId],
-//     (err, result) => {
-//       if (err) return res.status(500).json(err);
-//       return res.status(201).json({ message: "Chapter added successfully" });
-//     }
-//   );
-// };
 export const addLessonTitle = (req, res) => {
   const lessonTitle = req.body.lessonTitle;
   const chapterId = req.body.chapterId;
@@ -95,31 +90,158 @@ export const addLessonTitle = (req, res) => {
   });
 };
 
-export const editLesson = (req, res) => {
-  const { chapterTitle, chapterId } = req.body;
-  const courseId = req.params.id;
-  const query = `
-    UPDATE chapters
-    SET ChapterTitle = ?, CourseId = ?
-    WHERE ChapterId = ?
-  `;
-
-  db.query(query, [chapterTitle, courseId, chapterId], (err, result) => {
+export const getLessonTitle = (req, res) => {
+  const lessonId = req.params.lessonId;
+  const chapterId = req.params.chapterId;
+  const q =
+    "SELECT LessonTitle FROM lessons WHERE LessonId = ? AND ChapterId = ?";
+  db.query(q, [lessonId, chapterId], (err, result) => {
     if (err) return res.status(500).json(err);
-    return res.status(200).json({ message: "Cập nhật chương thành công" });
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+
+    const lesson = result[0];
+    return res.status(200).json({ lessonTitle: lesson.LessonTitle });
+  });
+};
+export const updateLessonTitle = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+    const chapterId = req.params.chapterId;
+    const lessonId = req.params.lessonId;
+    const lessonTitle = req.body.lessonTitle;
+    const q =
+      "UPDATE lessons SET LessonTitle = ? WHERE ChapterId = ? AND LessonId = ?";
+    const values = [lessonTitle, chapterId, lessonId];
+
+    // Check user role and chapter update permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+    db.query(q, values, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: "An unexpected error occurred." });
+
+      if (data.affectedRows === 0) {
+        return res.status(404).json({ error: "Chapter not found." });
+      }
+      return res.json({ message: "Lesson title has been updated." });
+    });
   });
 };
 
-export const deleteLesson = (req, res) => {
+export const getLessonVideo = (req, res) => {
+  const lessonId = req.params.lessonId;
   const chapterId = req.params.chapterId;
-  const q = `
-      DELETE FROM chapters
-      WHERE ChapterId = ?
-    `;
-
-  db.query(q, [chapterId], (err, result) => {
+  const q =
+    "SELECT LessonVideo FROM lessons WHERE LessonId = ? AND ChapterId = ?";
+  db.query(q, [lessonId, chapterId], (err, result) => {
     if (err) return res.status(500).json(err);
-    console.log("Chapter deleted successfully");
-    return res.status(200).json({ message: "Chapter deleted successfully" });
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+
+    const lesson = result[0];
+    return res.status(200).json({ lessonVideo: lesson.LessonVideo });
+  });
+};
+
+export const updateLessonVideo = (
+  lessonVideo,
+  chapterId,
+  lessonId,
+  req,
+  res
+) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const q =
+      "UPDATE lessons SET LessonVideo = ? WHERE ChapterId = ? AND LessonId = ?";
+    const values = [lessonVideo, chapterId, lessonId];
+
+    // Check user role and chapter update permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+    db.query(q, values, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: "An unexpected error occurred." });
+
+      if (data.affectedRows === 0) {
+        return res.status(404).json({ error: "Lesson not found." });
+      }
+      return res.json({ message: "Lesson video has been updated." });
+    });
+  });
+};
+export const getLessonDesc = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const lessonId = req.params.lessonId;
+    const chapterId = req.params.chapterId;
+
+    const q =
+      "SELECT LessonDesc FROM lessons WHERE  LessonId = ? AND ChapterId = ? ";
+    const values = [lessonId, chapterId];
+
+    // Check user role and course access permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: "An unexpected error occurred." });
+
+      if (data.length === 0) {
+        return res.status(404).json({ error: "Chapter not found." });
+      }
+      const lesson = data[0];
+      const lessonDesc = lesson.LessonDesc;
+
+      return res.json({ lessonDesc });
+    });
+  });
+};
+export const updateLessonDesc = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const lessonId = req.params.lessonId;
+    const chapterId = req.params.chapterId;
+    const lessonDesc = req.body.lessonDesc;
+
+    const q =
+      "UPDATE lessons SET LessonDesc = ? WHERE LessonId = ? AND ChapterId = ?";
+    const values = [lessonDesc, lessonId, chapterId];
+
+    // Check user role and chapter update permission
+    if (userInfo.role !== "admin") {
+      return res.status(403).json("Unauthorized!");
+    }
+
+    db.query(q, values, (err, data) => {
+      if (err)
+        return res.status(500).json({ error: "An unexpected error occurred." });
+
+      if (data.affectedRows === 0) {
+        return res.status(404).json({ error: "Lesson not found." });
+      }
+
+      return res.json("Lesson description has been updated.");
+    });
   });
 };

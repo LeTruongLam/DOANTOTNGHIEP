@@ -10,24 +10,25 @@ import Home from "./pages/home/Home.jsx";
 import Course from "./pages/course/Course.jsx";
 import Single from "./pages/single/Single.jsx";
 import TheHeader from "./components/TheHeader.jsx";
-import Write from "./pages/editCourse/Write.jsx";
+import CustomerCourse from "./pages/editCourse/CustomerCourse.jsx";
 import Footer from "./components/Footer";
 import Infor from "./pages/Info/Info.jsx";
 import CourseVideo from "./pages/course/CourseVideo.jsx";
 import "./style.scss";
 import HeaderVideo from "./pages/course/HeaderVideo.jsx";
-import FileViewer from "./pages/FileViewer.jsx"
+import FileViewer from "./pages/FileViewer.jsx";
+import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
 const Layout = () => {
   return (
     <>
       <TheHeader />
       <Outlet />
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };
 
-const LayoutVideo = () => {
+const LayoutViewer = () => {
   return (
     <>
       <HeaderVideo />
@@ -64,7 +65,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/write",
-        element: <Write />,
+        element: <CustomerCourse />,
       },
       {
         path: "/info",
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
       {
         path: "/news",
         element: <FileViewer />,
+      },
+      {
+        path: "/course/:courseId/file/:chapterId",
+        element: <CourseFileViewer />,
       },
     ],
   },
@@ -101,11 +106,11 @@ const router = createBrowserRouter([
     element: <Infor />,
   },
   {
-    path: "/course/:courseId/video/:chapterId",
-    element: <LayoutVideo />,
+    path: "/course/:courseId/chapter/:chapterId/lesson/:lessonId/video",
+    element: <LayoutViewer />,
     children: [
       {
-        path: "/course/:courseId/video/:chapterId",
+        path: "/course/:courseId/chapter/:chapterId/lesson/:lessonId/video",
         element: <CourseVideo />,
       },
     ],

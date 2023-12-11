@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
@@ -23,16 +24,17 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import ListItem from "@mui/material/ListItem";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-
 import Button from "@mui/material/Button";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-
+import ClassList from "./ClassList"
 const Single = () => {
+  const { fetchLesson, currentUser } = useContext(AuthContext);
   const location = useLocation();
+
   const courseId = location.pathname.split("/")[2];
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -40,25 +42,13 @@ const Single = () => {
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
   const [course, setCourse] = useState({});
-
-  const nestedItems = [
-    { text: "Bài 1" },
-    { text: "Bài 2" },
-    { text: "Bài 3" },
-    { text: "Bài 4" },
-  ];
-
-
+  const [lessons, setLessons] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`/courses/${courseId}`);
         setCourse(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-      try {
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
       } catch (err) {
@@ -80,12 +70,22 @@ const Single = () => {
   const handleEdit = async () => {
     navigate(`/write?edit=${courseId}`, { state: course });
   };
-  
-  const handleToVideo = async (ChapterId) => {
-    navigate(`/course/${courseId}/video/${ChapterId}`, {
+
+  const handleToVideo = async (chapterId, lessonId) => {
+    navigate(
+      `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/video`,
+      {
+        state: {
+          chapterId: chapterId,
+          lessonId: lessonId,
+          currentPath: currentPath,
+        },
+      }
+    );
+  };
+  const handleToFile = async (ChapterId) => {
+    navigate(`/course/${courseId}/file/${ChapterId}`, {
       state: {
-        course: course,
-        chapterData: chapterData,
         chapterId: ChapterId,
         currentPath: currentPath,
       },
@@ -97,8 +97,14 @@ const Single = () => {
     return doc.body.textContent;
   };
 
-  const handleClick = (index, item) => {
-    console.log(item.ChapterId);
+  const handleClick = async (index, item) => {
+    fetchLesson(item.ChapterId);
+    try {
+      const res = await fetchLesson(item.ChapterId);
+      setLessons(res);
+    } catch (err) {
+      console.log(err);
+    }
     setOpenIndex((prevOpenIndex) => (prevOpenIndex === index ? null : index));
   };
   function CustomTabPanel(props) {
@@ -162,9 +168,9 @@ const Single = () => {
             <h3>Giảng viên </h3>
             <ListItem>
               <ListItemIcon>
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
+                <Avatar alt="Cindy Baker" />
               </ListItemIcon>
-              <ListItemText primary="Lê Trường Lam" />
+              <ListItemText primary={course.TeacherName} />
             </ListItem>
             <h3>Môn học bao gồm: </h3>
             <ListItem>
@@ -177,7 +183,7 @@ const Single = () => {
               <ListItemIcon>
                 <InsertDriveFileIcon />
               </ListItemIcon>
-              <ListItemText primary="14 chương học" />
+              <ListItemText primary={`${chapterData.length} chương học`} />
             </ListItem>
             <ListItem>
               <ListItemIcon>
@@ -202,6 +208,7 @@ const Single = () => {
               <Tab label="Mô tả" {...a11yProps(0)} />
               <Tab label="Danh sách bài học" {...a11yProps(1)} />
               <Tab label="Trao đổi" {...a11yProps(2)} />
+              <Tab label="Danh sách lớp" {...a11yProps(3)} />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -232,9 +239,18 @@ const Single = () => {
                 </ListItemButton>
                 <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
-                    {nestedItems.map((nestedItem, nestedIndex) => (
-                      <ListItemButton key={nestedIndex} sx={{ pl: 4 }}>
-                        <ListItemText primary={nestedItem.text} />
+                    {lessons.map((lesson, lessonIndex) => (
+                      <ListItemButton
+                        key={lessonIndex}
+                        sx={{ pl: 4 }}
+                        onClick={() =>
+                          handleToVideo(item.ChapterId, lesson.LessonId)
+                        }
+                      >
+                        <ListItemIcon>
+                          <OndemandVideoIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={lesson.LessonTitle} />
                       </ListItemButton>
                     ))}
                     <ListItemButton>
@@ -244,14 +260,8 @@ const Single = () => {
                       <ListItemText primary="Bài tập cuối chương" />
                     </ListItemButton>
                     <ListItemButton
-                      onClick={() => handleToVideo(item.ChapterId)}
+                      onClick={() => handleToFile(item.ChapterId)}
                     >
-                      <ListItemIcon>
-                        <OndemandVideoIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Video chương học" />
-                    </ListItemButton>
-                    <ListItemButton>
                       <ListItemIcon>
                         <DescriptionIcon />
                       </ListItemIcon>
@@ -264,6 +274,9 @@ const Single = () => {
           </CustomTabPanel>
           <CustomTabPanel value={value} index={2}>
             Đây là chức năng nhận xét
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={3}>
+            <ClassList courseId={courseId} classCodeStudent = {course?.ClassCode}/>
           </CustomTabPanel>
         </Box>
       </div>

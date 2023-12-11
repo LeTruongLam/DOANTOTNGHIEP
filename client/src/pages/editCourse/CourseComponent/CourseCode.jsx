@@ -8,22 +8,15 @@ import TextField from "@mui/material/TextField";
 
 import "../EditWrite.scss";
 
-export default function CourseTitle({ title, subTitle }) {
+export default function CourseCode({ title, subTitle }) {
   const location = useLocation();
-  const [courseTitle, setCourseTitle] = useState(
-    localStorage.getItem("courseTitle") || location.state?.title || ""
-  );
+  const [courseCode, setCourseCode] = useState(location.state.CourseCode);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    console.log(location.state.title)
-    const storedCourseTitle = localStorage.getItem("courseTitle");
-    if (storedCourseTitle) {
-      setCourseTitle(storedCourseTitle);
-    } else {
-      setCourseTitle(location.state?.title || "");
-    }
-  }, [location.state?.title]);
+    console.log(location.state.CourseCode);
+   
+  }, [location.state?.CourseCode]);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -31,16 +24,14 @@ export default function CourseTitle({ title, subTitle }) {
 
   const handleCancelClick = () => {
     setIsEditing(false);
-    setCourseTitle(localStorage.getItem("courseTitle") || "");
   };
 
   const handleSaveClick = async () => {
-    const updatedTitle = courseTitle;
+    const updatedCode = courseCode;
     try {
-      await axios.put(`/courses/title/${location.state.CourseId}`, {
-        title: updatedTitle,
+      await axios.put(`/courses/code/${location.state.CourseId}`, {
+        courseCode: updatedCode,
       });
-      localStorage.setItem("courseTitle", updatedTitle);
     } catch (error) {
       console.log(error);
     }
@@ -65,19 +56,18 @@ export default function CourseTitle({ title, subTitle }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div>{courseTitle}</div>
+            <div>{courseCode}</div>
           ) : (
             <div className="grid">
               <TextField
-                value={courseTitle}
+                value={courseCode}
                 className="bg-main"
-                onChange={(e) => setCourseTitle(e.target.value)}
+                onChange={(e) => setCourseCode(e.target.value)}
               />
               <Button
                 style={{
                   marginTop: "12px",
                   width: "max-content",
-                  
                 }}
                 variant="contained"
                 onClick={handleSaveClick}

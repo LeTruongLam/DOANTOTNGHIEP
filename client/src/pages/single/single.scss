@@ -37,3 +37,44 @@
     margin: 0 40px 40px 40px;
 
 }
+
+.class-container {
+    border: 1px solid #dfe3e6;
+    border-radius: 16px;
+
+    margin-left: 8px;
+    margin-right: -8px;
+
+
+}
+
+.class-wrapper {
+    height: 100%;
+    margin: 20px;
+}
+
+.class-wrapper .class-title {
+    font-weight: bold;
+    border-bottom: 1px solid #dfe3e6;
+    padding-bottom: 16px;
+
+}
+
+.class-wrapper .student-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dfe3e6;
+
+
+}
+
+.student-info p {
+    margin: 0;
+}
+.class-header{
+    display: flex;
+    justify-content: space-between;
+}

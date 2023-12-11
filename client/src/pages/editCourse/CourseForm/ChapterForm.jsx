@@ -8,31 +8,26 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useLocation } from "react-router-dom";
 import ChapterTitle from "./ChapterTitle";
 import axios from "axios";
-import CourseFile from "../CourseComponent/CourseFile";
+import ChapterFile from "../CourseForm/ChapterFile";
 import ChapterDesc from "../CourseForm/ChapterDesc";
 export default function ChapterForm({
   isOpen,
   isClose,
   chapterId,
   type,
-  fetchChapter,
 }) {
-  const [chapterTitle, setChapterTitle] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [chapterDesc, setChapterDesc] = useState("");
+
 
   const location = useLocation();
   useEffect(() => {
     const fetchData = async () => {
-      if (chapterId && type === "edit") {
+      if (chapterId) {
         try {
           const response = await axios.get(
             `/courses/${location.state.CourseId}/chapters/${chapterId}`
           );
           const chapterData = response.data;
-          setChapterTitle(chapterData.ChapterTitle);
-          setVideoUrl(chapterData.ChapterVideo);
-          setChapterDesc(chapterData.ChapterDesc);
+
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -47,7 +42,7 @@ export default function ChapterForm({
   return (
     <div>
       <Dialog fullWidth sx={{ m: 1 }} open={isOpen} onClose={handleClose}>
-        <div className="form-wrapper">
+        <div className="form-wrapper scroll">
           <DialogTitle
             style={{ display: "flex", alignItems: "center", padding: 0 }}
           >
@@ -59,14 +54,13 @@ export default function ChapterForm({
           <ChapterTitle
             title="Chapter Title"
             subTitle="Edit Title"
-            chapterId = {chapterId}
+            chapterId={chapterId}
           />
-          <CourseFile />
+          <ChapterFile chapterId={chapterId} />
           <ChapterDesc
             title="Chapter Description"
             subTitle="Edit Description"
-            chapterId = {chapterId}
-
+            chapterId={chapterId}
           />
         </div>
       </Dialog>

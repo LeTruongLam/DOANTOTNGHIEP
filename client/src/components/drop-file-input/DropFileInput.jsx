@@ -4,9 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import "./drop-file-input.css";
 import EditIcon from "@mui/icons-material/Edit";
-import { ImageConfig } from "../../config/ImageConfig";
 import uploadImg from "../../img/cloud-upload-regular-240.png";
-import Typography from "@mui/material/Typography";
 const DropFileInput = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const wrapperRef = useRef(null);
@@ -33,12 +31,6 @@ const DropFileInput = (props) => {
     }
   };
 
-  //   const fileRemove = (file) => {
-  //     const updatedList = [...fileList];
-  //     updatedList.splice(fileList.indexOf(file), 1);
-  //     setFileList(updatedList);
-  //     props.onFileChange(updatedList);
-  //   };
 
   return (
     <div className="course-image">

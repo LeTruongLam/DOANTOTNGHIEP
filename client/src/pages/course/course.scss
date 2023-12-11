@@ -189,3 +189,19 @@
      border-radius: 8px;
      border: 1px solid #dfe3e6;
  }
+
+ .course-file-viewer {
+     height: calc(100% - 60px);
+     display: flex;
+     gap: 20px
+ }
+
+ .list-file {
+     flex: 2;
+     border-right: 1px solid #dfe3e6;
+ }
+
+ .file-container {
+     flex: 8;
+ }
+ 
