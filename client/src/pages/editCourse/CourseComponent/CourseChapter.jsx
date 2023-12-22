@@ -115,6 +115,7 @@ export default function CourseChapter({
                 onChange={(e) => setChapterTitle(e.target.value)}
               />
               <Button
+                sx={{ color: "white", backgroundColor: "black" }}
                 style={{
                   marginTop: "12px",
                   width: "max-content",

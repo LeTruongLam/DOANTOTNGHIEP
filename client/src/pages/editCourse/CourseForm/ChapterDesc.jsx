@@ -81,6 +81,8 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
         </div>
         {isEditing && (
           <Button
+          sx={{ color: "white", backgroundColor: "black" }}
+
             style={{ marginTop: "12px" }}
             variant="contained"
             onClick={handleSaveClick}

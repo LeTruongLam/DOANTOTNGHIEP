@@ -30,7 +30,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import ClassList from "./ClassList"
+import ClassList from "./ClassList";
 const Single = () => {
   const { fetchLesson, currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -91,7 +91,14 @@ const Single = () => {
       },
     });
   };
-
+  const handleToAssignment = async (chapterId) => {
+    navigate(`/course/${courseId}/chapters/${chapterId}/assignment`, {
+      state: {
+        chapterId: chapterId,
+        currentPath: currentPath,
+      },
+    });
+  };
   const getText = (html) => {
     const doc = new DOMParser().parseFromString(html, "text/html");
     return doc.body.textContent;
@@ -253,7 +260,9 @@ const Single = () => {
                         <ListItemText primary={lesson.LessonTitle} />
                       </ListItemButton>
                     ))}
-                    <ListItemButton>
+                    <ListItemButton
+                      onClick={() => handleToAssignment(item.ChapterId)}
+                    >
                       <ListItemIcon>
                         <AssignmentIcon />
                       </ListItemIcon>
@@ -276,7 +285,10 @@ const Single = () => {
             Đây là chức năng nhận xét
           </CustomTabPanel>
           <CustomTabPanel value={value} index={3}>
-            <ClassList courseId={courseId} classCodeStudent = {course?.ClassCode}/>
+            <ClassList
+              courseId={courseId}
+              classCodeStudent={course?.ClassCode}
+            />
           </CustomTabPanel>
         </Box>
       </div>

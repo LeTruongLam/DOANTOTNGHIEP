@@ -123,6 +123,7 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
                   />
                   <label htmlFor="chapter-file">
                     <Button
+                      sx={{ color: "white", backgroundColor: "black" }}
                       variant="contained"
                       component="span"
                       startIcon={<CloudUploadIcon />}
@@ -154,6 +155,7 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
               </div>
 
               <Button
+                sx={{ color: "white", backgroundColor: "black" }}
                 style={{
                   marginTop: "12px",
                   width: "max-content",

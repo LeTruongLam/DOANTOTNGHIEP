@@ -7,29 +7,29 @@ import TextField from "@mui/material/TextField";
 
 import "../EditWrite.scss";
 
-export default function LessonTitle({
+export default function AssignmentTitle({
   title,
   subTitle,
   chapterId,
-  lessonId,
-  fetchLessonData,
+  assignmentId,
+  fetchAssignmentData,
 }) {
-  const [lessonTitle, setLessonTitle] = useState("");
+  const [assignmentTitle, setAssignmentTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const getChapterTitle = async () => {
+  const getAssignmentTitle = async () => {
     try {
       const res = await axios.get(
-        `/courses/chapters/${chapterId}/lessons/title/${lessonId}`
+        `/courses/chapters/${chapterId}/assignments/title/${assignmentId}`
       );
-      setLessonTitle(res.data.lessonTitle);
+      setAssignmentTitle(res.data.assignmentTitle);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    getChapterTitle();
-  }, [lessonId]);
+    getAssignmentTitle();
+  }, [assignmentId]);
   const handleIconClick = () => {
     setIsEditing(!isEditing);
   };
@@ -41,12 +41,12 @@ export default function LessonTitle({
   const handleSaveClick = async () => {
     try {
       await axios.put(
-        `/courses/chapters/${chapterId}/lessons/title/${lessonId}`,
+        `/courses/chapters/${chapterId}/assignments/title/${assignmentId}`,
         {
-          lessonTitle: lessonTitle,
+          assignmentTitle: assignmentTitle,
         }
       );
-      fetchLessonData();
+      fetchAssignmentData();
     } catch (error) {
       console.log(error);
     }
@@ -71,13 +71,13 @@ export default function LessonTitle({
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div>{lessonTitle}</div>
+            <div>{assignmentTitle}</div>
           ) : (
             <div className="grid">
               <TextField
-                value={lessonTitle}
+                value={assignmentTitle}
                 className="bg-main"
-                onChange={(e) => setLessonTitle(e.target.value)}
+                onChange={(e) => setAssignmentTitle(e.target.value)}
               />
               <Button
                 sx={{ color: "white", backgroundColor: "black" }}

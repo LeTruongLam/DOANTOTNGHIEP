@@ -90,7 +90,6 @@ export const getCourseById = (req, res) => {
      `;
     }
     db.query(q, [userId, req.params.id], (err, data) => {
-      console.log(data);
 
       if (err) return res.status(500).json(err);
       return res.status(200).json(data[0]);
@@ -292,7 +291,7 @@ export const updateCourseDate = (req, res) => {
 
     db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);
-      return res.json("Course title has been updated.");
+      return res.json("Course date has been updated.");
     });
   });
 };

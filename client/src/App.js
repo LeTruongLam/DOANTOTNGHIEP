@@ -18,6 +18,8 @@ import "./style.scss";
 import HeaderVideo from "./pages/course/HeaderVideo.jsx";
 import FileViewer from "./pages/FileViewer.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
+import CourseAssignment from "./pages/course/CourseAssignment.jsx";
+
 const Layout = () => {
   return (
     <>
@@ -78,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: "/course/:courseId/file/:chapterId",
         element: <CourseFileViewer />,
+      },
+      {
+        path: "/course/:courseId/chapters/:chapterId/assignment",
+        element: <CourseAssignment />,
       },
     ],
   },

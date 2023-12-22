@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import DOMPurify from "dompurify";
@@ -9,22 +8,28 @@ import Button from "@mui/material/Button";
 
 import "../EditWrite.scss";
 
-export default function CourseDesc({ title, subTitle }) {
-  const location = useLocation();
-  const storedCourseDesc = localStorage.getItem("courseDesc");
-  const [courseDesc, setCourseDesc] = useState(
-    storedCourseDesc || location.state?.desc || ""
-  );
+export default function ChapterDesc({
+  title,
+  subTitle,
+  chapterId,
+  assignmentId,
+}) {
   const [isEditing, setIsEditing] = useState(false);
+  const [assignmentDesc, setAssignmentDesc] = useState("");
 
-  useEffect(() => {
-    const storedCourseDesc = localStorage.getItem("courseDesc");
-    if (storedCourseDesc) {
-      setCourseDesc(storedCourseDesc);
-    } else {
-      setCourseDesc(location.state?.desc || "");
+  const getChapterDesc = async () => {
+    try {
+      const res = await axios.get(
+        `/courses/chapters/${chapterId}/assignments/desc/${assignmentId}`
+      );
+      setAssignmentDesc(res.data.assignmentDesc);
+    } catch (error) {
+      console.error(error);
     }
-  }, [location.state?.desc]);
+  };
+  useEffect(() => {
+    getChapterDesc();
+  }, [assignmentId]);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -36,10 +41,12 @@ export default function CourseDesc({ title, subTitle }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`/courses/desc/${location.state.CourseId}`, {
-        desc: courseDesc,
-      });
-      localStorage.setItem("courseDesc", courseDesc);
+      await axios.put(
+        `/courses/chapters/${chapterId}/assignments/desc/${assignmentId}`,
+        {
+          assignmentDesc: assignmentDesc,
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -69,15 +76,15 @@ export default function CourseDesc({ title, subTitle }) {
           {!isEditing ? (
             <div
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(courseDesc),
+                __html: DOMPurify.sanitize(assignmentDesc),
               }}
             ></div>
           ) : (
             <ReactQuill
               className="editor bg-main"
               theme="snow"
-              value={courseDesc}
-              onChange={setCourseDesc}
+              value={assignmentDesc}
+              onChange={setAssignmentDesc}
             />
           )}
         </div>

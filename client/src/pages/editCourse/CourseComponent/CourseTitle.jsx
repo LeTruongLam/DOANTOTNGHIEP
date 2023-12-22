@@ -74,6 +74,8 @@ export default function CourseTitle({ title, subTitle }) {
                 onChange={(e) => setCourseTitle(e.target.value)}
               />
               <Button
+              sx={{ color: "white", backgroundColor: "black" }}
+
                 style={{
                   marginTop: "12px",
                   width: "max-content",

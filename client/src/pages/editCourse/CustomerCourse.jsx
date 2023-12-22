@@ -12,6 +12,7 @@ import ChapterForm from "./CourseForm/ChapterForm";
 import CourseTitle from "./CourseComponent/CourseTitle";
 import CourseDate from "./CourseComponent/CourseDate";
 import CourseDesc from "./CourseComponent/CourseDesc";
+import CourseAssignment from "./CourseComponent/CourseAssignment";
 import CourseChapter from "./CourseComponent/CourseChapter";
 import CourseLesson from "./CourseComponent/CourseLesson";
 import CourseCode from "./CourseComponent/CourseCode";
@@ -93,7 +94,6 @@ const CustomerCourse = () => {
           <p>Class Course</p>
         </div>
         <CourseClass title="Course Classes" subTitle="Add Class" />
-
       </div>
       <div className="container-right">
         <div className="course-container">
@@ -140,6 +140,11 @@ const CustomerCourse = () => {
                 selectedChapterId={selectedChapterId}
               />
             </div>
+            <CourseAssignment
+              title="Chapter Assignments"
+              subTitle=" Add Assignment"
+              selectedChapterId={selectedChapterId}
+            />
           </div>
         </div>
       </div>

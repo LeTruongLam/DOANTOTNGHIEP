@@ -7,7 +7,7 @@ import TextField from "@mui/material/TextField";
 
 import "../EditWrite.scss";
 
-export default function ChapterTitle({ title, subTitle ,chapterId }) {
+export default function ChapterTitle({ title, subTitle, chapterId }) {
   const [chapterTitle, setChapterTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const getChapterTitle = async () => {
@@ -19,7 +19,7 @@ export default function ChapterTitle({ title, subTitle ,chapterId }) {
     }
   };
   useEffect(() => {
-    console.log("id: " + chapterId)
+    console.log("id: " + chapterId);
     getChapterTitle();
   }, []);
   const handleIconClick = () => {
@@ -68,6 +68,7 @@ export default function ChapterTitle({ title, subTitle ,chapterId }) {
                 onChange={(e) => setChapterTitle(e.target.value)}
               />
               <Button
+                sx={{ color: "white", backgroundColor: "black" }}
                 style={{
                   marginTop: "12px",
                   width: "max-content",

@@ -39,6 +39,16 @@ export const AuthContexProvider = ({ children }) => {
       console.log(err);
     }
   };
+  const fetchAssignment = async (ChapterId) => {
+    try {
+      const reschapter = await axios.get(
+        `/courses/chapters/${ChapterId}/assignments`
+      );
+      return reschapter.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const logout = async () => {
     await axios.post("/auth/logout");
@@ -61,7 +71,7 @@ export const AuthContexProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, login, logout, fetchChapter, fetchLesson }}
+      value={{ currentUser, login, logout, fetchChapter, fetchLesson,fetchAssignment }}
     >
       {children}
     </AuthContext.Provider>

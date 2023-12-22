@@ -5,15 +5,16 @@ import Dialog from "@mui/material/Dialog";
 import "../EditWrite.scss";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
-import LessonTitle from "./LessonTitle";
-import LessonVideo from "./LessonVideo";
-import LessonDesc from "./LessonDesc";
-export default function LessonForm({
+import AssignmentTitle from "./AssignmentTitle";
+import AssignmentDesc from "./AssignmentDesc";
+import AssignmentDate from "./AssginmentDate";
+import AssignmentFile from "./AssginmentFile";
+export default function AssginmentForm({
   isOpen,
   isClose,
   chapterId,
-  lessonId,
-  fetchLessonData,
+  assignmentId,
+  fetchAssignmentData,
 }) {
   const handleClose = () => {
     isClose();
@@ -31,29 +32,35 @@ export default function LessonForm({
           <DialogTitle
             style={{ display: "flex", alignItems: "center", padding: 0 }}
           >
-            Thông tin bài học
+            Thông tin bài tập
             <Button style={{ marginLeft: "auto", justifyContent: "flex-end" }}>
               <CloseIcon onClick={handleClose} />
             </Button>
           </DialogTitle>
-          <LessonTitle
-            title="Lesson Title"
+          <AssignmentTitle
+            title="Assignment Title"
             subTitle="Edit Title"
             chapterId={chapterId}
-            lessonId={lessonId}
-            fetchLessonData={fetchLessonData}
+            assignmentId={assignmentId}
+            fetchAssignmentData={fetchAssignmentData}
           />
-          <LessonVideo
-            title="Lesson Video"
-            subTitle="Edit  Video"
-            chapterId={chapterId}
-            lessonId={lessonId}
-          />
-          <LessonDesc
-            title="Lesson Description"
+          <AssignmentDesc
+            title="Assignment Description"
             subTitle="Edit  Description"
             chapterId={chapterId}
-            lessonId={lessonId}
+            assignmentId={assignmentId}
+          />
+          <AssignmentDate
+            title="Assignment Date"
+            subTitle="Edit  Date"
+            chapterId={chapterId}
+            assignmentId={assignmentId}
+          />
+          <AssignmentFile
+            title="Assignment Date"
+            subTitle="Edit  Date"
+            chapterId={chapterId}
+            assignmentId={assignmentId}
           />
         </div>
       </Dialog>

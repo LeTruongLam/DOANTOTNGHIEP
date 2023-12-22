@@ -8,22 +8,26 @@ import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
 import "../EditWrite.scss";
-import LessonForm from "../CustomerLesson/LessonForm";
+import AssginmentForm from "../AssignmentForm/AssginmentForm";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-export default function TheLesson({ title, subTitle, selectedChapterId }) {
-  const { fetchLesson } = useContext(AuthContext);
+export default function CourseAssignment({
+  title,
+  subTitle,
+  selectedChapterId,
+}) {
+  const { fetchAssignment } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
-  const [lessons, setLessons] = useState([]);
-  const [lessonTitle, setLessonTitle] = useState("");
+  const [assignments, setAssignments] = useState([]);
+  const [assignmentTitle, setAssignmentTitle] = useState("");
   const [openForm, setOpenForm] = useState(false);
-  const [selectedLessonId, setSelectedLessonId] = useState();
-  const fetchLessonData = async () => {
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState();
+  const fetchAssignmentData = async () => {
     try {
       if (selectedChapterId) {
-        const data = await fetchLesson(selectedChapterId);
-        setLessons(data); // Lưu kết quả vào state lessons
+        const data = await fetchAssignment(selectedChapterId);
+        setAssignments(data); // Lưu kết quả vào state lessons
       } else {
-        setLessons([]); // Đặt state lessons thành một mảng rỗng nếu selectedChapterId không có giá trị
+        setAssignments([]); // Đặt state lessons thành một mảng rỗng nếu selectedChapterId không có giá trị
       }
     } catch (error) {
       console.error(error);
@@ -31,25 +35,25 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
   };
 
   useEffect(() => {
-    fetchLessonData();
+    fetchAssignmentData();
   }, [selectedChapterId]);
 
-  const lessonItems = lessons.map((lesson) => (
-    <div className="bg-sub lesson-content" key={lesson.LessonId}>
+  const assignmentItems = assignments.map((assignment) => (
+    <div className="bg-sub lesson-content" key={assignment.AssignmentId}>
       <div className="lesson-content-left">
         <DragIndicatorOutlinedIcon />
-        {lesson.LessonTitle}
+        {assignment.AssignmentTitle}
       </div>
       <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <EditIcon
           onClick={() => {
-            onShowForm(lesson.LessonId);
+            onShowForm(assignment.AssignmentId);
           }}
           fontSize="small"
         />
         <DeleteOutlineOutlinedIcon
           onClick={() => {
-            handleDeleteClick(lesson.LessonId);
+            handleDeleteClick(assignment.AssignmentId);
           }}
         />
       </span>
@@ -66,23 +70,23 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.post(`/courses/chapters/lessons`, {
-        lessonTitle: lessonTitle,
+      await axios.post(`/courses/chapters/assignments`, {
+        assignmentTitle: assignmentTitle,
         chapterId: selectedChapterId,
       });
-      fetchLessonData();
+      fetchAssignmentData();
     } catch (error) {
       console.log(error);
     }
 
     setIsEditing(false);
   };
-  const handleDeleteClick = async (lessonId) => {
+  const handleDeleteClick = async (assignmentId) => {
     try {
       await axios.delete(
-        `/courses/chapters/${selectedChapterId}/lessons/${lessonId}`
+        `/courses/chapters/${selectedChapterId}/assignments/${assignmentId}`
       );
-      fetchLessonData();
+      fetchAssignmentData();
 
       alert("Xóa thành công");
     } catch (error) {
@@ -90,8 +94,8 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
     }
   };
 
-  const onShowForm = async (lessonId) => {
-    setSelectedLessonId(lessonId);
+  const onShowForm = async (assignmentId) => {
+    setSelectedAssignmentId(assignmentId);
     setOpenForm(true);
   };
 
@@ -102,14 +106,14 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
   return (
     <div className="course-title">
       {openForm && (
-        <LessonForm
+        <AssginmentForm
           isOpen={openForm}
           isClose={onCloseForm}
-          selectedLessonId={selectedLessonId}
+          selectedAssignmentId={selectedAssignmentId}
           chapterId={selectedChapterId}
-          lessonId={selectedLessonId}
-          fetchLessonData={fetchLessonData}
-        ></LessonForm>
+          assignmentId={selectedAssignmentId}
+          fetchAssignmentData={fetchAssignmentData}
+        ></AssginmentForm>
       )}
 
       <div className="course-title-wrapper">
@@ -128,12 +132,12 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <>{lessonItems}</>
+            <>{assignmentItems}</>
           ) : (
             <div className="grid">
               <TextField
                 className="bg-main"
-                onChange={(e) => setLessonTitle(e.target.value)}
+                onChange={(e) => setAssignmentTitle(e.target.value)}
               />
               <Button
                 sx={{ color: "white", backgroundColor: "black" }}

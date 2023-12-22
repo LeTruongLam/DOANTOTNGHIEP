@@ -82,6 +82,7 @@ export default function CourseClass({ title, subTitle }) {
                 onChange={(e) => setClassCode(e.target.value)}
               />
               <Button
+                sx={{ color: "white", backgroundColor: "black" }}
                 style={{
                   marginTop: "12px",
                   width: "max-content",

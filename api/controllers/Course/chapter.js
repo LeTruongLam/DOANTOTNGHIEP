@@ -18,73 +18,106 @@ export const authorize = (req, res, next) => {
 };
 
 export const getChapterById = (req, res) => {
-  const courseId = req.params.courseId;
-  const chapterId = req.params.chapterId;
-  const q = `
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.courseId;
+    const chapterId = req.params.chapterId;
+    const q = `
     SELECT *
     FROM chapters
     WHERE CourseId = ? AND ChapterId = ?
   `;
 
-  db.query(q, [courseId, chapterId], (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "An unexpected error occurred." });
-    }
+    db.query(q, [courseId, chapterId], (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "An unexpected error occurred." });
+      }
 
-    if (data.length === 0) {
-      return res.status(404).json({ error: "Chapter not found." });
-    }
-    const chapter = data[0];
+      if (data.length === 0) {
+        return res.status(404).json({ error: "Chapter not found." });
+      }
+      const chapter = data[0];
 
-    return res.status(200).json(chapter);
+      return res.status(200).json(chapter);
+    });
   });
 };
 
 export const getAllChapter = (req, res) => {
-  const q = `
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const q = `
       SELECT *
       FROM chapters
       INNER JOIN courses ON chapters.courseId = courses.courseId
       WHERE courses.courseId = ?
     `;
 
-  db.query(q, [req.params.id], (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json(data);
+    db.query(q, [req.params.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json(data);
+    });
   });
 };
 
 export const addChapter = (req, res) => {
-  const { chapterTitle, chapterDesc, chapterVideo, chapterPosition, courseId } =
-    req.body;
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
 
-  const q = `
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const {
+      chapterTitle,
+      chapterDesc,
+      chapterVideo,
+      chapterPosition,
+      courseId,
+    } = req.body;
+
+    const q = `
       INSERT INTO chapters (ChapterTitle, ChapterDesc, ChapterVideo, ChapterPosition, CourseId)
       VALUES (?, ?, ?, ?, ?)
     `;
 
-  db.query(
-    q,
-    [chapterTitle, chapterDesc, chapterVideo, chapterPosition, courseId],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      return res.status(201).json({ message: "Chapter added successfully" });
-    }
-  );
+    db.query(
+      q,
+      [chapterTitle, chapterDesc, chapterVideo, chapterPosition, courseId],
+      (err, result) => {
+        if (err) return res.status(500).json(err);
+        return res.status(201).json({ message: "Chapter added successfully" });
+      }
+    );
+  });
 };
 export const editChapter = (req, res) => {
-  const { chapterTitle, chapterId } = req.body;
-  const courseId = req.params.id;
-  const query = `
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const { chapterTitle, chapterId } = req.body;
+    const courseId = req.params.id;
+    const query = `
     UPDATE chapters
     SET ChapterTitle = ?, CourseId = ?
     WHERE ChapterId = ?
   `;
 
-  db.query(query, [chapterTitle, courseId, chapterId], (err, result) => {
-    if (err) return res.status(500).json(err);
-    return res.status(200).json({ message: "Cập nhật chương thành công" });
+    db.query(query, [chapterTitle, courseId, chapterId], (err, result) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json({ message: "Cập nhật chương thành công" });
+    });
   });
 };
 
@@ -114,9 +147,7 @@ export const insertChapterTitle = (req, res) => {
     const q = "INSERT INTO chapters (ChapterTitle, CourseId) VALUES (?, ?)";
 
     // Check user role and course update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
+
 
     db.query(q, [chapterTitle, courseId], (err, data) => {
       if (err) return res.status(500).json(err);
@@ -160,9 +191,7 @@ export const updateChapterTitle = (req, res) => {
     const values = [chapterTitle, chapterId];
 
     // Check user role and chapter update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
+   
 
     db.query(q, values, (err, data) => {
       if (err)
@@ -183,17 +212,12 @@ export const getChapterDesc = (req, res) => {
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
-
+    // Check user role and course access permission
+   
     const chapterId = req.params.chapterId;
 
     const q = "SELECT ChapterDesc FROM chapters WHERE ChapterId = ? ";
     const values = [chapterId];
-
-    // Check user role and course access permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
     db.query(q, values, (err, data) => {
       if (err)
         return res.status(500).json({ error: "An unexpected error occurred." });
@@ -203,7 +227,7 @@ export const getChapterDesc = (req, res) => {
       }
       const chapter = data[0];
       const chapterDesc = chapter.ChapterDesc;
-
+      console.log(chapterDesc)
       return res.json({ chapterDesc });
     });
   });
@@ -221,10 +245,6 @@ export const updateChapterDesc = (req, res) => {
     const q = "UPDATE chapters SET ChapterDesc = ? WHERE ChapterId = ?";
     const values = [chapterDesc, chapterId];
 
-    // Check user role and chapter update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
 
     db.query(q, values, (err, data) => {
       if (err)
@@ -251,17 +271,12 @@ export const getChapterDocument = (req, res) => {
     const q = "SELECT * FROM documents WHERE ChapterId = ? ";
     const values = [chapterId];
 
-    // Check user role and course access permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
     db.query(q, values, (err, data) => {
       if (err)
         return res.status(500).json({ error: "An unexpected error occurred." });
 
       if (data.length === 0) {
-        return res.status(404).json({ error: "Chapter not found." });
+        return res.json({ message: "Chapter Document not found." });
       }
       const chapter = data[0];
 
@@ -283,16 +298,15 @@ export const deleteChapterDocument = (req, res) => {
     const values = [chapterId, documentId];
 
     // Check user role and course access permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
+   
     db.query(q, values, (err, result) => {
       if (err)
         return res.status(500).json({ error: "An unexpected error occurred." });
 
       if (result.affectedRows === 0) {
-        return res.status(404).json({ error: "Chapter or document not found." });
+        return res
+          .status(404)
+          .json({ error: "Chapter or document not found." });
       }
 
       return res.json({ message: "Document deleted successfully." });

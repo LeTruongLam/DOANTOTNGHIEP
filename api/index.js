@@ -7,7 +7,6 @@ import classRoutes from "./routes/class.js"
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import routeUpload from "./routes/routeUpload.js";
-import moment from "moment";
 import {db} from "./db.js"
 const app = express();
 
@@ -84,7 +83,7 @@ app.get("/api/chapters/:chapterId/document", function (req, res) {
 
       // Trả về tên tệp ChapterDocument
       const filename = results[0].ChapterDocument;
-      console.log(filename)
+      // console.log(filename)
       res.status(200).json({ filename });
     }
   );

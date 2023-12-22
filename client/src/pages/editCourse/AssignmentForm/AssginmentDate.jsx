@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import { useLocation } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
 import "../EditWrite.scss";
@@ -10,25 +9,32 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import moment from "moment";
 
-export default function CourseDate({ title, subTitle }) {
-  const location = useLocation();
-  const [startDate, setStartDate] = useState(location.state?.StartDate || "");
-  const [endDate, setEndDate] = useState(location.state?.EndDate || "");
+export default function AssignmentDate({
+  title,
+  subTitle,
+  chapterId,
+  assignmentId,
+}) {
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    console.log(startDate)
-    console.log(endDate)
-    const storedCourseStartDate = localStorage.getItem("startDate");
-    const storedCourseEndDate = localStorage.getItem("endDate");
-    if (storedCourseStartDate || storedCourseEndDate) {
-      setStartDate(storedCourseStartDate);
-      setEndDate(storedCourseEndDate);
-    } else {
-      setStartDate(location.state?.startDate || "");
-      setEndDate(location.state?.endDate || "");
+  const getAssignmentDate = async () => {
+    try {
+      const res = await axios.get(
+        `/courses/chapters/${chapterId}/assignments/date/${assignmentId}`
+      );
+      setStartDate(res.data.startDate);
+      setEndDate(res.data.endDate);
+    } catch (error) {
+      console.error(error);
     }
-  }, [location.state]);
+  };
+
+  useEffect(() => {
+    getAssignmentDate();
+  }, [assignmentId]);
+
   const handleIconClick = () => {
     setIsEditing(!isEditing);
   };
@@ -38,21 +44,17 @@ export default function CourseDate({ title, subTitle }) {
   };
 
   const handleSaveClick = async () => {
-    const updatedStartDate = startDate
-      ? moment(startDate).format("YYYY-MM-DD HH:mm:ss")
-      : (location.state && location.state.startDate) || "";
-    const updatedEndDate = endDate
-      ? moment(endDate).format("YYYY-MM-DD HH:mm:ss")
-      : (location.state && location.state.endDate) || "";
+    const updatedStartDate = moment(startDate).format("YYYY-MM-DD HH:mm:ss");
+    const updatedEndDate = moment(endDate).format("YYYY-MM-DD HH:mm:ss");
 
     try {
-      await axios.put(`/courses/date/${location.state.CourseId}`, {
-        StartDate: updatedStartDate,
-        EndDate: updatedEndDate,
-      });
-
-      localStorage.setItem("startDate", updatedStartDate);
-      localStorage.setItem("endDate", updatedEndDate);
+      await axios.put(
+        `/courses/chapters/${chapterId}/assignments/date/${assignmentId}`,
+        {
+          startDate: updatedStartDate,
+          endDate: updatedEndDate,
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -60,14 +62,14 @@ export default function CourseDate({ title, subTitle }) {
     setIsEditing(false);
   };
 
-  const onSetStartDate = (startDate) => {
-    const newStartDate = startDate.format("YYYY-MM-DD HH:mm:ss");
-    setStartDate(newStartDate);
+  const onSetStartDate = (newStartDate) => {
+    const formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
+    setStartDate(formattedStartDate);
   };
 
-  const onSetEndDate = (endDate) => {
-    const newEndDate = endDate.format("YYYY-MM-DD HH:mm:ss");
-    setEndDate(newEndDate);
+  const onSetEndDate = (newEndDate) => {
+    const formattedEndDate = newEndDate.format("YYYY-MM-DD HH:mm:ss");
+    setEndDate(formattedEndDate);
   };
 
   return (
@@ -116,14 +118,14 @@ export default function CourseDate({ title, subTitle }) {
                   label="Ngày bắt đầu"
                   className="bg-main"
                   value={dayjs(startDate)}
-                  onChange={(newStartDate) => onSetStartDate(newStartDate)}
+                  onChange={onSetStartDate}
                 />
 
                 <DatePicker
                   label="Ngày kết thúc"
                   value={dayjs(endDate)}
                   className="bg-main"
-                  onChange={(newEndDate) => onSetEndDate(newEndDate)}
+                  onChange={onSetEndDate}
                 />
               </DemoContainer>
             </LocalizationProvider>

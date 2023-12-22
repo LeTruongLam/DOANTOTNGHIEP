@@ -118,9 +118,7 @@ export const updateLessonTitle = (req, res) => {
     const values = [lessonTitle, chapterId, lessonId];
 
     // Check user role and chapter update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
+
     db.query(q, values, (err, data) => {
       if (err)
         return res.status(500).json({ error: "An unexpected error occurred." });
@@ -166,9 +164,7 @@ export const updateLessonVideo = (
     const values = [lessonVideo, chapterId, lessonId];
 
     // Check user role and chapter update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
+  
     db.query(q, values, (err, data) => {
       if (err)
         return res.status(500).json({ error: "An unexpected error occurred." });
@@ -195,9 +191,7 @@ export const getLessonDesc = (req, res) => {
     const values = [lessonId, chapterId];
 
     // Check user role and course access permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
+
 
     db.query(q, values, (err, data) => {
       if (err)
@@ -229,9 +223,7 @@ export const updateLessonDesc = (req, res) => {
     const values = [lessonDesc, lessonId, chapterId];
 
     // Check user role and chapter update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
+
 
     db.query(q, values, (err, data) => {
       if (err)

@@ -15,7 +15,6 @@ export default function CourseCode({ title, subTitle }) {
 
   useEffect(() => {
     console.log(location.state.CourseCode);
-   
   }, [location.state?.CourseCode]);
 
   const handleIconClick = () => {
@@ -65,6 +64,7 @@ export default function CourseCode({ title, subTitle }) {
                 onChange={(e) => setCourseCode(e.target.value)}
               />
               <Button
+                sx={{ color: "white", backgroundColor: "black" }}
                 style={{
                   marginTop: "12px",
                   width: "max-content",

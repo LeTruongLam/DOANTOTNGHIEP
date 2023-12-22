@@ -12,23 +12,21 @@ const ChapterFile = ({ chapterId }) => {
   const [fileList, setFileList] = useState([]);
   const [docs, setDocs] = useState([]);
   const [datas, setData] = useState([]);
-  const fetchCourseFiles = async () => {
+  const fetchChapterFiles = async () => {
     try {
       const response = await axios.get(
         `/courses/chapters/document/${chapterId}`
       );
       setData(response.data);
       const documentUrls = response.data.map((item) => item.DocumentUrl);
-      console.log(response.data);
       const documents = documentUrls.map((url) => ({ uri: url }));
       setDocs(documents);
     } catch (error) {
       console.error("Error fetching course files:", error);
     }
   };
-
   useEffect(() => {
-    fetchCourseFiles();
+    fetchChapterFiles();
   }, []);
 
   const handleSaveClick = async () => {
@@ -41,7 +39,7 @@ const ChapterFile = ({ chapterId }) => {
         formData
       );
       setSelectedFile(response.data);
-      fetchCourseFiles();
+      fetchChapterFiles();
       setFileList([]);
       return response.data;
     } catch (error) {
@@ -63,7 +61,7 @@ const ChapterFile = ({ chapterId }) => {
         `/courses/chapters/${chapterId}/document/${documentId}`
       );
       alert("Xóa thành công");
-      fetchCourseFiles();
+      fetchChapterFiles();
     } catch (error) {
       console.error("Lỗi xóa tệp tin:", error);
     }
@@ -153,6 +151,8 @@ const ChapterFile = ({ chapterId }) => {
           ))}
 
           <Button
+              sx={{ color: "white", backgroundColor: "black" }}
+
             style={{
               marginTop: "12px",
               width: "max-content",

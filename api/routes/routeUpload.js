@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 import { db } from "../db.js";
 import { updateLessonVideo } from "../controllers/Course/lesson.js";
+import { updateAssignmentFile } from "../controllers/Course/assignment.js";
 const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -47,8 +48,6 @@ router.put(
   upload.single("video"),
   (req, res) => {
     const { chapterId, lessonId } = req.params;
-    console.log(chapterId);
-    console.log(lessonId);
     let lessonVideo = "";
 
     if (req.file) {
@@ -69,7 +68,7 @@ router.put(
           });
         });
     } else {
-      lessonVideo = req.body.videoUrl
+      lessonVideo = req.body.videoUrl;
       updateLessonVideo(lessonVideo, chapterId, lessonId, req, res);
     }
   }
@@ -211,6 +210,79 @@ router.post(
       res.status(400).json({
         success: false,
         message: "No file provided",
+      });
+    }
+  }
+);
+function insertAssignmentFile(
+  assignmentFileId,
+  fileTitle,
+  fileUrl,
+  assignmentId,
+  req,
+  res
+) {
+  const query = `INSERT INTO assignmentfile (AssignmentFileId, AssignmentId, FileTitle, FileUrl)
+    VALUES (?, ?, ?, ?);`;
+
+  db.query(
+    query,
+    [assignmentFileId, assignmentId, fileTitle, fileUrl],
+    (err, result) => {
+      if (err) {
+        console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
+        res.status(500).json({
+          success: false,
+          message: "Lỗi",
+        });
+      } else {
+        console.log("Dữ liệu tài liệu đã được chèn vào cơ sở dữ liệu");
+        res.status(201).json({
+          success: true,
+          message: "fileUrl đã được tải lên!",
+          data: result,
+        });
+      }
+    }
+  );
+}
+
+router.post(
+  "/chapters/uploadAssignmentFile/:assignmentId",
+  upload.single("document"),
+  (req, res) => {
+    const { assignmentId } = req.params;
+    if (req.file) {
+      cloudinary.uploader
+        .upload(req.file.path, {
+          folder: "CourseAssignment/Teacher",
+          resource_type: "raw",
+        })
+        .then((result) => {
+          const assignmentFileId = result.asset_id;
+          const fileTitle = result.original_filename;
+          const fileUrl = result.url;
+
+          insertAssignmentFile(
+            assignmentFileId,
+            fileTitle,
+            fileUrl,
+            assignmentId,
+            req,
+            res
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json({
+            success: false,
+            message: "Lỗi",
+          });
+        });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Không có tệp được tải lên",
       });
     }
   }

@@ -12,17 +12,18 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [lessonDesc, setLessonDesc] = useState("");
 
-
-  const getChapterDesc = async () => {
+  const getLessonDesc = async () => {
     try {
-      const res = await axios.get(`/courses/chapters/${chapterId}/lessons/desc/${lessonId}`);
+      const res = await axios.get(
+        `/courses/chapters/${chapterId}/lessons/desc/${lessonId}`
+      );
       setLessonDesc(res.data.lessonDesc);
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
-    getChapterDesc();
+    getLessonDesc();
   }, [lessonId]);
 
   const handleIconClick = () => {
@@ -35,9 +36,12 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`/courses/chapters/${chapterId}/lessons/desc/${lessonId}`, {
-        lessonDesc: lessonDesc,
-      });
+      await axios.put(
+        `/courses/chapters/${chapterId}/lessons/desc/${lessonId}`,
+        {
+          lessonDesc: lessonDesc,
+        }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -81,6 +85,7 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
         </div>
         {isEditing && (
           <Button
+            sx={{ color: "white", backgroundColor: "black" }}
             style={{ marginTop: "12px" }}
             variant="contained"
             onClick={handleSaveClick}
