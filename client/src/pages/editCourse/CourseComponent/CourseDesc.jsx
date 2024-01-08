@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import DOMPurify from "dompurify";
+import { message } from "antd";
 
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
@@ -40,8 +41,9 @@ export default function CourseDesc({ title, subTitle }) {
         desc: courseDesc,
       });
       localStorage.setItem("courseDesc", courseDesc);
+      message.success("Sửa thành công!");
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
     }
     setIsEditing(false);
   };

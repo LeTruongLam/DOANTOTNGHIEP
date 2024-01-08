@@ -6,7 +6,8 @@ import {
   getCourses,
   updateCourse,
   getAllCourses,
-  // getCourseTitle,
+  getCourseTitle,
+  getCourseCode,
   updateCourseTitle,
   updateCourseCode,
   updateCourseDate,
@@ -47,7 +48,7 @@ import {
   updateAssignmentDesc,
   getAssignmentDate,
   updateAssignmentDate,
-  getAssignmentFile
+  getAssignmentFile,
 } from "../controllers/Course/assignment.js";
 const router = express.Router();
 
@@ -58,8 +59,10 @@ router.get("/:id", getCourseById);
 router.post("/", addCourse);
 router.delete("/:id", deleteCourse);
 router.put("/:id", updateCourse);
-// router.get("/title/:id", getCourseTitle);
+router.get("/title/:id", getCourseTitle);
 router.put("/title/:id", updateCourseTitle);
+router.get("/code/:id", getCourseCode);
+
 router.put("/code/:id", updateCourseCode);
 router.put("/date/:id", updateCourseDate);
 router.put("/desc/:id", updateCourseDesc);
@@ -101,7 +104,10 @@ router.delete(
   "/chapters/:chapterId/assignments/:assignmentId",
   deleteAssignment
 );
-router.get("/chapters/:chapterId/assignmentfile/:assignmentId", getAssignmentFile);
+router.get(
+  "/chapters/:chapterId/assignmentfile/:assignmentId",
+  getAssignmentFile
+);
 
 router.get(
   "/chapters/:chapterId/assignments/title/:assignmentId",

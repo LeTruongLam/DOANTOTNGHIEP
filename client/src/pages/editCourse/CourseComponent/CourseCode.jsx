@@ -5,17 +5,27 @@ import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { message } from "antd";
 
 import "../EditWrite.scss";
 
 export default function CourseCode({ title, subTitle }) {
   const location = useLocation();
-  const [courseCode, setCourseCode] = useState(location.state.CourseCode);
+  const [courseCode, setCourseCode] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
+  const fetchCourseCode = async () => {
+    try {
+      const res = await axios.get(`/courses/code/${location.state.CourseId}`);
+      setCourseCode(res.data.courseCode);
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
+
   useEffect(() => {
-    console.log(location.state.CourseCode);
-  }, [location.state?.CourseCode]);
+    fetchCourseCode();
+  }, []);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -31,8 +41,9 @@ export default function CourseCode({ title, subTitle }) {
       await axios.put(`/courses/code/${location.state.CourseId}`, {
         courseCode: updatedCode,
       });
+      message.success("Sửa thành công!");
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
     }
     setIsEditing(false);
   };

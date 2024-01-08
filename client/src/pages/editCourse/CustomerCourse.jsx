@@ -4,6 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import "./EditWrite.scss";
+import { message } from "antd";
 
 import DropFileInput from "../../components/drop-file-input/DropFileInput";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
@@ -55,7 +56,7 @@ const CustomerCourse = () => {
   };
   const fetchData = async () => {
     try {
-      const data = await fetchChapter(location.state.CourseId);
+      const data = await fetchChapter(location.state?.CourseId);
       setChapterData(data);
     } catch (error) {
       console.error(error);

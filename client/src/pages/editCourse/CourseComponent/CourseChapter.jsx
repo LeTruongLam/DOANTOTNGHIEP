@@ -9,6 +9,7 @@ import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
+import { message } from "antd";
 import EditIcon from "@mui/icons-material/Edit";
 
 import "../EditWrite.scss";
@@ -50,8 +51,11 @@ export default function CourseChapter({
         chapterTitle: chapterTitle,
         courseId: location.state.CourseId,
       });
+      message.success("Thêm thành công!");
+
     } catch (error) {
-      console.log(error);
+      message.error(error);
+
     }
     setIsEditing(false);
     fetchData();

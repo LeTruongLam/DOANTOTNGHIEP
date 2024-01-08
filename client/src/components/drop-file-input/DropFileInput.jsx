@@ -10,7 +10,7 @@ const DropFileInput = (props) => {
   const wrapperRef = useRef(null);
   const location = useLocation();
   useEffect(() => {
-    console.log(location.state.img);
+    console.log(location.state?.img);
   }, []);
   const [fileList, setFileList] = useState([]);
 
@@ -30,7 +30,6 @@ const DropFileInput = (props) => {
       console.log("file: " + newFile);
     }
   };
-
 
   return (
     <div className="course-image">
@@ -52,9 +51,9 @@ const DropFileInput = (props) => {
             <div className="selected-file">
               <img src={URL.createObjectURL(selectedFile)} alt="" />
             </div>
-          ) : location.state && location.state.img ? (
+          ) : location.state && location.state?.img ? (
             <div className="selected-file">
-              <img src={`../upload/${location.state.img}`} alt="" />
+              <img src={`../upload/${location.state?.img}`} alt="" />
             </div>
           ) : (
             <div className="drop-file-input__label">
@@ -65,32 +64,6 @@ const DropFileInput = (props) => {
           <input type="file" value="" onChange={onFileDrop} />
         </div>
       </div>
-
-      {/* {fileList.length > 0 ? (
-        <div className="drop-file-preview">
-          <p className="drop-file-preview__title">Ready to upload</p>
-          {fileList.map((item, index) => (
-            <div key={index} className="drop-file-preview__item">
-              <img
-                src={
-                  ImageConfig[item.type.split("/")[1]] || ImageConfig["default"]
-                }
-                alt=""
-              />
-              <div className="drop-file-preview__item__info">
-                <p>{item.name}</p>
-                <p>{item.size}B</p>
-              </div>
-              <span
-                className="drop-file-preview__item__del"
-                onClick={() => fileRemove(item)}
-              >
-                x
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : null} */}
     </div>
   );
 };

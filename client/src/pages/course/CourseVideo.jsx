@@ -104,9 +104,6 @@ const CourseVideo = () => {
           <div className="chapter-title">
             <h2>{lesson?.LessonTitle}</h2>
           </div>
-          <div className="chapter-desc">
-            <span>{lesson?.LessonDesc}</span>
-          </div>
         </div>
       </div>
     </div>

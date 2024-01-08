@@ -6,6 +6,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import "../../../components/drop-file-input/drop-file-input.css";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
+import { message } from "antd";
 
 const ChapterFile = ({ chapterId }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -41,6 +42,8 @@ const ChapterFile = ({ chapterId }) => {
       setSelectedFile(response.data);
       fetchChapterFiles();
       setFileList([]);
+      message.success("Sửa thành công!");
+
       return response.data;
     } catch (error) {
       console.log(error);
@@ -60,10 +63,12 @@ const ChapterFile = ({ chapterId }) => {
       await axios.delete(
         `/courses/chapters/${chapterId}/document/${documentId}`
       );
-      alert("Xóa thành công");
+      message.success("Xóa thành công!");
+
       fetchChapterFiles();
     } catch (error) {
-      console.error("Lỗi xóa tệp tin:", error);
+      message.error(error.message);
+
     }
   };
 

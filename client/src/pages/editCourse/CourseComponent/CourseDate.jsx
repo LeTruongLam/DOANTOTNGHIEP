@@ -12,23 +12,22 @@ import moment from "moment";
 
 export default function CourseDate({ title, subTitle }) {
   const location = useLocation();
-  const [startDate, setStartDate] = useState(location.state?.StartDate || "");
-  const [endDate, setEndDate] = useState(location.state?.EndDate || "");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    console.log(startDate)
-    console.log(endDate)
     const storedCourseStartDate = localStorage.getItem("startDate");
     const storedCourseEndDate = localStorage.getItem("endDate");
-    if (storedCourseStartDate || storedCourseEndDate) {
+    if (storedCourseStartDate && storedCourseEndDate) {
       setStartDate(storedCourseStartDate);
       setEndDate(storedCourseEndDate);
-    } else {
-      setStartDate(location.state?.startDate || "");
-      setEndDate(location.state?.endDate || "");
+    } else if (location.state) {
+      setStartDate(location.state.startDate || "");
+      setEndDate(location.state.endDate || "");
     }
   }, [location.state]);
+
   const handleIconClick = () => {
     setIsEditing(!isEditing);
   };
@@ -40,10 +39,10 @@ export default function CourseDate({ title, subTitle }) {
   const handleSaveClick = async () => {
     const updatedStartDate = startDate
       ? moment(startDate).format("YYYY-MM-DD HH:mm:ss")
-      : (location.state && location.state.startDate) || "";
+      : "";
     const updatedEndDate = endDate
       ? moment(endDate).format("YYYY-MM-DD HH:mm:ss")
-      : (location.state && location.state.endDate) || "";
+      : "";
 
     try {
       await axios.put(`/courses/date/${location.state.CourseId}`, {
@@ -60,13 +59,11 @@ export default function CourseDate({ title, subTitle }) {
     setIsEditing(false);
   };
 
-  const onSetStartDate = (startDate) => {
-    const newStartDate = startDate.format("YYYY-MM-DD HH:mm:ss");
+  const onSetStartDate = (newStartDate) => {
     setStartDate(newStartDate);
   };
 
-  const onSetEndDate = (endDate) => {
-    const newEndDate = endDate.format("YYYY-MM-DD HH:mm:ss");
+  const onSetEndDate = (newEndDate) => {
     setEndDate(newEndDate);
   };
 
@@ -115,15 +112,15 @@ export default function CourseDate({ title, subTitle }) {
                 <DatePicker
                   label="Ngày bắt đầu"
                   className="bg-main"
-                  value={dayjs(startDate)}
-                  onChange={(newStartDate) => onSetStartDate(newStartDate)}
+                  value={startDate ? dayjs(startDate) : null}
+                  onChange={onSetStartDate}
                 />
 
                 <DatePicker
                   label="Ngày kết thúc"
-                  value={dayjs(endDate)}
+                  value={endDate ? dayjs(endDate) : null}
                   className="bg-main"
-                  onChange={(newEndDate) => onSetEndDate(newEndDate)}
+                  onChange={onSetEndDate}
                 />
               </DemoContainer>
             </LocalizationProvider>

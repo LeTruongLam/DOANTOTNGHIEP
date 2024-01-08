@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "../../../context/authContext";
+import { message } from "antd";
 
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
@@ -83,10 +84,10 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
         `/courses/chapters/${selectedChapterId}/lessons/${lessonId}`
       );
       fetchLessonData();
-
-      alert("Xóa thành công");
+      message.success("Xóa thành công!");
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
+
     }
   };
 

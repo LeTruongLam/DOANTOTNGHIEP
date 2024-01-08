@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import DOMPurify from "dompurify";
+import { message } from "antd";
 
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
@@ -42,8 +43,9 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
           lessonDesc: lessonDesc,
         }
       );
+      message.success("Sửa thành công!");
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
     }
     setIsEditing(false);
   };

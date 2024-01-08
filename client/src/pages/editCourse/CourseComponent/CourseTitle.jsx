@@ -5,25 +5,27 @@ import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { message } from "antd";
 
 import "../EditWrite.scss";
 
 export default function CourseTitle({ title, subTitle }) {
   const location = useLocation();
-  const [courseTitle, setCourseTitle] = useState(
-    localStorage.getItem("courseTitle") || location.state?.title || ""
-  );
+  const [courseTitle, setCourseTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const fetchCourseTitle = async () => {
+    try {
+      const res = await axios.get(`/courses/title/${location.state.CourseId}`);
+      setCourseTitle(res.data.courseTitle);
+      console.log(res.data.courseTitle);
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
 
   useEffect(() => {
-    console.log(location.state.title)
-    const storedCourseTitle = localStorage.getItem("courseTitle");
-    if (storedCourseTitle) {
-      setCourseTitle(storedCourseTitle);
-    } else {
-      setCourseTitle(location.state?.title || "");
-    }
-  }, [location.state?.title]);
+    fetchCourseTitle();
+  }, []);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -31,7 +33,6 @@ export default function CourseTitle({ title, subTitle }) {
 
   const handleCancelClick = () => {
     setIsEditing(false);
-    setCourseTitle(localStorage.getItem("courseTitle") || "");
   };
 
   const handleSaveClick = async () => {
@@ -40,9 +41,9 @@ export default function CourseTitle({ title, subTitle }) {
       await axios.put(`/courses/title/${location.state.CourseId}`, {
         title: updatedTitle,
       });
-      localStorage.setItem("courseTitle", updatedTitle);
+      message.success("Sửa thành công!");
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
     }
     setIsEditing(false);
   };
@@ -74,12 +75,10 @@ export default function CourseTitle({ title, subTitle }) {
                 onChange={(e) => setCourseTitle(e.target.value)}
               />
               <Button
-              sx={{ color: "white", backgroundColor: "black" }}
-
+                sx={{ color: "white", backgroundColor: "black" }}
                 style={{
                   marginTop: "12px",
                   width: "max-content",
-                  
                 }}
                 variant="contained"
                 onClick={handleSaveClick}

@@ -10,6 +10,7 @@ import Home from "./pages/home/Home.jsx";
 import Course from "./pages/course/Course.jsx";
 import Single from "./pages/single/Single.jsx";
 import TheHeader from "./components/TheHeader.jsx";
+import CourseStepper from "./pages/course/CreateCourse/CourseStepper.jsx";
 import CustomerCourse from "./pages/editCourse/CustomerCourse.jsx";
 import Footer from "./components/Footer";
 import Infor from "./pages/Info/Info.jsx";
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "/course",
         element: <Course />,
+      },
+      {
+        path: "/course/create",
+        element: <CourseStepper />,
       },
       {
         path: "/register",

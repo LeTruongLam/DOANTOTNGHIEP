@@ -90,7 +90,6 @@ export const getCourseById = (req, res) => {
      `;
     }
     db.query(q, [userId, req.params.id], (err, data) => {
-
       if (err) return res.status(500).json(err);
       return res.status(200).json(data[0]);
     });
@@ -103,25 +102,31 @@ export const addCourse = (req, res) => {
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json({ message: "Token is not valid!" });
-    // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
-    if (userInfo.role !== "admin") {
-      return res.status(403).json({ message: "Unauthorized!" });
-    }
-    const q =
-      "INSERT INTO courses(`title`, `desc`, `img`, `cat`, `date`,`StartDate`,`EndDate`,`UserId`) VALUES (?)";
-    const values = [
-      req.body.title,
-      req.body.desc,
-      req.body.img,
-      req.body.cat,
-      req.body.StartDate,
-      req.body.EndDate,
-      userInfo.id,
-    ];
 
-    db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.status(201).json({ message: "Post has been created." });
+    const teacherQuery = "SELECT * FROM teachers WHERE UserId = ?";
+    const userId = userInfo.id;
+
+    db.query(teacherQuery, [userId], (teacherErr, teacherData) => {
+      if (teacherErr) return res.status(500).json(teacherErr);
+
+      if (teacherData.length === 0) {
+        return res.status(403).json({ message: "User does not have permission to add courses!" });
+      }
+
+      const teacherId = teacherData[0].TeacherId;
+
+      // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
+      const insertQuery = "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?)";
+      const insertValues = [req.body.courseTitle, teacherId, req.body.courseCode];
+
+      db.query(insertQuery, [insertValues], (insertErr, insertData) => {
+        if (insertErr) return res.status(500).json(insertErr);
+
+        const courseId = insertData.insertId; // Lấy courseId sau khi tạo thành công
+        return res
+          .status(201)
+          .json({ message: "Course has been created.", courseId: courseId });
+      });
     });
   });
 };
@@ -200,6 +205,27 @@ export const updateCourse = (req, res) => {
 //     });
 //   });
 // };
+
+export const getCourseTitle = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.id;
+    const q = "SELECT title FROM courses WHERE CourseId = ? ";
+    db.query(q, [courseId], (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Course title not found" });
+      }
+
+      const course = result[0];
+      return res.status(200).json({ courseTitle: course.title });
+    });
+  });
+};
 export const updateCourseTitle = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
@@ -212,14 +238,29 @@ export const updateCourseTitle = (req, res) => {
     const q = "UPDATE courses SET `title`=? WHERE `courseId` = ? ";
     const values = [req.body.title, courseId];
 
-    // Check user role and course update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
     db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);
-      return res.json("Course title has been updated.");
+      return res.json({ message: "Course title has been updated." });
+    });
+  });
+};
+export const getCourseCode = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.id;
+    const q = "SELECT CourseCode FROM courses WHERE CourseId = ? ";
+    db.query(q, [courseId], (err, result) => {
+      if (err) return res.status(500).json(err);
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Course code not found" });
+      }
+
+      const course = result[0];
+      return res.status(200).json({ courseCode: course.CourseCode });
     });
   });
 };
@@ -234,11 +275,6 @@ export const updateCourseCode = (req, res) => {
 
     const q = "UPDATE courses SET `CourseCode`=? WHERE `courseId` = ? ";
     const values = [req.body.courseCode, courseId];
-
-    // // Check user role and course update permission
-    // if (userInfo.role !== "admin") {
-    //   return res.status(403).json("Unauthorized!");
-    // }
 
     db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);

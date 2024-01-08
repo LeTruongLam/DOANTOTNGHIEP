@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import EditIcon from "@mui/icons-material/Edit";
+import { message } from "antd";
 
 import "../EditWrite.scss";
 
@@ -64,9 +65,11 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
         `/users/${chapterId}/uploadLessonVideo/${lessonId}`,
         formData
       );
-      alert("Video đã được thêm thành công");
+      message.success("Video đã được thêm thành công");
+
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
+
     }
     setIsEditing(false);
   };

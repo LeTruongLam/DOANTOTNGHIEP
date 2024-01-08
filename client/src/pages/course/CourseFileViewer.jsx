@@ -8,7 +8,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-
+import NoResult from "../../img/noresult.jpg";
 export default function CourseFileViewer() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export default function CourseFileViewer() {
             </div>
           </div>
         </div>
-        {selectedDoc && (
+        {selectedDoc ? (
           <DocViewer
             documents={[selectedDoc]}
             pluginRenderers={DocViewerRenderers}
@@ -104,6 +104,17 @@ export default function CourseFileViewer() {
               },
             }}
           />
+        ) : (
+          <div
+            className="empty-docs-message"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <img src={NoResult} alt="" />
+          </div>
         )}
       </div>
     </div>

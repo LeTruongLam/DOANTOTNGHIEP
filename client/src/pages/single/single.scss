@@ -17,7 +17,8 @@
     right: 40px;
     top: 150px;
     border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid #dfe3e6;
+
     z-index: 1;
 }
 
@@ -74,7 +75,8 @@
 .student-info p {
     margin: 0;
 }
-.class-header{
+
+.class-header {
     display: flex;
     justify-content: space-between;
 }

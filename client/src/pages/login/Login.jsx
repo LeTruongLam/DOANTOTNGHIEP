@@ -4,7 +4,7 @@ import { AuthContext } from "../../context/authContext";
 import image from "../../img/login_2.jpg";
 import "./login.scss";
 import Button from "@mui/material/Button";
-
+import { message } from "antd";
 const Login = () => {
   const [inputs, setInputs] = useState({
     username: "",
@@ -22,16 +22,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!inputs.username || !inputs.password) {
       setError("Please enter both username and password");
       return;
     }
-    
+
     try {
       await login(inputs);
       navigate("/course");
+      message.success("Đăng nhập thành công!");
     } catch (err) {
+      message.error(err.response.data);
+
       setError(err.response.data);
     }
   };
@@ -66,8 +69,6 @@ const Login = () => {
             <Button variant="contained" onClick={handleSubmit}>
               Login
             </Button>
-
-            {err && <p>{err}</p>}
             <span>
               Don't you have an account? <Link to="/register">Register</Link>
             </span>

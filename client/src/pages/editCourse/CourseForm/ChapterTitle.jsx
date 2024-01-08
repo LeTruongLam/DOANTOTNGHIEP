@@ -4,6 +4,7 @@ import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { message } from "antd";
 
 import "../EditWrite.scss";
 
@@ -35,8 +36,11 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
       await axios.put(`/courses/chapters/title/${chapterId}`, {
         chapterTitle: chapterTitle,
       });
+      message.success("Sửa thành công!");
+
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
+
     }
     setIsEditing(false);
   };

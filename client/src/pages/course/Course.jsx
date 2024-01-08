@@ -19,17 +19,17 @@ const Course = () => {
   const { currentUser } = useContext(AuthContext);
   const cat = useLocation().search;
 
-
-
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const formatDate = (date) => {
     return format(new Date(date), "dd/MM/yyyy");
   };
-
   const isAdmin = () => {
     return currentUser && currentUser.Role === "admin";
+  };
+  const isTeacher = () => {
+    return currentUser && currentUser.Role === "teacher";
   };
 
   const getText = (html) => {
@@ -67,22 +67,21 @@ const Course = () => {
     fetchData();
   }, [cat]);
   const handleWrite = () => {
-    navigate("/write");
+    navigate("/course/create");
   };
 
   return (
     <div className="section-row">
       <div className="title-course">
         <h1>My Course</h1>
-        {isAdmin() && (
+        {isTeacher() && (
           <SpeedDial
             ariaLabel="SpeedDial openIcon example"
             icon={
               <SpeedDialIcon openIcon={<EditIcon />} onClick={handleWrite} />
             }
             sx={{ position: "fixed", bottom: 16, right: 16 }}
-          >
-          </SpeedDial>
+          ></SpeedDial>
         )}
       </div>
 
@@ -103,8 +102,12 @@ const Course = () => {
               <div className="course-content">
                 <div className="course-glimpse-wrapper">
                   <div className="course-glimpse-info">
-                    <p className="course-title">{truncateString(getText(course.title), 35)}</p>
-                    <p className="course-desc">{truncateString(getText(course.desc), 250)}</p>
+                    <p className="course-title">
+                      {truncateString(getText(course.title), 35)}
+                    </p>
+                    <p className="course-desc">
+                      {truncateString(getText(course.desc), 250)}
+                    </p>
                   </div>
                   <div className="course-datetime">
                     <Chip
@@ -119,7 +122,11 @@ const Course = () => {
                       variant="outlined"
                       icon={<DateRangeIcon />}
                       label={`End: ${formatDate(course.EndDate)}`}
-                      style={{ width: "100%", justifyContent: "flex-start",margin:"10px 0" }}
+                      style={{
+                        width: "100%",
+                        justifyContent: "flex-start",
+                        margin: "10px 0",
+                      }}
                     />
                   </div>
                   <div className="course-glimpse-footer">
