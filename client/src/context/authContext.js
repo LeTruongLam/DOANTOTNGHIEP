@@ -13,7 +13,7 @@ export const AuthContexProvider = ({ children }) => {
     setCurrentUser(res.data);
 
     // Thiết lập thời gian tồn tại của phiên đăng nhập là 30 phút (1800000 milliseconds)
-    const sessionTimeout = 18000000;
+    const sessionTimeout = 1800000;
 
     // Lưu thời gian hết hạn của phiên đăng nhập vào localStorage
     const expirationTime = Date.now() + sessionTimeout;

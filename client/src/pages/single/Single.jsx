@@ -31,6 +31,8 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import ClassList from "./ClassList";
+import Comment from "./Comment";
+import ChapterList from "./ChapterList";
 const Single = () => {
   const { fetchLesson, currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -226,63 +228,18 @@ const Single = () => {
             ></p>
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
-            {chapterData.map((item, index) => (
-              <List
-                key={index}
-                sx={{
-                  width: "100%",
-                  maxWidth: 500,
-                  bgcolor: "#f7f9fa",
-                  border: "1px solid #dfe3e6",
-                }}
-                component="nav"
-                aria-labelledby="nested-list-subheader"
-              >
-                <ListItemButton onClick={() => handleClick(index, item)}>
-                  <ListItemText
-                    primary={`Chương ${index + 1}: ${item.ChapterTitle}`}
-                  />
-                  {openIndex === index ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-                <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {lessons.map((lesson, lessonIndex) => (
-                      <ListItemButton
-                        key={lessonIndex}
-                        sx={{ pl: 4 }}
-                        onClick={() =>
-                          handleToVideo(item.ChapterId, lesson.LessonId)
-                        }
-                      >
-                        <ListItemIcon>
-                          <OndemandVideoIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={lesson.LessonTitle} />
-                      </ListItemButton>
-                    ))}
-                    <ListItemButton
-                      onClick={() => handleToAssignment(item.ChapterId)}
-                    >
-                      <ListItemIcon>
-                        <AssignmentIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Bài tập cuối chương" />
-                    </ListItemButton>
-                    <ListItemButton
-                      onClick={() => handleToFile(item.ChapterId)}
-                    >
-                      <ListItemIcon>
-                        <DescriptionIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Tài liệu chương học" />
-                    </ListItemButton>
-                  </List>
-                </Collapse>
-              </List>
-            ))}
+            <ChapterList
+              openIndex={openIndex}
+              chapterData={chapterData}
+              lessons={lessons}
+              handleClick={handleClick}
+              handleToVideo={handleToVideo}
+              handleToAssignment={handleToAssignment}
+              handleToFile={handleToFile}
+            />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={2}>
-            Đây là chức năng nhận xét
+            <Comment />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={3}>
             <ClassList

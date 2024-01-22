@@ -102,7 +102,7 @@ const Course = () => {
               <div className="course-content">
                 <div className="course-glimpse-wrapper">
                   <div className="course-glimpse-info">
-                    <p className="course-title">
+                    <p className="course-title-main">
                       {truncateString(getText(course.title), 35)}
                     </p>
                     <p className="course-desc">

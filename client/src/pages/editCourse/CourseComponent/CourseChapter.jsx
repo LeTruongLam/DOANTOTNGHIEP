@@ -10,8 +10,9 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
 import { message } from "antd";
-import EditIcon from "@mui/icons-material/Edit";
-
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import "../EditWrite.scss";
 export default function CourseChapter({
   title,
@@ -52,10 +53,8 @@ export default function CourseChapter({
         courseId: location.state.CourseId,
       });
       message.success("Thêm thành công!");
-
     } catch (error) {
       message.error(error);
-
     }
     setIsEditing(false);
     fetchData();
@@ -103,12 +102,16 @@ export default function CourseChapter({
                 </FormControl>
               </Box>
               {selectedChapterId && (
-                <EditIcon
-                  onClick={() => {
-                    onShowForm();
-                  }}
-                  fontSize="small"
-                />
+                <Stack direction="row" spacing={1}>
+                  <Chip
+                    label="Edit"
+                    sx={{ color: "white", backgroundColor: "black" }}
+                    size="small"
+                    onClick={() => {
+                      onShowForm();
+                    }}
+                  />
+                </Stack>
               )}
             </div>
           ) : (

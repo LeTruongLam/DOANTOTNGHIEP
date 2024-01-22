@@ -4,7 +4,7 @@
      .section-items {
          display: flex;
          flex-wrap: wrap;
-         justify-content: space-between;
+         justify-content: flex-start;
 
          .course-glimpse {
              text-decoration: none;
@@ -82,13 +82,11 @@
 
                          }
 
-                         .course-title {
+                         .course-title-main {
                              font-weight: 700;
                              color: black;
                              font-size: 20px;
                              line-height: 1.4;
-                             font-family: "Inter", sans-serif;
-
                              &:hover {
                                  color: #3738e2;
 

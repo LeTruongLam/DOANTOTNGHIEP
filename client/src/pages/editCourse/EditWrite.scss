@@ -1,3 +1,4 @@
+
 .write-course {
     display: flex;
 }
@@ -204,4 +205,7 @@
 
 .form-wrapper {
     margin: 20px;
+}
+.drag-handle:hover{
+    cursor: pointer;
 }

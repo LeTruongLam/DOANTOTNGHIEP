@@ -1,23 +1,33 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "../../../context/authContext";
-import { message } from "antd";
+import { Container, Draggable } from "react-smooth-dnd";
+import { arrayMoveImmutable as arrayMove } from "array-move";
+import "../EditWrite.scss";
 
-import EditIcon from "@mui/icons-material/Edit";
+import { message } from "antd";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
-import "../EditWrite.scss";
 import LessonForm from "../CustomerLesson/LessonForm";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import List from "@mui/material/List";
+
 export default function TheLesson({ title, subTitle, selectedChapterId }) {
   const { fetchLesson } = useContext(AuthContext);
+
   const [isEditing, setIsEditing] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [lessonTitle, setLessonTitle] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [selectedLessonId, setSelectedLessonId] = useState();
+
+  const onDrop = ({ removedIndex, addedIndex }) => {
+    setLessons((items) => arrayMove(items, removedIndex, addedIndex));
+  };
+
   const fetchLessonData = async () => {
     try {
       if (selectedChapterId) {
@@ -36,25 +46,36 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
   }, [selectedChapterId]);
 
   const lessonItems = lessons.map((lesson) => (
-    <div className="bg-sub lesson-content" key={lesson.LessonId}>
+    <Draggable
+      style={{ display: "flex", alignItems: "center", gap: "10px" }}
+      className="bg-sub lesson-content"
+      key={lesson.LessonId}
+    >
       <div className="lesson-content-left">
-        <DragIndicatorOutlinedIcon />
+        <DragIndicatorOutlinedIcon className="drag-handle" />
         {lesson.LessonTitle}
       </div>
       <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <EditIcon
-          onClick={() => {
-            onShowForm(lesson.LessonId);
-          }}
-          fontSize="small"
-        />
-        <DeleteOutlineOutlinedIcon
-          onClick={() => {
-            handleDeleteClick(lesson.LessonId);
-          }}
-        />
+        <Stack direction="row" spacing={1}>
+          <Chip
+            label="Edit"
+            sx={{ color: "white", backgroundColor: "black", fontWeight: "600" }}
+            size="small"
+            onClick={() => {
+              onShowForm(lesson.LessonId);
+            }}
+          />
+          <Chip
+            label="Delete"
+            size="small"
+            sx={{ fontWeight: "600" }}
+            onClick={() => {
+              handleDeleteClick(lesson.LessonId);
+            }}
+          />
+        </Stack>
       </span>
-    </div>
+    </Draggable>
   ));
 
   const handleIconClick = () => {
@@ -71,9 +92,11 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
         lessonTitle: lessonTitle,
         chapterId: selectedChapterId,
       });
+      message.success("Thêm thành công!");
+
       fetchLessonData();
     } catch (error) {
-      console.log(error);
+      message.error(error.message);
     }
 
     setIsEditing(false);
@@ -87,7 +110,6 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
       message.success("Xóa thành công!");
     } catch (error) {
       message.error(error.message);
-
     }
   };
 
@@ -129,7 +151,15 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <>{lessonItems}</>
+            <List>
+              <Container
+                dragHandleSelector=".drag-handle"
+                lockAxis="y"
+                onDrop={onDrop}
+              >
+                {lessonItems}
+              </Container>
+            </List>
           ) : (
             <div className="grid">
               <TextField
