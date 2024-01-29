@@ -13,16 +13,20 @@ import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
 import LessonForm from "../CustomerLesson/LessonForm";
-import List from "@mui/material/List";
 
-export default function TheLesson({ title, subTitle, selectedChapterId }) {
+export default function TheLesson({
+  title,
+  subTitle,
+  chapterId,
+  setSelectedLessonId,
+  handleNext,
+}) {
   const { fetchLesson } = useContext(AuthContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [lessonTitle, setLessonTitle] = useState("");
   const [openForm, setOpenForm] = useState(false);
-  const [selectedLessonId, setSelectedLessonId] = useState();
 
   const onDrop = ({ removedIndex, addedIndex }) => {
     setLessons((items) => arrayMove(items, removedIndex, addedIndex));
@@ -30,8 +34,8 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
 
   const fetchLessonData = async () => {
     try {
-      if (selectedChapterId) {
-        const data = await fetchLesson(selectedChapterId);
+      if (chapterId) {
+        const data = await fetchLesson(chapterId);
         setLessons(data); // Lưu kết quả vào state lessons
       } else {
         setLessons([]); // Đặt state lessons thành một mảng rỗng nếu selectedChapterId không có giá trị
@@ -43,7 +47,7 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
 
   useEffect(() => {
     fetchLessonData();
-  }, [selectedChapterId]);
+  }, [chapterId]);
 
   const lessonItems = lessons.map((lesson) => (
     <Draggable
@@ -62,7 +66,8 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
             sx={{ color: "white", backgroundColor: "black", fontWeight: "600" }}
             size="small"
             onClick={() => {
-              onShowForm(lesson.LessonId);
+              setSelectedLessonId(lesson.LessonId);
+              handleNext();
             }}
           />
           <Chip
@@ -90,7 +95,7 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
     try {
       await axios.post(`/courses/chapters/lessons`, {
         lessonTitle: lessonTitle,
-        chapterId: selectedChapterId,
+        chapterId: chapterId,
       });
       message.success("Thêm thành công!");
 
@@ -103,9 +108,7 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
   };
   const handleDeleteClick = async (lessonId) => {
     try {
-      await axios.delete(
-        `/courses/chapters/${selectedChapterId}/lessons/${lessonId}`
-      );
+      await axios.delete(`/courses/chapters/${chapterId}/lessons/${lessonId}`);
       fetchLessonData();
       message.success("Xóa thành công!");
     } catch (error) {
@@ -113,53 +116,37 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
     }
   };
 
-  const onShowForm = async (lessonId) => {
-    setSelectedLessonId(lessonId);
-    setOpenForm(true);
-  };
-
-  const onCloseForm = () => {
-    setOpenForm(false);
-  };
-
   return (
     <div className="course-title">
-      {openForm && (
-        <LessonForm
-          isOpen={openForm}
-          isClose={onCloseForm}
-          selectedLessonId={selectedLessonId}
-          chapterId={selectedChapterId}
-          lessonId={selectedLessonId}
-          fetchLessonData={fetchLessonData}
-        ></LessonForm>
-      )}
-
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header mt-3 mb-3">
           <p>{title}</p>
-          {!isEditing ? (
-            <div onClick={handleIconClick} className="course-title-action">
-              <AddCircleOutlineOutlinedIcon fontSize="small" />
-              <span>{subTitle}</span>
-            </div>
+          {chapterId ? (
+            !isEditing ? (
+              <div onClick={handleIconClick} className="course-title-action">
+                <AddCircleOutlineOutlinedIcon fontSize="small" />
+                <span>{subTitle}</span>
+              </div>
+            ) : (
+              <div onClick={handleCancelClick} className="course-title-action">
+                <span>Cancel</span>
+              </div>
+            )
           ) : (
-            <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+            <div className="course-title-action">
+              <span>Please select a chapter</span>
             </div>
           )}
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <List>
-              <Container
-                dragHandleSelector=".drag-handle"
-                lockAxis="y"
-                onDrop={onDrop}
-              >
-                {lessonItems}
-              </Container>
-            </List>
+            <Container
+              dragHandleSelector=".drag-handle"
+              lockAxis="y"
+              onDrop={onDrop}
+            >
+              {lessonItems}
+            </Container>
           ) : (
             <div className="grid">
               <TextField
@@ -181,6 +168,7 @@ export default function TheLesson({ title, subTitle, selectedChapterId }) {
           )}
         </div>
       </div>
+      
     </div>
   );
 }

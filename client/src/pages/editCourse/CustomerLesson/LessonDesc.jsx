@@ -53,7 +53,7 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
           <div
             onClick={isEditing ? handleCancelClick : handleIconClick}

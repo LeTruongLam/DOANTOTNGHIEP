@@ -59,10 +59,10 @@ export default function CourseClass({ title, subTitle }) {
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header   mt-3 mb-3">
           <p>{title}</p>
           {!isEditing ? (
-            <div onClick={handleIconClick} className="course-title-action">
+            <div onClick={handleIconClick} className="course-title-action items-center	">
               <AddCircleOutlineOutlinedIcon fontSize="small" />
               <span>{subTitle}</span>
             </div>

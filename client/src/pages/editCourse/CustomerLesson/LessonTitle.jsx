@@ -13,11 +13,10 @@ export default function LessonTitle({
   subTitle,
   chapterId,
   lessonId,
-  fetchLessonData,
 }) {
   const [lessonTitle, setLessonTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const getChapterTitle = async () => {
+  const fetchLessonTitle = async () => {
     try {
       const res = await axios.get(
         `/courses/chapters/${chapterId}/lessons/title/${lessonId}`
@@ -29,7 +28,7 @@ export default function LessonTitle({
   };
 
   useEffect(() => {
-    getChapterTitle();
+    fetchLessonTitle();
   }, [lessonId]);
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -47,8 +46,6 @@ export default function LessonTitle({
           lessonTitle: lessonTitle,
         }
       );
-
-      fetchLessonData();
       message.success("Sửa thành công!");
     } catch (error) {
       message.error(error.message);
@@ -59,7 +56,7 @@ export default function LessonTitle({
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
           {!isEditing ? (
             <div onClick={handleIconClick} className="course-title-action">

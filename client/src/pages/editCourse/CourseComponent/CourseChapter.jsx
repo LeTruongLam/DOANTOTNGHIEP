@@ -1,37 +1,32 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
-import Box from "@mui/material/Box";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
 import { message } from "antd";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import "../EditWrite.scss";
-export default function CourseChapter({
-  title,
-  subTitle,
-  onShowForm,
-  selectChapter,
-  selectedChapterId,
-}) {
+import { Container, Draggable } from "react-smooth-dnd";
+import { arrayMoveImmutable as arrayMove } from "array-move";
+import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
+
+export default function CourseChapter({ title, subTitle, handleEdit }) {
   const location = useLocation();
   const { fetchChapter } = useContext(AuthContext);
   const [chapterData, setChapterData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [chapterTitle, setChapterTitle] = useState("");
 
-  const [value, setValue] = useState("");
+  const onDrop = ({ removedIndex, addedIndex }) => {
+    setChapterData((items) => arrayMove(items, removedIndex, addedIndex));
+  };
 
   const fetchData = async () => {
     try {
-      const data = await fetchChapter(location.state.CourseId);
+      const data = await fetchChapter(location.state?.CourseId);
       setChapterData(data);
     } catch (error) {
       console.error(error);
@@ -40,6 +35,32 @@ export default function CourseChapter({
   useEffect(() => {
     fetchData();
   }, []);
+  const chapterItems = chapterData.map((chapter) => (
+    <Draggable
+      style={{ display: "flex", alignItems: "center", gap: "10px" }}
+      className="bg-sub lesson-content"
+      key={chapter.ChapterId}
+    >
+      <div className="lesson-content-left">
+        <DragIndicatorOutlinedIcon className="drag-handle" />
+        {chapter.ChapterTitle}
+      </div>
+      <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <Stack direction="row" spacing={1}>
+          <Chip
+            onClick={() => {
+              handleEdit(chapter.ChapterId);
+            }}
+            label="Edit"
+            sx={{ color: "white", backgroundColor: "black", fontWeight: "600" }}
+            size="small"
+          />
+          <Chip label="Delete" size="small" sx={{ fontWeight: "600" }} />
+        </Stack>
+      </span>
+    </Draggable>
+  ));
+
   const handleIconClick = () => {
     setIsEditing(!isEditing);
   };
@@ -50,7 +71,7 @@ export default function CourseChapter({
     try {
       await axios.post(`/courses/chapters/title`, {
         chapterTitle: chapterTitle,
-        courseId: location.state.CourseId,
+        courseId: location.state?.CourseId,
       });
       message.success("Thêm thành công!");
     } catch (error) {
@@ -63,10 +84,13 @@ export default function CourseChapter({
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
           {!isEditing ? (
-            <div onClick={handleIconClick} className="course-title-action">
+            <div
+              onClick={handleIconClick}
+              className="course-title-action items-center"
+            >
               <AddCircleOutlineOutlinedIcon fontSize="small" />
               <span>{subTitle}</span>
             </div>
@@ -78,42 +102,13 @@ export default function CourseChapter({
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div className="chapter-select">
-              <Box className="box-select">
-                <FormControl fullWidth>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={value}
-                    onChange={(e) => {
-                      setValue(e.target.value);
-                      selectChapter(e.target.value);
-                    }}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    {chapterData.map((chapter, chapterIndex) => (
-                      <MenuItem key={chapterIndex} value={chapter.ChapterId}>
-                        {chapter.ChapterTitle}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-              {selectedChapterId && (
-                <Stack direction="row" spacing={1}>
-                  <Chip
-                    label="Edit"
-                    sx={{ color: "white", backgroundColor: "black" }}
-                    size="small"
-                    onClick={() => {
-                      onShowForm();
-                    }}
-                  />
-                </Stack>
-              )}
-            </div>
+            <Container
+              dragHandleSelector=".drag-handle"
+              lockAxis="y"
+              onDrop={onDrop}
+            >
+              {chapterItems}
+            </Container>
           ) : (
             <div className="grid">
               <TextField

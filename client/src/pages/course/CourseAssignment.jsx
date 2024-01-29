@@ -242,18 +242,10 @@ export default function CourseAssignment() {
       </div>
       <div className="file-container" tabIndex="0">
         <div className="navbar">
-          <div className="navbar-container">
-            <div className="links" onClick={handleLogout}>
+          <div className="p-4	 flex justify-end ">
+            <div className="links " onClick={handleLogout}>
               <ExitToAppIcon />
               <span>Exit</span>
-            </div>
-            <div className="turnin">
-              <Button
-                variant="contained"
-                sx={{ color: "white", backgroundColor: "green" }}
-              >
-                Turn in
-              </Button>
             </div>
           </div>
         </div>

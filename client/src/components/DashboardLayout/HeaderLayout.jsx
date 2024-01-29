@@ -1,7 +1,13 @@
-import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/authContext";
-import Logo from "../img/logo.png";
+import React, { useState, useEffect } from "react";
+import { useContext } from "react";
+
+import { useNavigate } from "react-router-dom";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -13,8 +19,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import Switch from "@mui/material/Switch";
-
-const TheHeader = () => {
+const HeaderLayout = () => {
   const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -42,24 +47,18 @@ const TheHeader = () => {
   const handleToProfile = () => {
     navigate("/info");
   };
+  const handleExit = () => {
+    navigate("/course");
+  };
   return (
-    <div className="navbar">
-      <div className="navbar-container">
-        <div className="logo">
-          <Link to="/">
-            <img src={Logo} alt="" />
-          </Link>
+    <div className="navbar flex justify-end">
+      <div className="navbar-container ">
+        <div className="links " onClick={handleExit}>
+          <ExitToAppIcon />
+          <span>Exit Mode</span>
         </div>
-        <div className="links">
-          <Link className="link" to="/">
-            <h6>Home</h6>
-          </Link>
-          <Link className="link" to="/news">
-            <h6>News</h6>
-          </Link>
-          <Link className="link" to="/course">
-            <h6>Courses</h6>
-          </Link>
+
+        <div className="links ">
           {currentUser ? (
             <>
               <Box
@@ -160,4 +159,4 @@ const TheHeader = () => {
   );
 };
 
-export default TheHeader;
+export default HeaderLayout;

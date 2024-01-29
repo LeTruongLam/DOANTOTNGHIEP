@@ -117,18 +117,25 @@ export default function CourseAssignment({
       )}
 
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
-          {!isEditing ? (
-            <div onClick={handleIconClick} className="course-title-action">
+          {selectedChapterId ? (
+            !isEditing ? (
+              <div onClick={handleIconClick} className="course-title-action">
               <AddCircleOutlineOutlinedIcon fontSize="small" />
               <span>{subTitle}</span>
             </div>
+            ) : (
+              <div onClick={handleCancelClick} className="course-title-action ">
+                <span>Cancel</span>
+              </div>
+            )
           ) : (
-            <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+            <div className="course-title-action">
+              <span>Please select a chapter</span>
             </div>
           )}
+       
         </div>
         <div className="course-title-body">
           {!isEditing ? (

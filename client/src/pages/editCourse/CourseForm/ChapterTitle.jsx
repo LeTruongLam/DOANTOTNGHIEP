@@ -37,10 +37,8 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
         chapterTitle: chapterTitle,
       });
       message.success("Sửa thành công!");
-
     } catch (error) {
       message.error(error.message);
-
     }
     setIsEditing(false);
   };
@@ -48,7 +46,7 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
           {!isEditing ? (
             <div onClick={handleIconClick} className="course-title-action">

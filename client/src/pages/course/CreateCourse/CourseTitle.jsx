@@ -9,7 +9,7 @@ export default function CourseTitle({courseTitle,setCourseTitle }) {
   return (
     <div className="course-title stepper-content">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>Course Title</p>
         </div>
         <div className="course-title-body">

@@ -46,7 +46,7 @@ const CourseFile = (props) => {
   return (
     <div className="course-image">
       <div className="course-image-wrapper">
-        <div className="course-image-header">
+        <div className="course-image-header  mt-3 mb-3">
           <p>Resources & Attachments</p>
           <div
             onClick={handleIconClick}

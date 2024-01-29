@@ -4,23 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
+import { formatDate, getText } from "../../js/TAROHelper";
+
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import Avatar from "@mui/material/Avatar";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import DescriptionIcon from "@mui/icons-material/Description";
 import ListItem from "@mui/material/ListItem";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -34,7 +25,7 @@ import ClassList from "./ClassList";
 import Comment from "./Comment";
 import ChapterList from "./ChapterList";
 const Single = () => {
-  const { fetchLesson, currentUser } = useContext(AuthContext);
+  const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
 
   const courseId = location.pathname.split("/")[2];
@@ -59,20 +50,6 @@ const Single = () => {
     };
     fetchData();
   }, [courseId]);
-
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`/courses/${courseId}`);
-      navigate("/course");
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleEdit = async () => {
-    navigate(`/write?edit=${courseId}`, { state: course });
-  };
-
   const handleToVideo = async (chapterId, lessonId) => {
     navigate(
       `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/video`,
@@ -100,10 +77,6 @@ const Single = () => {
         currentPath: currentPath,
       },
     });
-  };
-  const getText = (html) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent;
   };
 
   const handleClick = async (index, item) => {
@@ -161,7 +134,7 @@ const Single = () => {
         <div className="header-sub">
           <div className="header-sub-wrapper">
             {course.img && <img src={`../upload/${course.img}`} alt="" />}
-            <h3>{getText(course.title)}</h3>
+            <h3 className="font-bold mt-3">{getText(course.title)}</h3>
             <ListItem>
               <ListItemIcon>
                 <CalendarMonthIcon />
@@ -174,14 +147,14 @@ const Single = () => {
               </ListItemIcon>
               <ListItemText primary={`Ngày kết thúc: ${course.EndDate}`} />
             </ListItem>
-            <h3>Giảng viên </h3>
+            <h3 className="font-bold mt-1">Giảng viên </h3>
             <ListItem>
               <ListItemIcon>
                 <Avatar alt="Cindy Baker" />
               </ListItemIcon>
               <ListItemText primary={course.TeacherName} />
             </ListItem>
-            <h3>Môn học bao gồm: </h3>
+            <h3 className="font-bold mt-1">Môn học bao gồm: </h3>
             <ListItem>
               <ListItemIcon>
                 <AccountBoxIcon />
@@ -249,22 +222,6 @@ const Single = () => {
           </CustomTabPanel>
         </Box>
       </div>
-      <SpeedDial
-        ariaLabel="SpeedDial openIcon example"
-        sx={{ position: "fixed", bottom: 16, right: 16 }}
-        icon={<SpeedDialIcon openIcon={<EditIcon />} />}
-      >
-        <SpeedDialAction
-          icon={<DeleteIcon />}
-          tooltipTitle="Delete"
-          onClick={handleDelete}
-        />
-        <SpeedDialAction
-          icon={<EditIcon />}
-          tooltipTitle="Edit"
-          onClick={handleEdit}
-        />
-      </SpeedDial>
     </div>
   );
 };

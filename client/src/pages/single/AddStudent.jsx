@@ -86,7 +86,7 @@ export default function AddStudent({
     <>
       <div className="course-title">
         <div className="course-title-wrapper">
-          <div className="course-title-header">
+          <div className="course-title-header mt-3 mb-2">
             <p>Mã lớp học {classCode}</p>
           </div>
           <Autocomplete
@@ -105,12 +105,12 @@ export default function AddStudent({
             )}
           />
           <div className="course-title-body">
-            <div className="grid" style={{ marginTop: "20px" }}>
+            <div className="grid mt-5">
               {studentList}
             </div>
           </div>
           <Button
-            style={{ marginTop: "12px" }}
+            className="mt-3"
             variant="contained"
             onClick={handleSaveClick}
           >

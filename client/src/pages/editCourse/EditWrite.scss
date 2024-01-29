@@ -96,7 +96,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 16px;
 }
 
@@ -113,7 +113,8 @@
 
 .course-title-action {
     display: flex;
-    gap: 10px;
+    gap: 5px;
+    align-items: center;
 }
 
 .course-title-body {
@@ -184,8 +185,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: bold;
-    font-size: 20px;
+
 }
 
 .course-custom-icon {

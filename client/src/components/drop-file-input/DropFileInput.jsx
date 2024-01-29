@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 import "./drop-file-input.css";
 import EditIcon from "@mui/icons-material/Edit";
@@ -34,7 +35,7 @@ const DropFileInput = (props) => {
   return (
     <div className="course-image">
       <div className="course-image-wrapper">
-        <div className="course-image-header">
+        <div className="course-image-header  mt-3 mb-3">
           <p>Course Image</p>
           <p>
             <EditIcon fontSize="small" onClick={() => setSelectedFile(null)} />
@@ -57,8 +58,8 @@ const DropFileInput = (props) => {
             </div>
           ) : (
             <div className="drop-file-input__label">
-              <img src={uploadImg} alt="" />
-              <p>Drag & Drop your files here</p>
+              <CloudUploadIcon fontSize="large"/>
+              <p>Drag & Drop your file here</p>
             </div>
           )}
           <input type="file" value="" onChange={onFileDrop} />

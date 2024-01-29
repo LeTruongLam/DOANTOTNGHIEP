@@ -68,7 +68,6 @@ const ChapterFile = ({ chapterId }) => {
       fetchChapterFiles();
     } catch (error) {
       message.error(error.message);
-
     }
   };
 
@@ -86,7 +85,7 @@ const ChapterFile = ({ chapterId }) => {
   return (
     <div className="course-image">
       <div className="course-image-wrapper">
-        <div className="course-image-header">
+        <div className="course-image-header  mt-3 mb-3">
           <p>Resources & Attachments</p>
           <div
             onClick={handleIconClick}
@@ -109,9 +108,7 @@ const ChapterFile = ({ chapterId }) => {
         </div>
         {datas.length > 0 && (
           <>
-            <p>
-              <b>Attached: </b>
-            </p>
+            <p className=" mt-3 mb-3 font-bold">Attached:</p>
 
             {datas.map((data, index) => (
               <div key={index} className="drop-file-preview__item">
@@ -156,8 +153,7 @@ const ChapterFile = ({ chapterId }) => {
           ))}
 
           <Button
-              sx={{ color: "white", backgroundColor: "black" }}
-
+            sx={{ color: "white", backgroundColor: "black" }}
             style={{
               marginTop: "12px",
               width: "max-content",

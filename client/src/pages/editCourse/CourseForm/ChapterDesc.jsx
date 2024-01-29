@@ -13,7 +13,6 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [chapterDesc, setChapterDesc] = useState("");
 
-
   const getChapterDesc = async () => {
     try {
       const res = await axios.get(`/courses/chapters/desc/${chapterId}`);
@@ -51,7 +50,7 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
           <div
             onClick={isEditing ? handleCancelClick : handleIconClick}

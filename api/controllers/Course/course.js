@@ -139,14 +139,13 @@ export const deleteCourse = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const courseId = req.params.id;
-    const q = "DELETE FROM courses WHERE `CourseId` = ? AND `UserId` = ?";
+    console.log(courseId)
+    const q = "DELETE FROM courses WHERE `CourseId` = ? ";
 
     // Kiểm tra vai trò người dùng và quyền xóa khóa học
-    if (userInfo.role !== "admin" && userInfo.id !== courseId) {
-      return res.status(403).json("Unauthorized!");
-    }
+ 
 
-    db.query(q, [courseId, userInfo.id], (err, data) => {
+    db.query(q, [courseId], (err, data) => {
       if (err) return res.status(403).json("You can delete only your post!");
 
       return res.json("Post has been deleted!");

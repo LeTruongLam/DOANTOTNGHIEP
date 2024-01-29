@@ -17,7 +17,6 @@ export default function CourseTitle({ title, subTitle }) {
     try {
       const res = await axios.get(`/courses/title/${location.state.CourseId}`);
       setCourseTitle(res.data.courseTitle);
-      console.log(res.data.courseTitle);
     } catch (error) {
       message.error(error.message);
     }
@@ -51,12 +50,12 @@ export default function CourseTitle({ title, subTitle }) {
   return (
     <div className="course-title">
       <div className="course-title-wrapper">
-        <div className="course-title-header">
+        <div className="course-title-header mt-3 mb-3">
           <p>{title}</p>
           {!isEditing ? (
             <div onClick={handleIconClick} className="course-title-action">
               <EditIcon fontSize="small" />
-              <span>{subTitle}</span>
+              <span >{subTitle}</span>
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">

@@ -98,9 +98,9 @@ export default function ClassList({ courseId, classCodeStudent }) {
           <div className="class-title">
             Mã lớp học : {classCode || classCodeStudent}
           </div>
-          <div className="class-header">
-            <p>
-              <b>Danh sách lớp ({classStudent.length})</b>
+          <div className="class-header font-bold mt-3">
+            <p >
+              Danh sách lớp ({classStudent.length})
             </p>
             <p
               style={{
@@ -114,14 +114,14 @@ export default function ClassList({ courseId, classCodeStudent }) {
               {isTeacher && (
                 <>
                   <AddCircleOutlineOutlinedIcon fontSize="small" />
-                  <span>Add Student</span>
+                  <p>Add Student</p>
                 </>
               )}
             </p>
           </div>
 
           {classStudent.map((student, index) => (
-            <div className="student-info" key={index}>
+            <div className="student-info mt-3" key={index}>
               <div>
                 <Avatar alt="Cindy Baker" />
               </div>

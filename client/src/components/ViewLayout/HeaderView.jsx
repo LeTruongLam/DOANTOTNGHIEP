@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';const TheHeader = () => {
+import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
+const TheHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const courseId = location.pathname.split("/")[2];
@@ -16,7 +17,7 @@ import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';co
   const getChapterTitle = async () => {
     try {
       const response = await axios.get(
-        `/courses/${courseId}/chapters/${location.state.chapterId}`
+        `/courses/${courseId}/chapters/${location.state?.chapterId}`
       );
       setCourseTitle(response.data.ChapterTitle);
     } catch (err) {
@@ -25,11 +26,14 @@ import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';co
   };
   useEffect(() => {
     getChapterTitle();
-  }, [location.state.chapterId]);
+  }, [location.state?.chapterId]);
   return (
     <div className="navbar">
       <div className="navbar-container">
-        <div className="logo" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div
+          className="logo"
+          style={{ display: "flex", alignItems: "center", gap: "16px" }}
+        >
           <AutoStoriesOutlinedIcon />
           <b>{courseTitle}</b>
         </div>

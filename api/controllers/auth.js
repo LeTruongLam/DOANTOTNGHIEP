@@ -40,7 +40,7 @@ export const login = (req, res) => {
       return res.status(400).json("Wrong username or password!");
 
     const token = jwt.sign({ id: user.UserId, role: user.Role }, "jwtkey");
-    const { password: _, ...userData } = user; // Use "_" to ignore the "password" property
+    const { password: _, ...userData } = user; 
 
     res
       .cookie("access_token", token, {

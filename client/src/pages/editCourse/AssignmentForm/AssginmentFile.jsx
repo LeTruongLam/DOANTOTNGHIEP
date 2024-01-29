@@ -82,7 +82,7 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
   return (
     <div className="course-image">
       <div className="course-image-wrapper">
-        <div className="course-image-header">
+        <div className="course-image-header  mt-3 mb-3">
           <p>Resources & Attachments</p>
           <div
             onClick={handleIconClick}
@@ -128,10 +128,8 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
       </div>
 
       {fileList.length > 0 && (
-        <div className="drop-file-preview">
-          <p>
-            <b>Attaching: </b>
-          </p>
+        <div className="drop-file-preview ">
+          <p className=" mt-3 mb-3 font-bold">Attaching:</p>
 
           {fileList.map((item, index) => (
             <div key={index} className="drop-file-preview__item">
@@ -152,8 +150,7 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
           ))}
 
           <Button
-              sx={{ color: "white", backgroundColor: "black" }}
-
+            sx={{ color: "white", backgroundColor: "black" }}
             style={{
               marginTop: "12px",
               width: "max-content",
@@ -170,4 +167,3 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
 };
 
 export default AssignmentFile;
-
