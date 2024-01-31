@@ -11,11 +11,11 @@
 
 .header-sub {
     background-color: #fff;
-    width: 30%;
+    width: 300px;
     height: max-content;
     position: absolute;
     right: 40px;
-    top: 150px;
+    top: 50px;
     border-radius: 20px;
     border: 1px solid #dfe3e6;
 
@@ -34,7 +34,7 @@
 }
 
 .single-content {
-    width: 60%;
+    width: 70%;
     margin: 0 40px 40px 40px;
 
 }
@@ -61,6 +61,10 @@
 
 }
 
+.css-19kzrtu {
+    padding: 0 !important;
+}
+
 .class-wrapper .student-info {
     display: flex;
     gap: 20px;
@@ -80,3 +84,15 @@
     display: flex;
     justify-content: space-between;
 }
+
+.css-16ac5r2-MuiButtonBase-root-MuiListItemButton-root:hover {
+    background-color: #fff !important;
+    color: blue;
+}
+
+.css-13eg511-MuiButtonBase-root-MuiListItemButton-root:hover {
+    color: blue;
+    background-color: #fff !important;
+
+
+ }

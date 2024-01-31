@@ -71,11 +71,15 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(lessonDesc),
-              }}
-            ></div>
+            lessonDesc == null ? (
+              <div className="italic text-slate-400		">No lesson description </div>
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(lessonDesc),
+                }}
+              ></div>
+            )
           ) : (
             <ReactQuill
               className="editor bg-main"

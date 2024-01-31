@@ -10,8 +10,8 @@
              text-decoration: none;
              flex-grow: 1;
              flex-shrink: 0;
-             flex-basis: calc(33% - 40px);
-             max-width: calc(33% - 40px);
+             flex-basis: calc(25% - 40px);
+             max-width: calc(25% - 40px);
              position: relative;
              margin: 16px 16px;
              min-width: 16rem;
@@ -19,9 +19,6 @@
              border: 1px solid #dfe3e6;
              border-radius: 14px;
              box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-
-
-
              .link {
                  text-decoration: none;
                  display: flex;
@@ -83,10 +80,6 @@
                          }
 
                          .course-title-main {
-                             font-weight: 600;
-                             color: black;
-                             font-size: 20px;
-                             line-height: 1.4;
                              &:hover {
                                  color: #3738e2;
 
@@ -139,9 +132,7 @@
      }
  }
 
- .course-datetime {
-     width: 50%;
- }
+
 
  .title-course {
      display: flex;
@@ -189,9 +180,8 @@
  }
 
  .course-file-viewer {
-     height: calc(100% - 60px);
+     height: calc(100vh - 64px);
      display: flex;
-     gap: 20px
  }
 
  .list-file {
@@ -209,4 +199,7 @@
 
  .stepper-content {
      padding-bottom: 12px;
+ }
+ .css-16ac5r2-MuiButtonBase-root-MuiListItemButton-root {
+    justify-content: space-between !important;
  }

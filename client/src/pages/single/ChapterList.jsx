@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -9,6 +9,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import DescriptionIcon from "@mui/icons-material/Description";
+
 const ChapterList = ({
   openIndex,
   chapterData,
@@ -18,63 +19,77 @@ const ChapterList = ({
   handleToAssignment,
   handleToFile,
 }) => {
+  console.table(chapterData);
+
+  const lessonLength = chapterData.map((chapter, index) => {
+    const length = lessons.filter(
+      (lesson) => lesson.ChapterId === chapter.ChapterId
+    ).length;
+    return length;
+  });
+
   return (
-    <>
-      {chapterData.map((item, index) => (
-        <List
-          key={index}
-          sx={{
-            width: "100%",
-            maxWidth: 500,
-            bgcolor: "#f7f9fa",
-            border: "1px solid #dfe3e6",
-          }}
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-        >
-          <ListItemButton onClick={() => handleClick(index, item)}>
-            <ListItemText
-              primary={`Chương ${index + 1}: ${item.ChapterTitle}`}
-            />
-            {openIndex === index ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {lessons.map((lesson, lessonIndex) => (
+    <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
+      <div className="p-5">
+        {chapterData.map((item, index) => (
+          <List
+            key={index}
+            sx={{
+              borderRadius: "12px",
+              marginBottom: "16px",
+              width: "100%",
+              bgcolor: "#fff",
+            }}
+            component="nav"
+            aria-labelledby="nested-list-subheader"
+          >
+            <ListItemButton onClick={() => handleClick(index, item)}>
+              {openIndex === index ? <ExpandLess /> : <ExpandMore />}
+              <ListItemText
+                className="ml-3"
+                primary={`Chương ${index + 1}: ${item.ChapterTitle}`}
+              />
+            </ListItemButton>
+            <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {lessons.map((lesson, lessonIndex) => (
+                  <ListItemButton
+                    key={lessonIndex}
+                    sx={{ pl: 4 }}
+                    onClick={() =>
+                      handleToVideo(item.ChapterId, lesson.LessonId)
+                    }
+                  >
+                    <ListItemIcon>
+                      <OndemandVideoIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={` ${index + 1}.${lessonIndex + 1}:  ${
+                        lesson.LessonTitle
+                      }`}
+                    />
+                  </ListItemButton>
+                ))}
                 <ListItemButton
-                  key={lessonIndex}
-                  sx={{ pl: 4 }}
-                  onClick={() => handleToVideo(item.ChapterId, lesson.LessonId)}
+                  onClick={() => handleToAssignment(item.ChapterId)}
                 >
                   <ListItemIcon>
-                    <OndemandVideoIcon />
+                    <AssignmentIcon />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={` ${index + 1}.${lessonIndex + 1}:  ${
-                      lesson.LessonTitle
-                    }`}
-                  />
+                  <ListItemText primary="Bài tập cuối chương" />
                 </ListItemButton>
-              ))}
-              <ListItemButton
-                onClick={() => handleToAssignment(item.ChapterId)}
-              >
-                <ListItemIcon>
-                  <AssignmentIcon />
-                </ListItemIcon>
-                <ListItemText primary="Bài tập cuối chương" />
-              </ListItemButton>
-              <ListItemButton onClick={() => handleToFile(item.ChapterId)}>
-                <ListItemIcon>
-                  <DescriptionIcon />
-                </ListItemIcon>
-                <ListItemText primary="Tài liệu chương học" />
-              </ListItemButton>
-            </List>
-          </Collapse>
-        </List>
-      ))}
-    </>
+                <ListItemButton onClick={() => handleToFile(item.ChapterId)}>
+                  <ListItemIcon>
+                    <DescriptionIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Tài liệu chương học" />
+                </ListItemButton>
+              </List>
+            </Collapse>
+          </List>
+        ))}
+      </div>
+    </div>
   );
 };
 

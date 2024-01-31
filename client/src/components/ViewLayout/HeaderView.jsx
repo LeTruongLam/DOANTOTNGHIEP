@@ -28,7 +28,7 @@ const TheHeader = () => {
     getChapterTitle();
   }, [location.state?.chapterId]);
   return (
-    <div className="navbar">
+    <div className="navbar  mx-5">
       <div className="navbar-container">
         <div
           className="logo"

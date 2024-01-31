@@ -17,7 +17,7 @@ export default function CourseFileViewer() {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const listRef = useRef(null);
   const handleLogout = () => {
-    navigate(location.state.currentPath); // Redirect to "/" after logout
+    navigate(-1); // Redirect to "/" after logout
   };
   useEffect(() => {
     const fetchCourseFiles = async () => {
@@ -81,17 +81,6 @@ export default function CourseFileViewer() {
         </List>
       </div>
       <div className="file-container" tabIndex="0">
-        <div className="navbar">
-          <div className="navbar-container">
-            <div className="logo">
-              <b>{selectedDoc?.name}</b>
-            </div>
-            <div className="links" onClick={handleLogout}>
-              <ExitToAppIcon />
-              <span>Exit</span>
-            </div>
-          </div>
-        </div>
         {selectedDoc ? (
           <DocViewer
             documents={[selectedDoc]}

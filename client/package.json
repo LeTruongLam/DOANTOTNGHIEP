@@ -40,7 +40,9 @@
     "react-smooth-dnd": "^0.11.1",
     "sanitize-html": "^2.10.0",
     "sass": "^1.63.4",
+    "styled-components": "^6.1.8",
     "tailwindcss": "^3.4.1",
+    "twin.macro": "^3.4.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

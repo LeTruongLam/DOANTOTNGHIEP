@@ -5,16 +5,16 @@ import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
 import { formatDate, getText } from "../../js/TAROHelper";
-
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Avatar from "@mui/material/Avatar";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import SchoolIcon from "@mui/icons-material/School";
+import GroupsIcon from "@mui/icons-material/Groups";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
-import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
-import ListItem from "@mui/material/ListItem";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+
+import ListItem from "@mui/material/ListItem";
 import Button from "@mui/material/Button";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
@@ -129,49 +129,79 @@ const Single = () => {
     <div className="single">
       <div className="single-container">
         <div className="header-single">
-          {course.img && <img src={`../upload/${course.img}`} alt="" />}
+          <div className="bg-black min-h-20 h-[300px]">
+            <div className="mx-10 w-[60%] h-full pt-5">
+              <div className="flex items-center gap-5 ">
+                <span className="text-white font-medium py-2 px-3 bg-gray rounded-lg">
+                  Created
+                </span>
+                <span className="text-white">
+                  <span className=" text-gray-50">by </span>
+                  <span className="font-medium	">{course.TeacherName}</span>
+                </span>
+              </div>
+              <div className="text-white text-4xl my-5 font-medium	">
+                {course.title}
+              </div>
+              <div className=" flex gap-5  mb-3 text-white w-full">
+                <ul className="flex gap-2 items-center">
+                  <SchoolIcon
+                    style={{
+                      color: "rgb(101, 163, 13)",
+                    }}
+                  />
+                  <span>{course.CourseCode}</span>
+                </ul>
+                <ul className="flex gap-2 items-center">
+                  <ScheduleIcon
+                    style={{
+                      color: "rgb(101, 163, 13)",
+                    }}
+                  />
+                  <span>15h</span>
+                </ul>
+                <ul className="flex gap-2 items-center">
+                  <GroupsIcon
+                    style={{
+                      color: "rgb(101, 163, 13)",
+                    }}
+                  />
+                  <span>160</span>
+                </ul>
+                <ul className="flex gap-2 items-center">
+                  <InsertDriveFileIcon
+                    style={{
+                      color: "rgb(101, 163, 13)",
+                    }}
+                  />
+                  <span>{chapterData.length}</span>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="header-sub">
+        <div className="header-sub drop-shadow-2xl">
           <div className="header-sub-wrapper">
             {course.img && <img src={`../upload/${course.img}`} alt="" />}
-            <h3 className="font-bold mt-3">{getText(course.title)}</h3>
             <ListItem>
               <ListItemIcon>
-                <CalendarMonthIcon />
+                <CalendarMonthIcon
+                  style={{
+                    color: "rgb(101, 163, 13)",
+                  }}
+                />
               </ListItemIcon>
               <ListItemText primary={`Ngày bắt đầu: ${course.StartDate}`} />
             </ListItem>
             <ListItem>
               <ListItemIcon>
-                <CalendarMonthIcon />
+                <CalendarMonthIcon
+                  style={{
+                    color: "rgb(101, 163, 13)",
+                  }}
+                />
               </ListItemIcon>
               <ListItemText primary={`Ngày kết thúc: ${course.EndDate}`} />
-            </ListItem>
-            <h3 className="font-bold mt-1">Giảng viên </h3>
-            <ListItem>
-              <ListItemIcon>
-                <Avatar alt="Cindy Baker" />
-              </ListItemIcon>
-              <ListItemText primary={course.TeacherName} />
-            </ListItem>
-            <h3 className="font-bold mt-1">Môn học bao gồm: </h3>
-            <ListItem>
-              <ListItemIcon>
-                <AccountBoxIcon />
-              </ListItemIcon>
-              <ListItemText primary="160 sinh viên đăng ký học" />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <InsertDriveFileIcon />
-              </ListItemIcon>
-              <ListItemText primary={`${chapterData.length} chương học`} />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <OndemandVideoIcon />
-              </ListItemIcon>
-              <ListItemText primary="15 giờ học video" />
             </ListItem>
             <Button variant="contained" sx={{ width: "100%" }}>
               MEETING
@@ -179,22 +209,62 @@ const Single = () => {
           </div>
         </div>
       </div>
-      <div className="single-content">
+      <div className="single-content mt-4 ">
         <Box sx={{ width: "100%" }}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Box
+            sx={{
+              border: 1,
+              borderColor: "divider",
+              borderRadius: "12px 12px 0 0 ",
+            }}
+          >
             <Tabs
               value={value}
               onChange={handleChange}
               aria-label="basic tabs example"
             >
-              <Tab label="Mô tả" {...a11yProps(0)} />
-              <Tab label="Danh sách bài học" {...a11yProps(1)} />
-              <Tab label="Trao đổi" {...a11yProps(2)} />
-              <Tab label="Danh sách lớp" {...a11yProps(3)} />
+              <Tab
+                label="Mô tả"
+                {...a11yProps(0)}
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                  },
+                }}
+              />
+              <Tab
+                label="Danh sách bài học"
+                {...a11yProps(1)}
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                  },
+                }}
+              />
+              <Tab
+                label="Trao đổi"
+                {...a11yProps(2)}
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                  },
+                }}
+              />
+              <Tab
+                label="Danh sách lớp"
+                {...a11yProps(3)}
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                  },
+                }}
+              />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
             <p
+              style={{ backgroundColor: "#F5F5F5" }}
+              className=" p-5 rounded-b-xl "
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(course.desc),
               }}

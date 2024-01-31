@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import Logo from "../img/logo.png";
@@ -13,6 +13,30 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import Switch from "@mui/material/Switch";
+import styled from "styled-components";
+import { NavLink } from "react-router-dom";
+
+const Container = styled.div`
+  .active {
+    border-bottom: 4px solid rgb(14 165 233);
+    color: rgb(147 51 234);
+  }
+`;
+const SlickBar = styled.ul`
+  color: var(--white);
+  display: flex;
+  flex-direction: row;
+  background-color: var(--white);
+`;
+const Item = styled(NavLink)`
+  color: var(--black);
+  cursor: pointer;
+  display: flex;
+  &:hover {
+    border-bottom: 4px solid rgb(14 165 233);
+    color: rgb(147 51 234);
+  }
+`;
 
 const TheHeader = () => {
   const { currentUser, logout } = useContext(AuthContext);
@@ -20,6 +44,8 @@ const TheHeader = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [checked, setChecked] = React.useState(false);
+  const [click, setClick] = useState(true);
+
   const handleChecked = (event) => {
     setChecked(event.target.checked);
     if (event.target.checked) {
@@ -43,23 +69,33 @@ const TheHeader = () => {
     navigate("/info");
   };
   return (
-    <div className="navbar">
-      <div className="navbar-container">
+    <div className="navbar mx-5 ">
+      <div className="navbar-container ">
         <div className="logo">
           <Link to="/">
             <img src={Logo} alt="" />
           </Link>
         </div>
-        <div className="links">
-          <Link className="link" to="/">
-            <h6>Home</h6>
-          </Link>
-          <Link className="link" to="/news">
-            <h6>News</h6>
-          </Link>
-          <Link className="link" to="/course">
-            <h6>Courses</h6>
-          </Link>
+        <div className="flex">
+          <Container className="">
+            <SlickBar className="h-full items-center " clicked={click}>
+              <Item exact activeClassName="active" to="/">
+                <span className="py-4 mx-2" clicked={click}>
+                  Home
+                </span>
+              </Item>
+              <Item activeClassName="active" to="/news">
+                <span className="py-4 mx-2" clicked={click}>
+                  News
+                </span>
+              </Item>
+              <Item activeClassName="active" to="/course">
+                <span className="py-4 mx-2" clicked={click}>
+                  Course
+                </span>
+              </Item>
+            </SlickBar>
+          </Container>
           {currentUser ? (
             <>
               <Box

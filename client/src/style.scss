@@ -3,12 +3,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root {
+    /* Colors */
+    --black: #09090c;
+    --grey: #a4b2bc;
+    --white: #fff;
+    --background: rgba(137, 171, 245, 0.37);
+  }
+  
 .app {
     display: flex;
     justify-content: center;
     .container {
         width: 100%;
-        margin: 0 30px;
         // NAVBAR
         .navbar {
             border-bottom: 1px solid #dfe3e6;

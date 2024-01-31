@@ -5,10 +5,9 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./course.scss";
 import { AuthContext } from "../../context/authContext";
-import Chip from "@mui/material/Chip";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import { formatDate, getText } from "../../js/TAROHelper";
-
+import SchoolIcon from "@mui/icons-material/School";
 const Course = () => {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
@@ -36,6 +35,7 @@ const Course = () => {
           setCourses(res.data);
         } else {
           const res = await axios.get(`/courses/${cat}`);
+          console.table(res.data);
           setCourses(res.data);
         }
         setLoading(false);
@@ -46,9 +46,6 @@ const Course = () => {
     };
     fetchData();
   }, [cat]);
-  const handleWrite = () => {
-    navigate("/course/create");
-  };
   return (
     <div className="section-row">
       <div className="title-course mt-6 mb-3	">
@@ -63,36 +60,45 @@ const Course = () => {
               </div>
               <div className="course-content">
                 <div className="course-glimpse-wrapper">
+                  <div>
+                    <span className="font-normal	 text-base">
+                      Created by {course.TeacherName}
+                    </span>
+                  </div>
                   <div className="course-glimpse-info">
-                    <p className="course-title-main font-medium	">
-                      {truncateString(getText(course.title), 35)}
-                    </p>
-                    <p className="course-desc  mt-3">
-                      {truncateString(getText(course.desc), 250)}
+                    <p className="course-title-main font-medium text-base			">
+                      {truncateString(getText(course.title), 100)}
                     </p>
                   </div>
                   <div className="course-datetime mt-3">
-                    <Chip
-                      color="primary"
-                      variant="outlined"
-                      icon={<DateRangeIcon />}
-                      label={`Starts: ${formatDate(course.StartDate)}`}
-                      style={{ width: "100%", justifyContent: "flex-start" }}
-                    />
-                    <Chip
-                      color="primary"
-                      variant="outlined"
-                      icon={<DateRangeIcon />}
-                      label={`End: ${formatDate(course.EndDate)}`}
-                      style={{
-                        width: "100%",
-                        justifyContent: "flex-start",
-                        margin: "10px 0",
-                      }}
-                    />
+                    <span className="	flex items-center gap-2">
+                      <DateRangeIcon
+                        style={{
+                          color: "rgb(101, 163, 13)",
+                          fontSize: "medium",
+                        }}
+                      />
+                      <span className="text-slate-500">
+                        {`${formatDate(course.StartDate)} -  ${formatDate(
+                          course.EndDate
+                        )}`}
+                      </span>
+                    </span>
                   </div>
-                  <div className="course-glimpse-footer  mt-2">
-                    <p className="course-glimpse-footer-btn">Xem khóa học</p>
+                  <div>
+                    <hr className="text-slate-300 mt-3" />
+                  </div>
+                  <div className=" mt-2 flex justify-between">
+                    <p className="	flex items-center gap-2 font-medium	">
+                      <SchoolIcon
+                        style={{
+                          color: "rgb(101, 163, 13)",
+                          fontSize: "medium",
+                        }}
+                      />
+                      <span>{course.CourseCode}</span>
+                    </p>
+                    <p className="font-medium	">View More</p>
                   </div>
                 </div>
               </div>

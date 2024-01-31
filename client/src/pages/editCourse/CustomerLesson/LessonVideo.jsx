@@ -232,7 +232,11 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
                     ) : (
                       <div className="drop-file-input__label">
                         <CloudUploadIcon fontSize="large" />
-                        <p>Drag & Drop your files here</p>
+                        <p className="font-normal	">
+                          <span className="text-purple-600	">Upload a file</span>
+                          <span> or drag and drop </span>
+                        </p>
+                        <p className="font-light text-sm">MP4 up to 100MB</p>
                       </div>
                     )}
                     <input type="file" value="" onChange={onFileDrop} />

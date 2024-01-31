@@ -10,7 +10,6 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import AddStudentForm from "./AddStudentForm";
 export default function ClassList({ courseId, classCodeStudent }) {
   const { currentUser } = useContext(AuthContext);
-
   const [classes, setClasses] = useState([]);
   const [classCode, setClassCode] = useState("");
   const [classId, setClassId] = useState("");
@@ -56,85 +55,85 @@ export default function ClassList({ courseId, classCodeStudent }) {
     setOpenForm(false);
   };
   return (
-    <>
-      {openForm && classCode && (
-        <AddStudentForm
-          classCode={classCode}
-          isOpen={openForm}
-          courseId={courseId}
-          isClose={onCloseForm}
-          classId={classId}
-          fetchClassStudent={fetchClassStudent}
-        ></AddStudentForm>
-      )}
-      {isTeacher && (
-        <FormControl fullWidth sx={{ m: 1 }} size="medium">
-          <InputLabel id="demo-select-small-label">Class Code</InputLabel>
-          <Select
-            labelId="demo-select-small-label"
-            id="demo-select-small"
-            value={classCode}
-            label="Class Code"
-            onChange={handleChange}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {classes.map((classItem, classIndexs) => (
-              <MenuItem
-                key={classIndexs}
-                value={classItem.ClassCode}
-                onClick={() => setClassId(classItem.ClassId)}
-              >
-                {classItem.ClassCode}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )}
-
-      <div className="class-container">
-        <div className="class-wrapper">
-          <div className="class-title">
-            Mã lớp học : {classCode || classCodeStudent}
-          </div>
-          <div className="class-header font-bold mt-3">
-            <p >
-              Danh sách lớp ({classStudent.length})
-            </p>
-            <p
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "10px",
-              }}
-              onClick={onShowForm}
+    <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
+      <div className="p-5">
+        {openForm && classCode && (
+          <AddStudentForm
+            classCode={classCode}
+            isOpen={openForm}
+            courseId={courseId}
+            isClose={onCloseForm}
+            classId={classId}
+            fetchClassStudent={fetchClassStudent}
+          ></AddStudentForm>
+        )}
+        {isTeacher && (
+          <FormControl fullWidth sx={{ m: 1, backgroundColor: "#fff" }} size="medium">
+            <InputLabel id="demo-select-small-label">Class Code</InputLabel>
+            <Select
+              labelId="demo-select-small-label"
+              id="demo-select-small"
+              value={classCode}
+              label="Class Code"
+              onChange={handleChange}
             >
-              {isTeacher && (
-                <>
-                  <AddCircleOutlineOutlinedIcon fontSize="small" />
-                  <p>Add Student</p>
-                </>
-              )}
-            </p>
-          </div>
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {classes.map((classItem, classIndexs) => (
+                <MenuItem
+                  key={classIndexs}
+                  value={classItem.ClassCode}
+                  onClick={() => setClassId(classItem.ClassId)}
+                >
+                  {classItem.ClassCode}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
-          {classStudent.map((student, index) => (
-            <div className="student-info mt-3" key={index}>
-              <div>
-                <Avatar alt="Cindy Baker" />
-              </div>
-              <div>
-                <p>
-                  <b>{student.StudentName}</b>
-                </p>
-                <p>{student.StudentCode}</p>
-              </div>
+        <div className="class-container bg-white">
+          <div className="class-wrapper">
+            <div className="class-title">
+              Mã lớp học : {classCode || classCodeStudent}
             </div>
-          ))}
+            <div className="class-header font-bold mt-3">
+              <p>Danh sách lớp ({classStudent.length})</p>
+              <p
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+                onClick={onShowForm}
+              >
+                {isTeacher && (
+                  <>
+                    <AddCircleOutlineOutlinedIcon fontSize="small" />
+                    <p>Add Student</p>
+                  </>
+                )}
+              </p>
+            </div>
+
+            {classStudent.map((student, index) => (
+              <div className="student-info mt-3" key={index}>
+                <div>
+                  <Avatar alt="Cindy Baker" />
+                </div>
+                <div>
+                  <p>
+                    <b>{student.StudentName}</b>
+                  </p>
+                  <p>{student.StudentCode}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

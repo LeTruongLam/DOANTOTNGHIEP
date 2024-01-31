@@ -17,7 +17,6 @@ import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
 import CourseAssignment from "./pages/course/CourseAssignment.jsx";
 import { useContext } from "react";
 import TheDashboard from "./pages/dashboard/TheDashboard.jsx";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./context/authContext.js";
 import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
 import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
@@ -31,14 +30,14 @@ const Layout = ({ children }) => (
 const LayoutViewer = ({ children }) => (
   <>
     <HeaderVideo />
-    {children}
+    <div className="mr-4">{children}</div>
   </>
 );
 
 const LayoutTeacher = ({ children }) => (
   <div className="flex gap-6">
     <Sidebar />
-    <div className="w-full">
+    <div className="w-full mr-5">
       <HeaderLayout />
       {children}
     </div>
@@ -52,7 +51,14 @@ function App() {
       <div className="container">
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={
+                <Layout>
+                  <Home />
+                </Layout>
+              }
+            />
             <Route
               path="/course/:id"
               element={
@@ -89,8 +95,22 @@ function App() {
                 )
               }
             />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route
+              path="/register"
+              element={
+                <Layout>
+                  <Register />
+                </Layout>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Layout>
+                  <Login />
+                </Layout>
+              }
+            />
             <Route
               path="/dashboard"
               element={
