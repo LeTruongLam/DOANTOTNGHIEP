@@ -19,15 +19,6 @@ const ChapterList = ({
   handleToAssignment,
   handleToFile,
 }) => {
-  console.table(chapterData);
-
-  const lessonLength = chapterData.map((chapter, index) => {
-    const length = lessons.filter(
-      (lesson) => lesson.ChapterId === chapter.ChapterId
-    ).length;
-    return length;
-  });
-
   return (
     <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="p-5">

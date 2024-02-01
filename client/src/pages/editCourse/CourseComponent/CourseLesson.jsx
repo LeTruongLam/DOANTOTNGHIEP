@@ -6,13 +6,11 @@ import { arrayMoveImmutable as arrayMove } from "array-move";
 import "../EditWrite.scss";
 
 import { message } from "antd";
-import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
-import LessonForm from "../CustomerLesson/LessonForm";
 
 export default function TheLesson({
   title,
@@ -52,7 +50,7 @@ export default function TheLesson({
   const lessonItems = lessons.map((lesson) => (
     <Draggable
       style={{ display: "flex", alignItems: "center", gap: "10px" }}
-      className="bg-sub lesson-content"
+      className="bg-white rounded-lg mr-2  lesson-content"
       key={lesson.LessonId}
     >
       <div className="lesson-content-left">
@@ -61,23 +59,23 @@ export default function TheLesson({
       </div>
       <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <Stack direction="row" spacing={1}>
-          <Chip
-            label="Edit"
-            sx={{ color: "white", backgroundColor: "black", fontWeight: "600" }}
-            size="small"
+          <button
+            onClick={() => {
+              handleDeleteClick(lesson.LessonId);
+            }}
+            className="mr-2 text-xs	 rounded-2xl	 	 text-black px-2.5 py-1  text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-100 bg-blue-50	"
+          >
+            Delete
+          </button>
+          <button
             onClick={() => {
               setSelectedLessonId(lesson.LessonId);
               handleNext();
             }}
-          />
-          <Chip
-            label="Delete"
-            size="small"
-            sx={{ fontWeight: "600" }}
-            onClick={() => {
-              handleDeleteClick(lesson.LessonId);
-            }}
-          />
+            className="mr-2 text-xs	 rounded-2xl	 bg-black	 text-white px-2.5 py-1 text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
+          >
+            Edit
+          </button>
         </Stack>
       </span>
     </Draggable>
@@ -168,7 +166,6 @@ export default function TheLesson({
           )}
         </div>
       </div>
-      
     </div>
   );
 }

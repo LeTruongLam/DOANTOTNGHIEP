@@ -45,7 +45,6 @@ const LayoutTeacher = ({ children }) => (
 );
 
 function App() {
-  const { expiredToken, currentUser } = useContext(AuthContext);
   return (
     <div className="app">
       <div className="container">
@@ -62,37 +61,25 @@ function App() {
             <Route
               path="/course/:id"
               element={
-                !expiredToken ? (
-                  <Layout>
-                    <Single />
-                  </Layout>
-                ) : (
-                  <Login />
-                )
+                <Layout>
+                  <Single />
+                </Layout>
               }
             />
             <Route
               path="/course"
               element={
-                !expiredToken ? (
-                  <Layout>
-                    <Course />
-                  </Layout>
-                ) : (
-                  <Login />
-                )
+                <Layout>
+                  <Course />
+                </Layout>
               }
             />
             <Route
               path="/course/create"
               element={
-                !expiredToken ? (
-                  <LayoutTeacher>
-                    <CourseStepper />
-                  </LayoutTeacher>
-                ) : (
-                  <Login />
-                )
+                <LayoutTeacher>
+                  <CourseStepper />
+                </LayoutTeacher>
               }
             />
             <Route
@@ -114,85 +101,57 @@ function App() {
             <Route
               path="/dashboard"
               element={
-                !expiredToken ? (
-                  <LayoutTeacher>
-                    <TheDashboard />
-                  </LayoutTeacher>
-                ) : (
-                  <Login />
-                )
+                <LayoutTeacher>
+                  <TheDashboard />
+                </LayoutTeacher>
               }
             />
             <Route
               path="/write"
               element={
-                !expiredToken ? (
-                  <LayoutTeacher>
-                    <CustomerCourse />
-                  </LayoutTeacher>
-                ) : (
-                  <Login />
-                )
+                <LayoutTeacher>
+                  <CustomerCourse />
+                </LayoutTeacher>
               }
             />
             <Route
               path="/info"
               element={
-                !expiredToken ? (
-                  <Layout>
-                    <Infor />
-                  </Layout>
-                ) : (
-                  <Login />
-                )
+                <Layout>
+                  <Infor />
+                </Layout>
               }
             />
             <Route
               path="/news"
               element={
-                !expiredToken ? (
-                  <Layout>
-                    <FileViewer />
-                  </Layout>
-                ) : (
-                  <Login />
-                )
+                <Layout>
+                  <FileViewer />
+                </Layout>
               }
             />
             <Route
               path="/course/:courseId/file/:chapterId"
               element={
-                !expiredToken ? (
-                  <LayoutViewer>
-                    <CourseFileViewer />
-                  </LayoutViewer>
-                ) : (
-                  <Login />
-                )
+                <LayoutViewer>
+                  <CourseFileViewer />
+                </LayoutViewer>
               }
             />
             <Route
               path="/course/:courseId/chapters/:chapterId/assignment"
               element={
-                !expiredToken ? (
-                  <LayoutViewer>
-                    <CourseAssignment />
-                  </LayoutViewer>
-                ) : (
-                  <Login />
-                )
+                <LayoutViewer>
+                  <CourseAssignment />
+                </LayoutViewer>
               }
             />
             <Route
               path="/course/:courseId/chapter/:chapterId/lesson/:lessonId/video"
               element={
-                !expiredToken ? (
-                  <LayoutViewer>
-                    <CourseVideo />
-                  </LayoutViewer>
-                ) : (
-                  <Login />
-                )
+                <LayoutViewer>
+                  <CourseVideo />
+                </LayoutViewer>
               }
             />
           </Routes>

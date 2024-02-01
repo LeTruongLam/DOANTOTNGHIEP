@@ -21,7 +21,7 @@ const LessonStepper = ({ chapterId, handleBack, lessonId }) => {
               handleBack();
             }}
             type="button"
-            className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 "
           >
             Back
           </button>
@@ -31,7 +31,7 @@ const LessonStepper = ({ chapterId, handleBack, lessonId }) => {
 
             }}
             type="button"
-            className="mr-2 rounded-md bg-green-600	 text-white px-2.5 py-2 text-sm font-semibold   ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className="mr-2 rounded-md bg-black	 text-white px-2.5 py-2 text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
           >
             Done
           </button>

@@ -38,7 +38,7 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
   const chapterItems = chapterData.map((chapter) => (
     <Draggable
       style={{ display: "flex", alignItems: "center", gap: "10px" }}
-      className="bg-sub lesson-content"
+      className="bg-white rounded-lg mr-2 lesson-content"
       key={chapter.ChapterId}
     >
       <div className="lesson-content-left">
@@ -47,15 +47,17 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
       </div>
       <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <Stack direction="row" spacing={1}>
-          <Chip
+          <button className="mr-2 text-xs	 rounded-2xl	 	 text-black px-2.5 py-1  text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-100 bg-blue-50	">
+            Delete
+          </button>
+          <button
             onClick={() => {
               handleEdit(chapter.ChapterId);
             }}
-            label="Edit"
-            sx={{ color: "white", backgroundColor: "black", fontWeight: "600" }}
-            size="small"
-          />
-          <Chip label="Delete" size="small" sx={{ fontWeight: "600" }} />
+            className="mr-2 text-xs	 rounded-2xl	 bg-black	 text-white px-2.5 py-1 text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
+          >
+            Edit
+          </button>
         </Stack>
       </span>
     </Draggable>

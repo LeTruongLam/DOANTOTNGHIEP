@@ -7,13 +7,13 @@ import { formatDate, getText } from "../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
-import ListSubheader from "@mui/material/ListSubheader";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
-
+import AttachmentIcon from "@mui/icons-material/Attachment";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import Box from "@mui/material/Box";
 export default function CourseAssignment() {
   const location = useLocation();
@@ -118,11 +118,16 @@ export default function CourseAssignment() {
         <div className="assignment-body  bg-white h-full w-full rounded-lg">
           {assignment && (
             <>
-              <div className="assignment-body-title">
+              <div className="assignment-body-title flex justify-between my-4">
                 <h1 className="text-3xl	font-semibold		">
                   {assignment.AssignmentTitle}
                 </h1>
-                <p className="font-semibold	">Point: </p>
+                <button
+                  type="submit"
+                  className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                >
+                  Submit
+                </button>
               </div>
               <div className="my-2">
                 {assignment.StartDate ? (
@@ -151,17 +156,20 @@ export default function CourseAssignment() {
                   </span>
                 )}
               </div>
-              <div className="my-2">
+              <div className="my-2 w-max">
                 <p className="font-semibold	mb-2">Reference materials:</p>
                 {attachFile.length > 0 ? (
                   <>
                     {attachFile.map((file, index) => (
                       <a
+                        className=" inline 	 no-underline	"
                         href={file.FileUrl}
                         download
-                        style={{ textDecoration: "none" }}
                       >
-                        <div key={index} className="drop-file-preview__item">
+                        <div
+                          key={index}
+                          className="drop-file-preview__item w-max bg-white"
+                        >
                           <img src={ImageConfig["default"]} alt="" />
                           <p>{file.FileTitle}</p>
                         </div>
@@ -173,6 +181,16 @@ export default function CourseAssignment() {
                     <em>None</em>
                   </span>
                 )}
+              </div>
+              <div className="my-2 flex gap-5">
+                <p className="font-semibold gap-1   flex items-center justify-center">
+                  <AttachmentIcon />
+                  <span>Attach</span>
+                </p>
+                <p className="font-semibold gap-1  flex items-center justify-center ">
+                  <EditNoteIcon />
+                  <span>Note</span>
+                </p>
               </div>
             </>
           )}

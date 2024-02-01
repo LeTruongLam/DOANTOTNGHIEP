@@ -10,11 +10,7 @@ import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined
 import "../EditWrite.scss";
 import AssginmentForm from "../AssignmentForm/AssginmentForm";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-export default function CourseAssignment({
-  title,
-  subTitle,
-  selectedChapterId,
-}) {
+export default function CourseAssignment({ title, subTitle, chapterId }) {
   const { fetchAssignment } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [assignments, setAssignments] = useState([]);
@@ -23,8 +19,8 @@ export default function CourseAssignment({
   const [selectedAssignmentId, setSelectedAssignmentId] = useState();
   const fetchAssignmentData = async () => {
     try {
-      if (selectedChapterId) {
-        const data = await fetchAssignment(selectedChapterId);
+      if (chapterId) {
+        const data = await fetchAssignment(chapterId);
         setAssignments(data); // Lưu kết quả vào state lessons
       } else {
         setAssignments([]); // Đặt state lessons thành một mảng rỗng nếu selectedChapterId không có giá trị
@@ -36,7 +32,7 @@ export default function CourseAssignment({
 
   useEffect(() => {
     fetchAssignmentData();
-  }, [selectedChapterId]);
+  }, [chapterId]);
 
   const assignmentItems = assignments.map((assignment) => (
     <div className="bg-sub lesson-content" key={assignment.AssignmentId}>
@@ -72,7 +68,7 @@ export default function CourseAssignment({
     try {
       await axios.post(`/courses/chapters/assignments`, {
         assignmentTitle: assignmentTitle,
-        chapterId: selectedChapterId,
+        chapterId: chapterId,
       });
       fetchAssignmentData();
     } catch (error) {
@@ -84,7 +80,7 @@ export default function CourseAssignment({
   const handleDeleteClick = async (assignmentId) => {
     try {
       await axios.delete(
-        `/courses/chapters/${selectedChapterId}/assignments/${assignmentId}`
+        `/courses/chapters/${chapterId}/assignments/${assignmentId}`
       );
       fetchAssignmentData();
 
@@ -110,7 +106,7 @@ export default function CourseAssignment({
           isOpen={openForm}
           isClose={onCloseForm}
           selectedAssignmentId={selectedAssignmentId}
-          chapterId={selectedChapterId}
+          chapterId={chapterId}
           assignmentId={selectedAssignmentId}
           fetchAssignmentData={fetchAssignmentData}
         ></AssginmentForm>
@@ -119,23 +115,16 @@ export default function CourseAssignment({
       <div className="course-title-wrapper">
         <div className="course-title-header  mt-3 mb-3">
           <p>{title}</p>
-          {selectedChapterId ? (
-            !isEditing ? (
-              <div onClick={handleIconClick} className="course-title-action">
+          {!isEditing ? (
+            <div onClick={handleIconClick} className="course-title-action">
               <AddCircleOutlineOutlinedIcon fontSize="small" />
               <span>{subTitle}</span>
             </div>
-            ) : (
-              <div onClick={handleCancelClick} className="course-title-action ">
-                <span>Cancel</span>
-              </div>
-            )
           ) : (
-            <div className="course-title-action">
-              <span>Please select a chapter</span>
+            <div onClick={handleCancelClick} className="course-title-action ">
+              <span>Cancel</span>
             </div>
           )}
-       
         </div>
         <div className="course-title-body">
           {!isEditing ? (
