@@ -89,12 +89,7 @@ export default function CourseAssignment() {
                 gap: "8px",
               }}
             >
-              <div
-                className="course-custom-icon"
-                style={{ backgroundColor: "gray", color: "#fff" }}
-              >
-                <AssignmentOutlinedIcon />
-              </div>
+              <AssignmentOutlinedIcon />
               <span onClick={handleToggle}>Upcoming</span>
             </Box>
             {open ? (
@@ -214,7 +209,7 @@ export default function CourseAssignment() {
                       ))}
                     </>
                   ) : (
-                    <span >
+                    <span>
                       <em>None</em>
                     </span>
                   )}
