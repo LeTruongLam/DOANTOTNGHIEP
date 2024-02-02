@@ -52,15 +52,22 @@ const ChapterStepper = ({
           <ChapterTitle
             chapterId={chapterId}
             title="Chapter Title"
-            subTitle="Edit Title"
+            subTitle="Edit "
           />
           <div className="editorContainer">
             <ChapterDesc
               chapterId={chapterId}
               title="Chapter Desccription"
-              subTitle="Edit desccription"
+              subTitle="Edit "
             />
           </div>
+          <div>
+        <CourseAssignment
+          chapterId={chapterId}
+          title="Assignments"
+          subTitle="Add"
+        />
+      </div>
         </div>
         <div className="course-custom">
           <div className="course-custom-title">
@@ -74,17 +81,11 @@ const ChapterStepper = ({
             setSelectedLessonId={setSelectedLessonId}
             chapterId={chapterId}
             title="Lessons "
-            subTitle="Add a lesson"
+            subTitle="Add "
           />
         </div>
       </div>
-      <div>
-        <CourseAssignment
-          chapterId={chapterId}
-          title="Assignment"
-          subTitle="Edit"
-        />
-      </div>
+    
     </div>
   );
 };

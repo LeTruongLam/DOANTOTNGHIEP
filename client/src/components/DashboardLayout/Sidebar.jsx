@@ -5,6 +5,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import QuizIcon from "@mui/icons-material/Quiz";
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 const Container = styled.div`
   .active {
     border-right: 4px solid rgb(14 165 233);
@@ -37,20 +38,20 @@ const Item = styled(NavLink)`
 `;
 
 const Text = styled.span`
-  width: ${(props) => (props.clicked ? "100%" : "0")};
-  margin-left: ${(props) => (props.clicked ? "1.5rem" : "0")};
+
+  margin-left: 1.5rem;
 `;
 
 const Sidebar = () => {
   const [click, setClick] = useState(true);
 
   return (
-    <div className="mt-3 min-w-44 grow-[1] border-r border-slate-300 flex flex-col justify-between ">
+    <div className=" min-w-[250px] border-r border-slate-300 flex flex-col justify-between ">
       <Container>
         <SlickBar clicked={click}>
           <Item exact activeClassName="active" to="/">
             <HomeIcon />
-            <Text clicked={click}>Home</Text>
+            <Text className="inline" clicked={click}>Home</Text>
           </Item>
           <Item activeClassName="active" to="/dashboard">
             <ListAltIcon />
@@ -67,10 +68,18 @@ const Sidebar = () => {
           <Item
             onClick={() => setClick(false)}
             activeClassName="active"
+            to="/assignment"
+          >
+            <AssignmentIndIcon />
+            <Text clicked={click}>Assignments</Text>
+          </Item>
+          <Item
+            onClick={() => setClick(false)}
+            activeClassName="active"
             to="/bankquestion"
           >
             <QuizIcon />
-            <Text clicked={click}>Bank Questions</Text>
+            <Text className="inline" >Bank Questions</Text>
           </Item>
         </SlickBar>
       </Container>

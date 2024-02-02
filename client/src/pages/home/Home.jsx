@@ -6,21 +6,21 @@ import "./home.scss"
 
 const Home = () => {
   return (
-    <div className="home">
+    <div className="home mx-10">
       <div className="container">
         <div className="hero-section">
           <div className="hero-content">
-            <div className="title">
-              <h1>Studying Online</h1>
-              <h1>is now much easier</h1>
+            <div className="title mb-4">
+              <h1 className="text-5xl font-semibold">Studying Online</h1>
+              <h1 className="text-5xl font-semibold">is now much easier</h1>
             </div>
-            <div>
+            <div className="mb-4">
               <p>
                 BK-ELEARNING is an interesting platform that will teach you in
                 more an interactive way
               </p>
             </div>
-            <Link to="/login" className="join">
+            <Link to="/login" className="join font-semibold">
               <h6>Join now</h6>
             </Link>
           </div>

@@ -10,8 +10,8 @@ const TheHeader = () => {
   const courseId = location.pathname.split("/")[2];
   const [courseTitle, setCourseTitle] = useState("");
 
-  const handleLogout = () => {
-    navigate(location.state.currentPath); // Redirect to "/" after logout
+  const handleExit = () => {
+    navigate(-1); // Redirect to "/" after logout
   };
 
   const getChapterTitle = async () => {
@@ -37,7 +37,7 @@ const TheHeader = () => {
           <AutoStoriesOutlinedIcon />
           <b>{courseTitle}</b>
         </div>
-        <div className="links" onClick={handleLogout}>
+        <div className="links" onClick={handleExit}>
           <ExitToAppIcon />
           <span>Exit</span>
         </div>

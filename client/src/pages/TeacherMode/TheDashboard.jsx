@@ -10,7 +10,6 @@ import TableRow from "@mui/material/TableRow";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Chip from "@mui/material/Chip";
 import { formatDate, getText } from "../../js/TAROHelper";
 import axios from "axios";
 const columns = [
@@ -95,7 +94,7 @@ export default function StickyHeadTable() {
 
 
   return (
-    <div className="grow-[3]">
+    <div >
       <div>
         <div className="my-6 flex justify-between">
           <input

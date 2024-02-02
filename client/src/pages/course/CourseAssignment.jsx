@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable jsx-a11y/no-redundant-roles */
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./course.scss";
-import { ImageConfig } from "../../config/ImageConfig.js";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDate, getText } from "../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -15,6 +17,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import Box from "@mui/material/Box";
+import { PaperClipIcon } from "@heroicons/react/20/solid";
+
 export default function CourseAssignment() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -114,86 +118,133 @@ export default function CourseAssignment() {
           </Collapse>
         </List>
       </div>
-      <div className="file-container outline-none  " tabIndex="0">
-        <div className="assignment-body  bg-white h-full w-full rounded-lg">
-          {assignment && (
-            <>
-              <div className="assignment-body-title flex justify-between my-4">
-                <h1 className="text-3xl	font-semibold		">
-                  {assignment.AssignmentTitle}
-                </h1>
-                <button
-                  type="submit"
-                  className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                >
-                  Submit
-                </button>
-              </div>
-              <div className="my-2">
-                {assignment.StartDate ? (
+      <div className="file-container outline-none mt-5  " tabIndex="0">
+        <div className="px-4 sm:px-0 flex justify-between">
+          <h3 className="text-2xl font-semibold leading-7 text-gray-900">
+            Assignment
+          </h3>
+
+          <button
+            type="submit"
+            className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          >
+            Submit
+          </button>
+        </div>
+        <div className="mt-6 border-t border-gray-100">
+          <dl className="divide-y divide-gray-100">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-base	 font-medium leading-6 text-gray-900">
+                Title
+              </dt>
+              <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {assignment?.AssignmentTitle}
+              </dd>
+            </div>
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-base	 font-medium leading-6 text-gray-900">
+                Date
+              </dt>
+              <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {assignment?.StartDate ? (
                   <span>{formatDate(assignment?.StartDate)} - </span>
                 ) : (
                   <span>
-                    <em>None</em>
+                    <em>None - </em>
                   </span>
                 )}
-
-                {assignment.EndDate ? (
+                {assignment?.EndDate ? (
                   <span>{formatDate(assignment?.EndDate)}</span>
                 ) : (
                   <span>
                     <em>None</em>
                   </span>
                 )}
-              </div>
-              <div className="my-2">
-                <p className="font-semibold	">Instructions:</p>
-                {assignment.AssignmentDesc ? (
+              </dd>
+            </div>
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-base	 font-medium leading-6 text-gray-900">
+                About
+              </dt>
+              <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {assignment?.AssignmentDesc ? (
                   <span>{getText(assignment?.AssignmentDesc)}</span>
                 ) : (
                   <span>
                     <em>None</em>
                   </span>
                 )}
-              </div>
-              <div className="my-2 w-max">
-                <p className="font-semibold	mb-2">Reference materials:</p>
-                {attachFile.length > 0 ? (
-                  <>
-                    {attachFile.map((file, index) => (
-                      <a
-                        className=" inline 	 no-underline	"
-                        href={file.FileUrl}
-                        download
-                      >
-                        <div
-                          key={index}
-                          className="drop-file-preview__item w-max bg-white"
-                        >
-                          <img src={ImageConfig["default"]} alt="" />
-                          <p>{file.FileTitle}</p>
-                        </div>
-                      </a>
-                    ))}
-                  </>
-                ) : (
-                  <span>
-                    <em>None</em>
-                  </span>
-                )}
-              </div>
-              <div className="my-2 flex gap-5">
-                <p className="font-semibold gap-1   flex items-center justify-center">
-                  <AttachmentIcon />
-                  <span>Attach</span>
-                </p>
-                <p className="font-semibold gap-1  flex items-center justify-center ">
-                  <EditNoteIcon />
-                  <span>Note</span>
-                </p>
-              </div>
-            </>
-          )}
+              </dd>
+            </div>
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-base	 font-medium leading-6 text-gray-900">
+                Attachments
+              </dt>
+              <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
+                <ul
+                  role="list"
+                  className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                >
+                  {attachFile?.length > 0 ? (
+                    <>
+                      {attachFile?.map((file, index) => (
+                        <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
+                          <div className="flex w-0 flex-1 items-center">
+                            <PaperClipIcon
+                              className="h-5 w-5 flex-shrink-0 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                              <span className="truncate font-medium">
+                                {file?.FileTitle}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="ml-4 flex-shrink-0 flex items-center gap-4">
+                            <a
+                              href={file?.FileUrl}
+                              download
+                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                            >
+                              Download
+                            </a>
+                            <VisibilityIcon className="hover:text-indigo-500 cursor-pointer" />
+                          </div>
+                        </li>
+                      ))}
+                    </>
+                  ) : (
+                    <span >
+                      <em>None</em>
+                    </span>
+                  )}
+                </ul>
+              </dd>
+            </div>
+
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-base	font-medium leading-6 text-gray-900">
+                My work
+              </dt>
+              <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
+                <ul
+                  role="list"
+                  className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                >
+                  <div className="my-2  flex-col ml-4">
+                    <p className="font-semibold gap-1   flex items-center ">
+                      <AttachmentIcon />
+                      <span>Attach</span>
+                    </p>
+                    <p className="font-semibold gap-1  flex items-center  ">
+                      <EditNoteIcon />
+                      <span>Note</span>
+                    </p>
+                  </div>
+                </ul>
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
     </div>
