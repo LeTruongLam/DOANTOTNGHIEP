@@ -1,11 +1,9 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/no-redundant-roles */
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
-import "./course.scss";
+import "../course.scss";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { formatDate, getText } from "../../js/TAROHelper";
+import { formatDate, getText } from "../../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
@@ -21,14 +19,11 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 
 export default function CourseAssignment() {
   const location = useLocation();
-  const navigate = useNavigate();
   const listRef = useRef(null);
-
   const [open, setOpen] = useState(false);
   const handleToggle = () => {
     setOpen(!open);
   };
-
   const [assignment, setAssignment] = useState([]);
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
@@ -199,7 +194,7 @@ export default function CourseAssignment() {
                             <a
                               href={file?.FileUrl}
                               download
-                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                              className="font-medium  text-indigo-600 hover:text-indigo-500"
                             >
                               Download
                             </a>
@@ -226,14 +221,31 @@ export default function CourseAssignment() {
                   role="list"
                   className="divide-y divide-gray-100 rounded-md border border-gray-200"
                 >
-                  <div className="my-2  flex-col ml-4">
-                    <p className="font-semibold gap-1   flex items-center ">
-                      <AttachmentIcon />
-                      <span>Attach</span>
+                  <div className="  flex-col  divide-y divide-gray-100">
+                    <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
+                      <div className="flex items-center justify-center gap-1">
+                        <AttachmentIcon />
+                        <span>Attach</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      >
+                        Change
+                      </button>
                     </p>
-                    <p className="font-semibold gap-1  flex items-center  ">
-                      <EditNoteIcon />
-                      <span>Note</span>
+                    <p className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
+                      <div className="flex items-center justify-center gap-1">
+                        <EditNoteIcon />
+                        <span>Note</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      >
+                        Change
+                      </button>
                     </p>
                   </div>
                 </ul>

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 
+const  SESSIONTIMEOUT = 10000000000000; // 10s
 export const AuthContext = createContext();
 
 export const AuthContexProvider = ({ children }) => {
@@ -11,18 +12,13 @@ export const AuthContexProvider = ({ children }) => {
   const login = async (inputs) => {
     const res = await axios.post("/auth/login", inputs);
     setCurrentUser(res.data);
-
-    // Thiết lập thời gian tồn tại của phiên đăng nhập là 30 phút (1800000 milliseconds)
-    const sessionTimeout = 18000000;
-
     // Lưu thời gian hết hạn của phiên đăng nhập vào localStorage
-    const expirationTime = Date.now() + sessionTimeout;
+    const expirationTime = Date.now() + SESSIONTIMEOUT;
     localStorage.setItem("expirationTime", expirationTime);
   };
   const fetchChapter = async (CourseId) => {
     try {
       const reschapter = await axios.get(`/courses/${CourseId}/chapters`);
-      // console.log(reschapter.data)
 
       return reschapter.data;
     } catch (err) {
@@ -59,7 +55,6 @@ export const AuthContexProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(currentUser));
-
     // Lấy thời gian hết hạn của phiên đăng nhập từ localStorage
     const expirationTime = localStorage.getItem("expirationTime");
 

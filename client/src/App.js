@@ -14,13 +14,15 @@ import "./style.scss";
 import HeaderVideo from "./components/ViewLayout/HeaderView.jsx";
 import FileViewer from "./pages/FileViewer.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
-import CourseAssignment from "./pages/course/CourseAssignment.jsx";
+import CourseAssignment from "./pages/course/CourseAssignment/CourseAssignment.jsx";
 import { useContext } from "react";
 import TheDashboard from "./pages/TeacherMode/TheDashboard.jsx";
-import { AuthContext } from "./context/authContext.js";
+import PageNotFound from "./pages/PageNotFound.jsx"
 import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
 import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
 import TheAssignment from "./pages/TeacherMode/TheAssignment.jsx";
+import PrivateRouter from "./utils/PrivateRouter.jsx";
+import TeacherRouter from "./utils/TeacherRouter.jsx";
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -59,30 +61,37 @@ function App() {
                 </Layout>
               }
             />
-            <Route
-              path="/course/:id"
-              element={
-                <Layout>
-                  <Single />
-                </Layout>
-              }
-            />
-            <Route
-              path="/course"
-              element={
-                <Layout>
-                  <Course />
-                </Layout>
-              }
-            />
-            <Route
-              path="/course/create"
-              element={
-                <LayoutTeacher>
-                  <CourseStepper />
-                </LayoutTeacher>
-              }
-            />
+            <Route element={<PrivateRouter />}>
+              <Route
+                path="/course/:id"
+                element={
+                  <Layout>
+                    <Single />
+                  </Layout>
+                }
+              />
+            </Route>
+            <Route element={<PrivateRouter />}>
+              <Route
+                path="/course"
+                element={
+                  <Layout>
+                    <Course />
+                  </Layout>
+                }
+              />
+            </Route>
+            <Route element={<TeacherRouter />}>
+              <Route
+                path="/course/create"
+                element={
+                  <LayoutTeacher>
+                    <CourseStepper />
+                  </LayoutTeacher>
+                }
+              />
+            </Route>
+
             <Route
               path="/register"
               element={
@@ -99,38 +108,47 @@ function App() {
                 </Layout>
               }
             />
-            <Route
-              path="/dashboard"
-              element={
-                <LayoutTeacher>
-                  <TheDashboard />
-                </LayoutTeacher>
-              }
-            />
-            <Route
-              path="/assignment"
-              element={
-                <LayoutTeacher>
-                  <TheAssignment />
-                </LayoutTeacher>
-              }
-            />
-            <Route
-              path="/write"
-              element={
-                <LayoutTeacher>
-                  <CustomerCourse />
-                </LayoutTeacher>
-              }
-            />
-            <Route
-              path="/info"
-              element={
-                <Layout>
-                  <Infor />
-                </Layout>
-              }
-            />
+            <Route element={<TeacherRouter />}>
+              <Route
+                path="/dashboard"
+                element={
+                  <LayoutTeacher>
+                    <TheDashboard />
+                  </LayoutTeacher>
+                }
+              />
+            </Route>
+            <Route element={<TeacherRouter />}>
+              <Route
+                path="/assignment"
+                element={
+                  <LayoutTeacher>
+                    <TheAssignment />
+                  </LayoutTeacher>
+                }
+              />
+            </Route>
+            <Route element={<TeacherRouter />}>
+              <Route
+                path="/write"
+                element={
+                  <LayoutTeacher>
+                    <CustomerCourse />
+                  </LayoutTeacher>
+                }
+              />
+            </Route>
+            <Route element={<PrivateRouter />}>
+              <Route
+                path="/info"
+                element={
+                  <Layout>
+                    <Infor />
+                  </Layout>
+                }
+              />
+            </Route>
+
             <Route
               path="/news"
               element={
@@ -139,30 +157,38 @@ function App() {
                 </Layout>
               }
             />
-            <Route
-              path="/course/:courseId/file/:chapterId"
-              element={
-                <LayoutViewer>
-                  <CourseFileViewer />
-                </LayoutViewer>
-              }
-            />
-            <Route
-              path="/course/:courseId/chapters/:chapterId/assignment"
-              element={
-                <LayoutViewer>
-                  <CourseAssignment />
-                </LayoutViewer>
-              }
-            />
-            <Route
-              path="/course/:courseId/chapter/:chapterId/lesson/:lessonId/video"
-              element={
-                <LayoutViewer>
-                  <CourseVideo />
-                </LayoutViewer>
-              }
-            />
+
+            <Route element={<PrivateRouter />}>
+              <Route
+                path="/course/:courseId/file/:chapterId"
+                element={
+                  <LayoutViewer>
+                    <CourseFileViewer />
+                  </LayoutViewer>
+                }
+              />
+            </Route>
+            <Route element={<PrivateRouter />}>
+              <Route
+                path="/course/:courseId/chapters/:chapterId/assignment"
+                element={
+                  <LayoutViewer>
+                    <CourseAssignment />
+                  </LayoutViewer>
+                }
+              />
+            </Route>
+            <Route element={<PrivateRouter />}>
+              <Route
+                path="/course/:courseId/chapter/:chapterId/lesson/:lessonId/video"
+                element={
+                  <LayoutViewer>
+                    <CourseVideo />
+                  </LayoutViewer>
+                }
+              />
+            </Route>
+            <Route path="/*" element={<PageNotFound />} />
           </Routes>
         </Router>
       </div>
