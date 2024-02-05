@@ -46,7 +46,7 @@ const Info = () => {
   };
 
   return (
-    <div className="m-5">
+    <div className="m-5  mr-10 ml-10">
       <form>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">

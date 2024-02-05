@@ -47,7 +47,7 @@ const Course = () => {
     fetchData();
   }, [cat]);
   return (
-    <div className="section-row">
+    <div className="section-row ml-10">
       <div className="title-course mt-6 mb-3	">
         <h1 className=" font-bold text-3xl ml-3 ">My Courses</h1>
       </div>
