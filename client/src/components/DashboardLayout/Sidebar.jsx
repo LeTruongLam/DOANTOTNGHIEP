@@ -5,11 +5,12 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import QuizIcon from "@mui/icons-material/Quiz";
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 const Container = styled.div`
   .active {
-    border-right: 4px solid rgb(14 165 233);
-    background-color: rgb(165 243 252);
+    border-right-width: 2px;
+    --tw-border-opacity: 1;
+    border-color: rgb(37 99 235 / var(--tw-border-opacity));
     color: rgb(147 51 234);
   }
 `;
@@ -28,58 +29,45 @@ const Item = styled(NavLink)`
   width: 100%;
   padding: 1rem 0;
   cursor: pointer;
-  display: flex;
+  display: flex; 
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
   padding-left: 1rem;
   &:hover {
-    border-right: 4px solid rgb(14 165 233);
-    background-color: rgb(165 243 252);
+    border-right: 2px solid  rgb(209 213 219) ;
     color: rgb(147 51 234);
   }
 `;
 
 const Text = styled.span`
-
   margin-left: 1.5rem;
 `;
 
 const Sidebar = () => {
-  const [click, setClick] = useState(true);
-
   return (
     <div className=" min-w-[250px] border-r border-slate-300 flex flex-col justify-between ">
       <Container>
-        <SlickBar clicked={click}>
+        <SlickBar>
           <Item exact activeClassName="active" to="/">
             <HomeIcon />
-            <Text className="inline" clicked={click}>Home</Text>
+            <Text className="inline ">Home</Text>
           </Item>
           <Item activeClassName="active" to="/dashboard">
             <ListAltIcon />
-            <Text clicked={click}>Courses</Text>
+            <Text>Courses</Text>
           </Item>
-          <Item
-            onClick={() => setClick(false)}
-            activeClassName="active"
-            to="/calender"
-          >
+          <Item activeClassName="active" to="/calender">
             <CalendarMonthIcon />
-            <Text clicked={click}>Calender</Text>
+            <Text>Calender</Text>
           </Item>
-          <Item
-            onClick={() => setClick(false)}
-            activeClassName="active"
-            to="/assignment"
-          >
+          <Item activeClassName="active" to="/assignment">
             <AssignmentIndIcon />
-            <Text clicked={click}>Assignments</Text>
+            <Text>Assignments</Text>
           </Item>
-          <Item
-            onClick={() => setClick(false)}
-            activeClassName="active"
-            to="/bankquestion"
-          >
+          <Item activeClassName="active" to="/bankquestion">
             <QuizIcon />
-            <Text className="inline" >Bank Questions</Text>
+            <Text className="inline">Bank Questions</Text>
           </Item>
         </SlickBar>
       </Container>

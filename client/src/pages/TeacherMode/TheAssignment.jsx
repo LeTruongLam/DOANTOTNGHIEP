@@ -1,4 +1,44 @@
 import React from "react";
+
+import PropTypes from "prop-types";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
 const people = [
   {
     name: "Le Truong Lam",
@@ -55,88 +95,85 @@ const people = [
 ];
 
 const TheAssignment = () => {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
     <>
-      <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
-        <ul class="flex flex-wrap -mb-px">
-          <li class="me-2">
-            <a
-              href="#"
-              class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-            >
-              Profile
-            </a>
-          </li>
-          <li class="me-2">
-            <a
-              href="#"
-              class="inline-block p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500"
-              aria-current="page"
-            >
-              Dashboard
-            </a>
-          </li>
-          <li class="me-2">
-            <a
-              href="#"
-              class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-            >
-              Settings
-            </a>
-          </li>
-          <li class="me-2">
-            <a
-              href="#"
-              class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-            >
-              Contacts
-            </a>
-          </li>
-          <li>
-            <a class="inline-block p-4 text-gray-400 rounded-t-lg cursor-not-allowed dark:text-gray-500">
-              Disabled
-            </a>
-          </li>
-        </ul>
-      </div>
-      <ul role="list" className="divide-y divide-slate-200">
-        {people.map((person) => (
-          <li key={person.email} className="flex justify-between gap-x-6 py-5">
-            <div className="flex min-w-0 gap-x-4">
-              <img
-                className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                src={person.imageUrl}
-                alt=""
-              />
-              <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">
-                  {person.name}
-                </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                  {person.email}
-                </p>
-              </div>
-            </div>
-            <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-              <p className="text-sm leading-6 text-gray-900">{person.role}</p>
-              {person.lastSeen ? (
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  <time dateTime={person.lastSeenDateTime}>
-                    {person.lastSeen}
-                  </time>
-                </p>
-              ) : (
-                <div className="mt-1 flex items-center gap-x-1.5">
-                  <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ borderBottom: 2, borderColor: "divider" }}>
+          <Tabs value={value} onChange={handleChange}>
+            <Tab
+              label="Upcoming"
+              {...a11yProps(0)}
+              sx={{ textTransform: "none" }}
+            />
+            <Tab
+              label="Pass due"
+              {...a11yProps(1)}
+              sx={{ textTransform: "none" }}
+            />
+            <Tab
+              label="Completed"
+              {...a11yProps(2)}
+              sx={{ textTransform: "none" }}
+            />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <ul role="list" className="divide-y divide-slate-200">
+            {people.map((person) => (
+              <li
+                key={person.email}
+                className="flex justify-between gap-x-6 py-5"
+              >
+                <div className="flex min-w-0 gap-x-4">
+                  <img
+                    className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                    src={person.imageUrl}
+                    alt=""
+                  />
+                  <div className="min-w-0 flex-auto">
+                    <p className="text-sm font-semibold leading-6 text-gray-900">
+                      {person.name}
+                    </p>
+                    <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                      {person.email}
+                    </p>
                   </div>
-                  <p className="text-xs leading-5 text-gray-500">Online</p>
                 </div>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
+                <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                  <p className="text-sm leading-6 text-gray-900">
+                    {person.role}
+                  </p>
+                  {person.lastSeen ? (
+                    <p className="mt-1 text-xs leading-5 text-gray-500">
+                      <time dateTime={person.lastSeenDateTime}>
+                        {person.lastSeen}
+                      </time>
+                    </p>
+                  ) : (
+                    <div className="mt-1 flex items-center gap-x-1.5">
+                      <div className="flex-none rounded-full bg-emerald-500/20 p-1">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      </div>
+                      <p className="text-xs leading-5 text-gray-500">Online</p>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          Item Two
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={2}>
+          Item Three
+        </CustomTabPanel>
+      </Box>
     </>
   );
 };

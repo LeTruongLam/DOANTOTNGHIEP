@@ -18,7 +18,9 @@ import { NavLink } from "react-router-dom";
 
 const Container = styled.div`
   .active {
-    border-bottom: 4px solid rgb(14 165 233);
+    border-bottom-width: 2px;
+    --tw-border-opacity: 1;
+    border-color: rgb(37 99 235 / var(--tw-border-opacity));
     color: rgb(147 51 234);
   }
 `;
@@ -33,7 +35,7 @@ const Item = styled(NavLink)`
   cursor: pointer;
   display: flex;
   &:hover {
-    border-bottom: 4px solid rgb(14 165 233);
+    border-bottom: 2px solid rgb(209 213 219);
     color: rgb(147 51 234);
   }
 `;

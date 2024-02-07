@@ -15,9 +15,8 @@ import HeaderVideo from "./components/ViewLayout/HeaderView.jsx";
 import FileViewer from "./pages/FileViewer.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
 import CourseAssignment from "./pages/course/CourseAssignment/CourseAssignment.jsx";
-import { useContext } from "react";
 import TheDashboard from "./pages/TeacherMode/TheDashboard.jsx";
-import PageNotFound from "./pages/PageNotFound.jsx"
+import PageNotFound from "./pages/NotFounds/PageNotFound.jsx"
 import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
 import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
 import TheAssignment from "./pages/TeacherMode/TheAssignment.jsx";

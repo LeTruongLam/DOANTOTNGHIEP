@@ -27,21 +27,19 @@ import ChapterList from "./ChapterList";
 const Single = () => {
   const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
-
   const courseId = location.pathname.split("/")[2];
   const navigate = useNavigate();
   const currentPath = location.pathname;
-
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
   const [course, setCourse] = useState({});
   const [lessons, setLessons] = useState([]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`/courses/${courseId}`);
         setCourse(res.data);
+        console.table(res.data)
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
       } catch (err) {
@@ -191,7 +189,7 @@ const Single = () => {
                   }}
                 />
               </ListItemIcon>
-              <ListItemText primary={`Ngày bắt đầu: ${course.StartDate}`} />
+              <ListItemText primary={`Ngày bắt đầu: ${formatDate(course.StartDate)}`} />
             </ListItem>
             <ListItem>
               <ListItemIcon>
@@ -201,7 +199,7 @@ const Single = () => {
                   }}
                 />
               </ListItemIcon>
-              <ListItemText primary={`Ngày kết thúc: ${course.EndDate}`} />
+              <ListItemText primary={`Ngày kết thúc: ${formatDate(course.EndDate)}`} />
             </ListItem>
             <Button variant="contained" sx={{ width: "100%" }}>
               MEETING
@@ -227,6 +225,8 @@ const Single = () => {
                 label="Mô tả"
                 {...a11yProps(0)}
                 sx={{
+                  textTransform: "none",
+
                   "&.Mui-selected": {
                     backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
                   },
@@ -236,6 +236,8 @@ const Single = () => {
                 label="Danh sách bài học"
                 {...a11yProps(1)}
                 sx={{
+                  textTransform: "none",
+
                   "&.Mui-selected": {
                     backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
                   },
@@ -245,6 +247,7 @@ const Single = () => {
                 label="Trao đổi"
                 {...a11yProps(2)}
                 sx={{
+                  textTransform: "none",
                   "&.Mui-selected": {
                     backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
                   },
@@ -254,6 +257,8 @@ const Single = () => {
                 label="Danh sách lớp"
                 {...a11yProps(3)}
                 sx={{
+                  textTransform: "none",
+
                   "&.Mui-selected": {
                     backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
                   },

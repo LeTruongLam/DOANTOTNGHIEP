@@ -1,7 +1,7 @@
-import { format } from "date-fns";
+import moment from "moment";
 
 export const formatDate = (date) => {
-  return format(new Date(date), "dd/MM/yyyy");
+  return moment(new Date(date)).format("DD/MM/YYYY");
 };
 
 export const getText = (html) => {

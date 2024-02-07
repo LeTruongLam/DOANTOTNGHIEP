@@ -1,29 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./course.scss";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import NoResult from "../../img/noresult.jpg";
+import NoResultFound from "../NotFounds/NoResultFound";
 export default function CourseFileViewer() {
   const location = useLocation();
-  const navigate = useNavigate();
-
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const listRef = useRef(null);
-  const handleLogout = () => {
-    navigate(-1); // Redirect to "/" after logout
-  };
   useEffect(() => {
     const fetchCourseFiles = async () => {
       try {
         const response = await axios.get(
-          `/courses/chapters/document/${location.state.chapterId}`
+          `/courses/chapters/document/${location.state?.chapterId}`
         );
         const documents = response.data.map((item) => ({
           uri: item.DocumentUrl,
@@ -37,7 +31,7 @@ export default function CourseFileViewer() {
     };
 
     fetchCourseFiles();
-  }, [location.state.chapterId]);
+  }, [location.state?.chapterId]);
 
   useEffect(() => {
     if (listRef.current) {
@@ -54,58 +48,51 @@ export default function CourseFileViewer() {
   };
 
   return (
-    <div className="course-file-viewer">
-      <div className="list-file">
-        <List
-          ref={listRef}
-          sx={{ width: "100%", maxWidth: 350, bgcolor: "background.paper" }}
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-        >
-          {docs.map((data, index) => (
-            <ListItemButton
-              key={index}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "16px",
-                marginTop: index === 0 ? 0 : 2,
-              }}
-              onClick={() => handleDocClick(data)}
+    <>
+      {selectedDoc ? (
+        <div className="course-file-viewer">
+          <div className="list-file">
+            <List
+              ref={listRef}
+              sx={{ width: "100%", maxWidth: 250, bgcolor: "background.paper" }}
+              component="nav"
+              aria-labelledby="nested-list-subheader"
             >
-              <InsertDriveFileIcon />
-              <ListItemText primary={` ${data.name}`} />
-            </ListItemButton>
-          ))}
-        </List>
-      </div>
-      <div className="file-container" tabIndex="0">
-        {selectedDoc ? (
-          <DocViewer
-            documents={[selectedDoc]}
-            pluginRenderers={DocViewerRenderers}
-            style={{ height: 650 }}
-            config={{
-              header: {
-                disableHeader: false,
-                disableFileName: true,
-              },
-            }}
-          />
-        ) : (
-          <div
-            className="empty-docs-message"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <img src={NoResult} alt="" />
+              {docs.map((data, index) => (
+                <ListItemButton
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "16px",
+                    marginTop: index === 0 ? 0 : 2,
+                  }}
+                  onClick={() => handleDocClick(data)}
+                >
+                  <InsertDriveFileIcon />
+                  <ListItemText className="truncate" primary={` ${data.name}`} />
+                </ListItemButton>
+              ))}
+            </List>
           </div>
-        )}
-      </div>
-    </div>
+          <div className="file-container" tabIndex="0">
+            <DocViewer
+              documents={[selectedDoc]}
+              pluginRenderers={DocViewerRenderers}
+              style={{ height: 650 }}
+              config={{
+                header: {
+                  disableHeader: false,
+                  disableFileName: true,
+                },
+              }}
+            />
+          </div>
+        </div>
+      ) : (
+        <NoResultFound />
+      )}
+    </>
   );
 }
