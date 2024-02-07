@@ -27,17 +27,11 @@ const Course = () => {
   };
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-
-        if (isAdmin()) {
-          const res = await axios.get(`/courses/all/${cat}`);
-          setCourses(res.data);
-        } else {
-          const res = await axios.get(`/courses/${cat}`);
-          console.table(res.data);
-          setCourses(res.data);
-        }
+        const res = await axios.get(`/courses/${cat}`);
+        console.table(res.data);
+        setCourses(res.data);
         setLoading(false);
       } catch (err) {
         console.log(err);

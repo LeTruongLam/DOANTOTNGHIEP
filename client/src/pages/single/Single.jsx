@@ -72,7 +72,7 @@ const Single = () => {
     navigate(`/course/${courseId}/chapters/${chapterId}/assignment`, {
       state: {
         chapterId: chapterId,
-        currentPath: currentPath,
+        courseId: courseId,
       },
     });
   };

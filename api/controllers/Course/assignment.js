@@ -313,3 +313,28 @@ export const updateAssignmentFile = (
     });
   });
 };
+export const AssignmentSubmission  = (req, res) => {
+  const assignmentTitle = req.body.assignmentTitle;
+  const chapterId = req.body.chapterId;
+  const jsonData = JSON.stringify(data);
+
+  const insertQuery = `INSERT INTO my_table (data) VALUES ('${jsonData}')`;
+
+  connection.query(insertQuery, (error, results) => {
+    if (error) {
+      console.error('Error saving data to MySQL:', error);
+      return;
+    }
+
+    console.log('Data saved to MySQL');
+  });
+  const q = `
+      INSERT INTO assignments (AssignmentTitle, ChapterId)
+      VALUES (?, ?)
+    `;
+
+  db.query(q, [assignmentTitle, chapterId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    return res.status(201).json({ message: "Assignment added successfully" });
+  });
+};

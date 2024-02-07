@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../course.scss";
+import ReactQuill from "react-quill";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDate, getText } from "../../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -17,10 +18,23 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
+import MainButton from "../../../components/MainButton";
 export default function CourseAssignment() {
   const location = useLocation();
   const listRef = useRef(null);
   const [open, setOpen] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const handleFileSelect = (event) => {
+    const files = event.target.files;
+    const fileArray = Array.from(files);
+    setSelectedFiles(fileArray);
+  };
+
+  const handleChangeClick = () => {
+    fileInputRef.current.click();
+  };
   const handleToggle = () => {
     setOpen(!open);
   };
@@ -62,6 +76,14 @@ export default function CourseAssignment() {
       );
       setAssignment(response.data);
       fetchAssignmentFiles(assignmentId);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(`/courses/chapters/`);
     } catch (err) {
       console.log(err);
     }
@@ -118,12 +140,7 @@ export default function CourseAssignment() {
                 Assignment
               </h3>
 
-              <button
-                type="submit"
-                className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              >
-                Submit
-              </button>
+              <MainButton content="Submit" />
             </div>
             <div className="mt-6 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">
@@ -226,30 +243,66 @@ export default function CourseAssignment() {
                       className="divide-y divide-gray-100 rounded-md border border-gray-200"
                     >
                       <div className="  flex-col  divide-y divide-gray-100">
-                        <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
-                          <div className="flex items-center justify-center gap-1">
-                            <AttachmentIcon />
-                            <span>Attach</span>
+                        <div className="flex-col">
+                          <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
+                            <div className="flex items-center justify-center gap-1">
+                              <AttachmentIcon />
+                              <span>Attach</span>
+                            </div>
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              style={{ display: "none" }}
+                              multiple
+                              onChange={handleFileSelect}
+                            />
+
+                            <button
+                              onClick={handleChangeClick}
+                              type="button"
+                              className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                            >
+                              Select files
+                            </button>
+                          </p>
+                          <div>
+                            {selectedFiles && (
+                              <>
+                                {selectedFiles.map((file, index) => (
+                                  <li
+                                    key={index}
+                                    className="flex mx-8 border-b border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                                  >
+                                    <div className="flex w-0 flex-1 items-center">
+                                      <PaperClipIcon
+                                        className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                        aria-hidden="true"
+                                      />
+                                      <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                                        <span className="truncate font-medium text-blue-500">
+                                          {file.name}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </li>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="flex-col">
+                          <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
+                            <div className="flex items-center justify-center gap-1">
+                              <EditNoteIcon />
+                              <span>Note</span>
+                            </div>
                           </div>
 
-                          <button
-                            type="button"
-                            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                          >
-                            Change
-                          </button>
-                        </p>
-                        <p className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
-                          <div className="flex items-center justify-center gap-1">
-                            <EditNoteIcon />
-                            <span>Note</span>
-                          </div>
-                          <button
-                            type="button"
-                            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                          >
-                            Change
-                          </button>
+                          <ReactQuill
+                            className="editor bg-main mx-4 mb-4 rounded-xl"
+                            theme="snow"
+                          />
                         </p>
                       </div>
                     </ul>
