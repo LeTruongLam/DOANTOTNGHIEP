@@ -288,4 +288,31 @@ router.post(
   }
 );
 
+router.post(
+  "/chapters/uploadAssignmentFile/:assignmentId/submission",
+  upload.single("document"),
+  (req, res) => {
+    if (req.file) {
+      cloudinary.uploader
+        .upload(req.file.path, {
+          folder: "CourseAssignment/Student",
+          resource_type: "raw",
+        })
+        .then((result) => {})
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json({
+            success: false,
+            message: err,
+          });
+        });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Không có tệp được tải lên",
+      });
+    }
+  }
+);
+
 export default router;

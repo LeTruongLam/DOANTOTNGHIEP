@@ -49,6 +49,7 @@ import {
   getAssignmentDate,
   updateAssignmentDate,
   getAssignmentFile,
+  AssignmentSubmission,
 } from "../controllers/Course/assignment.js";
 const router = express.Router();
 
@@ -118,7 +119,7 @@ router.put(
   updateAssignmentTitle
 );
 router.post("/chapters/assignments", addAssignmentTitle);
-
+router.post("/chapters/:chapterId/submission", AssignmentSubmission);
 router.get(
   "/chapters/:chapterId/assignments/desc/:assignmentId",
   getAssignmentDesc

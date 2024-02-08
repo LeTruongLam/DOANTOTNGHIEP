@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { AuthContext } from "../../../context/authContext";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../course.scss";
@@ -20,11 +21,15 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
 import MainButton from "../../../components/MainButton";
 export default function CourseAssignment() {
+  const { currentUser } = useContext(AuthContext);
   const location = useLocation();
   const listRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const [assignment, setAssignment] = useState();
+  const [assignmentList, setAssignmentList] = useState([]);
+  const [attachFile, setAttachFile] = useState([]);
 
   const handleFileSelect = (event) => {
     const files = event.target.files;
@@ -38,9 +43,6 @@ export default function CourseAssignment() {
   const handleToggle = () => {
     setOpen(!open);
   };
-  const [assignment, setAssignment] = useState([]);
-  const [assignmentList, setAssignmentList] = useState([]);
-  const [attachFile, setAttachFile] = useState([]);
 
   const fetchAssignmentData = async () => {
     try {
@@ -75,6 +77,7 @@ export default function CourseAssignment() {
         `/courses/chapters/${chapterId}/assignments/${assignmentId}`
       );
       setAssignment(response.data);
+      console.table(response.data);
       fetchAssignmentFiles(assignmentId);
     } catch (err) {
       console.log(err);
@@ -83,7 +86,20 @@ export default function CourseAssignment() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`/courses/chapters/`);
+      const requestBody = {
+        assignmentId: assignment.AssignmentId,
+        chapterId: location.state?.chapterId,
+        studentId: currentUser.UserId,
+        courseId: location.state?.courseId,
+        submissonFile: selectedFiles,
+      };
+      
+      console.table(requestBody.submissonFile);
+
+      await axios.post(
+        `/courses/chapters/${location.state?.chapterId}/submission`,
+        requestBody
+      );
     } catch (err) {
       console.log(err);
     }
@@ -139,8 +155,8 @@ export default function CourseAssignment() {
               <h3 className="text-2xl font-semibold leading-7 text-gray-900">
                 Assignment
               </h3>
-
-              <MainButton content="Submit" />
+              <button onClick={handleSubmit}>Submit</button>
+              {/* <MainButton onClick={handleSubmit} content="Submit" /> */}
             </div>
             <div className="mt-6 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">

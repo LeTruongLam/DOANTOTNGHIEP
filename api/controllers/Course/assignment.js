@@ -46,7 +46,6 @@ export const getAssignments = (req, res) => {
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
     const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
-    // console.log(chapterId);
     const q = `
       SELECT assignments.*
       FROM assignments
@@ -55,7 +54,6 @@ export const getAssignments = (req, res) => {
 
     db.query(q, [chapterId], (err, data) => {
       if (err) return res.status(500).json(err);
-      // console.log(data);
       return res.status(200).json(data);
     });
   });
@@ -71,7 +69,6 @@ export const deleteAssignment = (req, res) => {
 
   db.query(q, [chapterId, assignmentId], (err, result) => {
     if (err) return res.status(500).json(err);
-    console.log("Lesson deleted successfully");
     return res.status(200).json({ message: "Assignment deleted successfully" });
   });
 };
@@ -253,7 +250,6 @@ export const updateAssignmentDate = (req, res) => {
       if (data.affectedRows === 0) {
         return res.status(404).json({ error: "assignments not found." });
       }
-      // console.log(values);
       return res.json("assignments date has been updated.");
     });
   });
@@ -279,7 +275,6 @@ export const getAssignmentFile = (req, res) => {
         return res.json({ message: "assignmentId not found." });
       }
       const chapter = data[0];
-      // console.log(data);
       return res.json(data);
     });
   });
@@ -313,28 +308,47 @@ export const updateAssignmentFile = (
     });
   });
 };
-export const AssignmentSubmission  = (req, res) => {
-  const assignmentTitle = req.body.assignmentTitle;
+export const AssignmentSubmission = (req, res) => {
+  const assignmentId = req.body.assignmentId;
   const chapterId = req.body.chapterId;
-  const jsonData = JSON.stringify(data);
-
-  const insertQuery = `INSERT INTO my_table (data) VALUES ('${jsonData}')`;
-
-  connection.query(insertQuery, (error, results) => {
-    if (error) {
-      console.error('Error saving data to MySQL:', error);
-      return;
-    }
-
-    console.log('Data saved to MySQL');
-  });
+  const studentId = req.body.studentId;
+  const courseId = req.body.courseId;
+  const submissonFile = JSON.stringify(req.body.submissonFile);
+  const submissionContent = req.body.submissionContent;
+  const submissionDate = new Date().toISOString();
+  const status = 1;
+  const data = [
+    assignmentId,
+    chapterId,
+    studentId,
+    courseId,
+    submissionDate,
+    submissionContent,
+    status,
+    submissonFile,
+  ];
+  console.log(data);
   const q = `
-      INSERT INTO assignments (AssignmentTitle, ChapterId)
-      VALUES (?, ?)
-    `;
+    INSERT INTO submissions (AssignmentId, ChapterId, StudentId, CourseId, SubmissionDate, SubmissionContent, Status, SubmissonFile)
+    VALUES (?, ?, ?, ?,NOW(), ?, ?, ?)
+  `;
 
-  db.query(q, [assignmentTitle, chapterId], (err, result) => {
-    if (err) return res.status(500).json(err);
-    return res.status(201).json({ message: "Assignment added successfully" });
-  });
+  db.query(
+    q,
+    [
+      assignmentId,
+      chapterId,
+      studentId,
+      courseId,
+      submissionContent,
+      status,
+      submissonFile,
+    ],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      return res
+        .status(201)
+        .json({ message: "Assignment submission successful" });
+    }
+  );
 };
