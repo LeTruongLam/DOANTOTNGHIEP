@@ -18,7 +18,7 @@ const Info = () => {
       try {
         const res = await axios.get(`/infor${cat}`);
         setInfo(res.data);
-        console.log(res.data);
+        console.table(res.data);
       } catch (err) {
         console.log(err);
       }
@@ -72,14 +72,50 @@ const Info = () => {
                       type="text"
                       name="username"
                       id="username"
+                      value={info[0]?.StudentName}
                       autoComplete="username"
                       className="block flex-1 bg-transparent py-1.5 px-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 border-0 outline-none sm:text-sm sm:leading-6"
-                      placeholder="janesmith"
                     />
                   </div>
                 </div>
               </div>
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="first-name"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Telephone number
+                </label>
+                <div className="mt-2">
+                  <input
+                    value={info[0]?.PhoneNo}
+                    type="text"
+                    name="first-name"
+                    id="first-name"
+                    autoComplete="given-name"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
 
+              <div className="sm:col-span-3">
+                <label
+                  htmlFor="last-name"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Last name
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    name="last-name"
+                    id="last-name"
+                    autoComplete="family-name"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+              
               <div className="col-span-full">
                 <label
                   htmlFor="photo"
