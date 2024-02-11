@@ -4,7 +4,7 @@ import Login from "./pages/login/Login.jsx";
 import Register from "./pages/register/Register.jsx";
 import Home from "./pages/home/Home.jsx";
 import Course from "./pages/course/Course.jsx";
-import Single from "./pages/single/Single.jsx";
+import CourseDetails from "./pages/CourseDetails/CourseDetails.jsx";
 import TheHeader from "./components/TheHeader.jsx";
 import CourseStepper from "./pages/course/CreateCourse/CourseStepper.jsx";
 import CustomerCourse from "./pages/editCourse/CustomerCourse.jsx";
@@ -16,7 +16,7 @@ import FileViewer from "./pages/FileViewer.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
 import CourseAssignment from "./pages/course/CourseAssignment/CourseAssignment.jsx";
 import TheDashboard from "./pages/TeacherMode/TheDashboard.jsx";
-import PageNotFound from "./pages/NotFounds/PageNotFound.jsx"
+import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
 import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
 import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
 import TheAssignment from "./pages/TeacherMode/TheAssignment.jsx";
@@ -65,7 +65,7 @@ function App() {
                 path="/course/:id"
                 element={
                   <Layout>
-                    <Single />
+                    <CourseDetails />
                   </Layout>
                 }
               />

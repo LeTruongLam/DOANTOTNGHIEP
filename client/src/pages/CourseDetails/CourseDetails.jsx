@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
+
 import { formatDate, getText } from "../../js/TAROHelper";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import SchoolIcon from "@mui/icons-material/School";
@@ -23,8 +24,9 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import ClassList from "./ClassList";
 import Comment from "./Comment";
+import TheBreadcrumbs from "../../components/Breadcrumbs";
 import ChapterList from "./ChapterList";
-const Single = () => {
+const CourseDetails = () => {
   const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
   const courseId = location.pathname.split("/")[2];
@@ -39,7 +41,7 @@ const Single = () => {
       try {
         const res = await axios.get(`/courses/${courseId}`);
         setCourse(res.data);
-        console.table(res.data)
+        console.table(res.data);
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
       } catch (err) {
@@ -129,6 +131,7 @@ const Single = () => {
         <div className="header-single">
           <div className="bg-black min-h-20 h-[300px]">
             <div className="mx-10 w-[60%] h-full pt-5">
+              <TheBreadcrumbs courseTitle={course.title} />
               <div className="flex items-center gap-5 ">
                 <span className="text-white font-medium py-2 px-3 bg-gray rounded-lg">
                   Created
@@ -189,7 +192,9 @@ const Single = () => {
                   }}
                 />
               </ListItemIcon>
-              <ListItemText primary={`Ngày bắt đầu: ${formatDate(course.StartDate)}`} />
+              <ListItemText
+                primary={`Ngày bắt đầu: ${formatDate(course.StartDate)}`}
+              />
             </ListItem>
             <ListItem>
               <ListItemIcon>
@@ -199,7 +204,9 @@ const Single = () => {
                   }}
                 />
               </ListItemIcon>
-              <ListItemText primary={`Ngày kết thúc: ${formatDate(course.EndDate)}`} />
+              <ListItemText
+                primary={`Ngày kết thúc: ${formatDate(course.EndDate)}`}
+              />
             </ListItem>
             <Button variant="contained" sx={{ width: "100%" }}>
               MEETING
@@ -301,4 +308,4 @@ const Single = () => {
   );
 };
 
-export default Single;
+export default CourseDetails;

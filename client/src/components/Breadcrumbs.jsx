@@ -1,29 +1,19 @@
-import * as React from 'react';
-import Typography from '@mui/material/Typography';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-
-function handleClick(event) {
-  event.preventDefault();
-  console.info('You clicked a breadcrumb.');
-}
-
-export default function BasicBreadcrumbs() {
+import React from "react";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+const TheBreadcrumbs = ({ courseTitle }) => {
   return (
-    <div role="presentation" onClick={handleClick}>
+    <div role="presentation" className="mt-2 mb-6">
       <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/">
-          MUI
+        <Link underline="hover" color="white" href="/course" className="flex ">
+          <AutoStoriesIcon sx={{ mr: 1 }} fontSize="medium" />
+          <span>Course</span>
         </Link>
-        <Link
-          underline="hover"
-          color="inherit"
-          href="/material-ui/getting-started/installation/"
-        >
-          Core
-        </Link>
-        <Typography color="text.primary">Breadcrumbs</Typography>
+        <span className="text-white">/</span>
+        <span className="text-white">{courseTitle}</span>
       </Breadcrumbs>
     </div>
   );
-}
+};
+export default TheBreadcrumbs;

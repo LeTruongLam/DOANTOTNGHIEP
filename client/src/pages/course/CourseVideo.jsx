@@ -7,21 +7,20 @@ import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import axios from "axios";
-
+import NotFound from "../../img/Noresults.png";
 const CourseVideo = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const [lesson, setLesson] = useState([]);
   const [lessonList, setLessonList] = useState([]);
-  const [currentPath, setCurrentPath] = useState(location.state.currentPath);
 
   const courseId = location.pathname.split("/")[2];
   const videoRef = useRef(null);
   const fetchLessonData = async () => {
     try {
       const response = await axios.get(
-        `/courses/chapters/${location.state.chapterId}/lessons/${location.state.lessonId}`
+        `/courses/chapters/${location.state?.chapterId}/lessons/${location.state?.lessonId}`
       );
       setLesson(response.data[0]);
     } catch (err) {
@@ -32,7 +31,7 @@ const CourseVideo = () => {
   const fetchLessonList = async () => {
     try {
       const response = await axios.get(
-        `/courses/chapters/${location.state.chapterId}/lessons`
+        `/courses/chapters/${location.state?.chapterId}/lessons`
       );
       setLessonList(response.data);
     } catch (err) {
@@ -42,7 +41,7 @@ const CourseVideo = () => {
   useEffect(() => {
     fetchLessonData();
     fetchLessonList();
-  }, [location.state.lessonId]);
+  }, [location.state?.lessonId]);
 
   const handleToVideo = async (lessonId) => {
     const chapterId = location.state.chapterId;
@@ -52,7 +51,6 @@ const CourseVideo = () => {
         state: {
           chapterId: chapterId,
           lessonId: lessonId,
-          currentPath: currentPath,
         },
       }
     );
@@ -74,37 +72,55 @@ const CourseVideo = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "16px",
-                marginTop: lessonIndex === 0 ? 0 : 2,
+                marginTop: lesson.LessonId === 0 ? 0 : 2,
+                borderRight:
+                  location.state?.lessonId === lesson.LessonId
+                    ? "2px solid rgb(147 51 234)"
+                    : "none",
               }}
               onClick={() => handleToVideo(lesson.LessonId)}
             >
               {location.state.lessonId === lesson.LessonId ? (
-                <PauseCircleOutlineSharpIcon />
+                <>
+                  <PauseCircleOutlineSharpIcon
+                    style={{
+                      color: " rgb(147 51 234)",
+                    }}
+                  />
+                  <ListItemText
+                    style={{
+                      color: " rgb(147 51 234)",
+                    }}
+                    primary={`Lesson ${lessonIndex + 1}: ${lesson.LessonTitle}`}
+                  />
+                </>
               ) : (
-                <PlayCircleOutlineIcon />
+                <>
+                  <PlayCircleOutlineIcon />
+                  <ListItemText
+                    primary={`Lesson ${lessonIndex + 1}: ${lesson.LessonTitle}`}
+                  />
+                </>
               )}
-
-              <ListItemText
-                primary={`Lesson ${lessonIndex + 1}: ${lesson.LessonTitle}`}
-              />
             </ListItemButton>
           ))}
         </List>
       </div>
       <div className="container-right">
-        <iframe
-          ref={videoRef}
-          src={lesson?.LessonVideo}
-          title="Chapter Video"
-          className="video-player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-        <div className="chapter-content">
-          <div className="chapter-title">
-            <h2>{lesson?.LessonTitle}</h2>
-          </div>
-        </div>
+        {lesson?.LessonVideo ? (
+          <iframe
+            ref={videoRef}
+            src={lesson?.LessonVideo}
+            title="Chapter Video"
+            className="video-player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          <>
+            <img className="video-player" src={NotFound} alt="Not found" />
+          </>
+        )}
       </div>
     </div>
   );

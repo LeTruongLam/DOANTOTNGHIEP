@@ -11,7 +11,7 @@ const TheHeader = () => {
   const [courseTitle, setCourseTitle] = useState("");
 
   const handleExit = () => {
-    navigate(-1); // Redirect to "/" after logout
+    navigate(`/course/${courseId}`); // Redirect to "/" after logout
   };
 
   const getChapterTitle = async () => {
