@@ -7,19 +7,23 @@ import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 const TheHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const courseId = location.pathname.split("/")[2];
-  const [courseTitle, setCourseTitle] = useState("");
+  const [chapterTitle, setChapterTitle] = useState("");
 
   const handleExit = () => {
-    navigate(`/course/${courseId}`); // Redirect to "/" after logout
+    navigate(`/course/${location.state?.courseTitle}`, {
+      state: {
+        courseTitle: location.state?.courseTitle,
+        courseId: location.state?.courseId,
+      },
+    }); // Redirect to "/" after logout
   };
 
   const getChapterTitle = async () => {
     try {
       const response = await axios.get(
-        `/courses/${courseId}/chapters/${location.state?.chapterId}`
+        `/courses/${location.state?.courseId}/chapters/${location.state?.chapterId}`
       );
-      setCourseTitle(response.data.ChapterTitle);
+      setChapterTitle(response.data.ChapterTitle);
     } catch (err) {
       console.log(err);
     }
@@ -35,7 +39,7 @@ const TheHeader = () => {
           style={{ display: "flex", alignItems: "center", gap: "16px" }}
         >
           <AutoStoriesOutlinedIcon />
-          <b>{courseTitle}</b>
+          <b>{chapterTitle}</b>
         </div>
         <div className="links" onClick={handleExit}>
           <ExitToAppIcon />

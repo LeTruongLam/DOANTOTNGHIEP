@@ -29,19 +29,20 @@ import ChapterList from "./ChapterList";
 const CourseDetails = () => {
   const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
-  const courseId = location.pathname.split("/")[2];
+  const [courseId, setCourseId] = useState(location.state?.courseId);
   const navigate = useNavigate();
   const currentPath = location.pathname;
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
   const [course, setCourse] = useState({});
   const [lessons, setLessons] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`/courses/${courseId}`);
         setCourse(res.data);
-        console.table(res.data);
+        // console.table(res.data);
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
       } catch (err) {
@@ -51,30 +52,30 @@ const CourseDetails = () => {
     fetchData();
   }, [courseId]);
   const handleToVideo = async (chapterId, lessonId) => {
-    navigate(
-      `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/video`,
-      {
-        state: {
-          chapterId: chapterId,
-          lessonId: lessonId,
-          currentPath: currentPath,
-        },
-      }
-    );
+    navigate(`/course/${location.state?.courseTitle}/lecture/${lessonId}`, {
+      state: {
+        chapterId: chapterId,
+        lessonId: lessonId,
+        courseId: courseId,
+        courseTitle: location.state?.courseTitle,
+      },
+    });
   };
   const handleToFile = async (ChapterId) => {
-    navigate(`/course/${courseId}/file/${ChapterId}`, {
+    navigate(`/course/${location.state?.courseTitle}/document/${ChapterId}`, {
       state: {
         chapterId: ChapterId,
-        currentPath: currentPath,
+        courseId: courseId,
+        courseTitle: location.state?.courseTitle,
       },
     });
   };
   const handleToAssignment = async (chapterId) => {
-    navigate(`/course/${courseId}/chapters/${chapterId}/assignment`, {
+    navigate(`/course/${location.state?.courseTitle}/assignment/${chapterId}`, {
       state: {
         chapterId: chapterId,
         courseId: courseId,
+        courseTitle: location.state?.courseTitle,
       },
     });
   };

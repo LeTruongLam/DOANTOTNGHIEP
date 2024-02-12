@@ -14,8 +14,6 @@ export default function CourseFileViewer() {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const listRef = useRef(null);
   useEffect(() => {
-
-    
     const fetchCourseFiles = async () => {
       try {
         const response = await axios.get(

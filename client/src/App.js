@@ -62,7 +62,7 @@ function App() {
             />
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:id"
+                path="/course/:courseTitle"
                 element={
                   <Layout>
                     <CourseDetails />
@@ -159,7 +159,7 @@ function App() {
 
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseId/file/:chapterId"
+                path="/course/:courseTitle/document/:chapterId"
                 element={
                   <LayoutViewer>
                     <CourseFileViewer />
@@ -169,7 +169,7 @@ function App() {
             </Route>
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseId/chapters/:chapterId/assignment"
+                path="/course/:courseTitle/assignment/:chapterId"
                 element={
                   <LayoutViewer>
                     <CourseAssignment />
@@ -179,7 +179,7 @@ function App() {
             </Route>
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseId/chapter/:chapterId/lesson/:lessonId/video"
+                path="/course/:courseTitle/lecture/:lessonId"
                 element={
                   <LayoutViewer>
                     <CourseVideo />

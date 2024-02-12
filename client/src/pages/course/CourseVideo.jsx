@@ -11,11 +11,8 @@ import NotFound from "../../img/Noresults.png";
 const CourseVideo = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const [lesson, setLesson] = useState([]);
   const [lessonList, setLessonList] = useState([]);
-
-  const courseId = location.pathname.split("/")[2];
   const videoRef = useRef(null);
   const fetchLessonData = async () => {
     try {
@@ -45,15 +42,14 @@ const CourseVideo = () => {
 
   const handleToVideo = async (lessonId) => {
     const chapterId = location.state.chapterId;
-    navigate(
-      `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/video`,
-      {
-        state: {
-          chapterId: chapterId,
-          lessonId: lessonId,
-        },
-      }
-    );
+    navigate(`/course/${location.state?.courseTitle}/lecture/${lessonId}`, {
+      state: {
+        chapterId: chapterId,
+        lessonId: lessonId,
+        courseId: location.state?.courseId,
+        courseTitle: location.state?.courseTitle,
+      },
+    });
   };
 
   return (
