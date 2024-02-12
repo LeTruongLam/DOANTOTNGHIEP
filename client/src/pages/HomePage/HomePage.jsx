@@ -4,7 +4,7 @@ import Background from "../../img/landingpage/main.png";
 import "./home.scss"
 
 
-const Home = () => {
+const HomePage = () => {
   return (
     <div className="home mx-10">
       <div className="container">
@@ -64,4 +64,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

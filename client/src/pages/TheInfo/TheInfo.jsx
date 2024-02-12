@@ -8,7 +8,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("vi-VN", options);
 };
 
-const Info = () => {
+const TheInfo = () => {
   const [info, setInfo] = useState([]);
   const [editing, setEditing] = useState(false);
   const cat = useLocation().search;
@@ -541,4 +541,4 @@ const Info = () => {
   );
 };
 
-export default Info;
+export default TheInfo;

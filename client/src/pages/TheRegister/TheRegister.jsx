@@ -5,7 +5,7 @@ import axios from "axios";
 import image from "../../img/register_2.jpg";
 import "../login/Login";
 import Button from "@mui/material/Button";
-const Register = () => {
+const TheRegister = () => {
   const [inputs, setInputs] = useState({
     username: "",
     email: "",
@@ -79,4 +79,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default TheRegister;

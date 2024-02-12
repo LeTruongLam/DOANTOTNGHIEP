@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import "../course.scss";
+import "../../course/course.scss";
 import ReactQuill from "react-quill";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDate, getText } from "../../../js/TAROHelper";
@@ -19,7 +19,6 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
-import MainButton from "../../../components/MainButton";
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();

@@ -4,17 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
-
 import { formatDate, getText } from "../../js/TAROHelper";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import SchoolIcon from "@mui/icons-material/School";
 import GroupsIcon from "@mui/icons-material/Groups";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-
 import ListItem from "@mui/material/ListItem";
 import Button from "@mui/material/Button";
 import PropTypes from "prop-types";
@@ -22,16 +19,15 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import ClassList from "./ClassList";
-import Comment from "./Comment";
+import ClassList from "./CourseClass/ClassList";
+import Comment from "./Comment/Comment";
 import TheBreadcrumbs from "../../components/Breadcrumbs";
-import ChapterList from "./ChapterList";
+import ChapterList from "./CourseChapter/ChapterList";
 const CourseDetails = () => {
   const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
   const [courseId, setCourseId] = useState(location.state?.courseId);
   const navigate = useNavigate();
-  const currentPath = location.pathname;
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
   const [course, setCourse] = useState({});

@@ -1,12 +1,13 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import ClassOutlinedIcon from "@mui/icons-material/ClassOutlined";
 import "../EditWrite.scss";
+import Dropdown from "../../../components/Dropdowns/Dropdown";
 export default function CourseClass({ title, subTitle }) {
   const location = useLocation();
 
@@ -32,6 +33,7 @@ export default function CourseClass({ title, subTitle }) {
         <ClassOutlinedIcon />
         {classItem.ClassCode}
       </div>
+      <Dropdown />
     </div>
   ));
 
@@ -57,12 +59,15 @@ export default function CourseClass({ title, subTitle }) {
   };
 
   return (
-    <div className="course-title">
+    <div className="course-title overflow-visible	py-0.5">
       <div className="course-title-wrapper">
         <div className="course-title-header   mt-3 mb-3">
           <p>{title}</p>
           {!isEditing ? (
-            <div onClick={handleIconClick} className="course-title-action items-center	">
+            <div
+              onClick={handleIconClick}
+              className="course-title-action items-center	"
+            >
               <AddCircleOutlineOutlinedIcon fontSize="small" />
               <span>{subTitle}</span>
             </div>
@@ -72,7 +77,7 @@ export default function CourseClass({ title, subTitle }) {
             </div>
           )}
         </div>
-        <div className="course-title-body">
+        <div>
           {!isEditing ? (
             <>{classItems}</>
           ) : (

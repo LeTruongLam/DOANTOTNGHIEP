@@ -61,11 +61,11 @@ const Course = () => {
                 <div className="course-glimpse-wrapper">
                   <div>
                     <span className="font-normal text-base">
-                      Created by {course.TeacherName}
+                      Created by <span className="font-semibold">{course.TeacherName}</span>
                     </span>
                   </div>
                   <div className="course-glimpse-info">
-                    <p className="course-title-main font-medium text-base">
+                    <p className="course-title-main font-semibold text-lg">
                       {truncateString(getText(course.title), 100)}
                     </p>
                   </div>
@@ -97,7 +97,7 @@ const Course = () => {
                       />
                       <span>{course.CourseCode}</span>
                     </p>
-                    <p className="font-medium">View More</p>
+                    <p className="font-medium hover:text-primary-purple hover:cursor-pointer">View More</p>
                   </div>
                 </div>
               </div>

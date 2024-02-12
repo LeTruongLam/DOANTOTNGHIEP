@@ -3,7 +3,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { AuthContext } from "../../context/authContext";
+import { AuthContext } from "../../../context/authContext";
 import Avatar from "@mui/material/Avatar";
 import axios from "axios";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";

@@ -1,7 +1,7 @@
 import React from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 
-export default function FileViewer() {
+export default function TheNews() {
   const docs = [
     {
       uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",

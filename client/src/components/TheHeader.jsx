@@ -82,17 +82,17 @@ const TheHeader = () => {
           <Container className="">
             <SlickBar className="h-full items-center " clicked={click}>
               <Item exact activeClassName="active" to="/">
-                <span className="py-4 mx-2" clicked={click}>
+                <span className="py-4 mx-2 font-semibold" clicked={click}>
                   Home
                 </span>
               </Item>
               <Item activeClassName="active" to="/news">
-                <span className="py-4 mx-2" clicked={click}>
+                <span className="py-4 mx-2 font-semibold" clicked={click}>
                   News
                 </span>
               </Item>
               <Item activeClassName="active" to="/course">
-                <span className="py-4 mx-2" clicked={click}>
+                <span className="py-4 mx-2 font-semibold" clicked={click}>
                   Course
                 </span>
               </Item>

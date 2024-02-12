@@ -3,7 +3,7 @@ import axios from "axios";
 import "../EditWrite.scss";
 import { ImageConfig } from "../../../config/ImageConfig";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import "../../../components/drop-file-input/drop-file-input.css";
+import "../../../components/DropFile/drop-file-input.css";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
 

@@ -1,10 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import "../EditWrite.scss";
 import { message } from "antd";
-import DropFileInput from "../../../components/drop-file-input/DropFileInput";
+import DropFileInput from "../../../components/DropFile/DropFileInput";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ChecklistOutlinedIcon from "@mui/icons-material/ChecklistOutlined";
 import CourseTitle from "../CourseComponent/CourseTitle";
@@ -35,8 +35,6 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
         console.error(error);
       });
   };
-
- 
 
   const handleEdit = (chapterId) => {
     setSelectedChapterId(chapterId);

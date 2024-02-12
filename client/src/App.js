@@ -1,20 +1,20 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/login/Login.jsx";
-import Register from "./pages/register/Register.jsx";
-import Home from "./pages/home/Home.jsx";
+import TheRegister from "./pages/TheRegister/TheRegister.jsx";
+import HomePage from "./pages/HomePage/HomePage.jsx";
 import Course from "./pages/course/Course.jsx";
 import CourseDetails from "./pages/CourseDetails/CourseDetails.jsx";
 import TheHeader from "./components/TheHeader.jsx";
 import CourseStepper from "./pages/course/CreateCourse/CourseStepper.jsx";
 import CustomerCourse from "./pages/editCourse/CustomerCourse.jsx";
-import Infor from "./pages/Info/Info.jsx";
+import TheInfo from "./pages/TheInfo/TheInfo.jsx";
 import CourseVideo from "./pages/course/CourseVideo.jsx";
 import "./style.scss";
 import HeaderVideo from "./components/ViewLayout/HeaderView.jsx";
-import FileViewer from "./pages/FileViewer.jsx";
+import TheNews from "./pages/TheNews/TheNews.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
-import CourseAssignment from "./pages/course/CourseAssignment/CourseAssignment.jsx";
+import CourseAssignment from "./pages/CourseDetails/CourseAssignment/CourseAssignment.jsx";
 import TheDashboard from "./pages/TeacherMode/TheDashboard.jsx";
 import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
 import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
@@ -56,7 +56,7 @@ function App() {
               path="/"
               element={
                 <Layout>
-                  <Home />
+                  <HomePage />
                 </Layout>
               }
             />
@@ -95,7 +95,7 @@ function App() {
               path="/register"
               element={
                 <Layout>
-                  <Register />
+                  <TheRegister />
                 </Layout>
               }
             />
@@ -142,7 +142,7 @@ function App() {
                 path="/info"
                 element={
                   <Layout>
-                    <Infor />
+                    <TheInfo />
                   </Layout>
                 }
               />
@@ -152,7 +152,7 @@ function App() {
               path="/news"
               element={
                 <Layout>
-                  <FileViewer />
+                  <TheNews />
                 </Layout>
               }
             />
