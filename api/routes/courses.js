@@ -51,16 +51,17 @@ import {
   getAssignmentFile,
   AssignmentSubmission,
 } from "../controllers/Course/assignment.js";
+import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
 
 // courses
-router.get("/", getCourses);
-router.get("/all", getAllCourses);
-router.get("/:id", getCourseById);
-router.post("/", addCourse);
-router.delete("/:id", deleteCourse);
-router.put("/:id", updateCourse);
-router.get("/title/:id", getCourseTitle);
+router.get("/", authorize, getCourses);
+router.get("/all", authorize, getAllCourses);
+router.get("/:id", authorize, getCourseById);
+router.post("/", authorize, addCourse);
+router.delete("/:id", authorize, deleteCourse);
+router.put("/:id",authorize, updateCourse);
+router.get("/title/:id",authorize, getCourseTitle);
 router.put("/title/:id", updateCourseTitle);
 router.get("/code/:id", getCourseCode);
 

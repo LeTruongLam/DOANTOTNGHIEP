@@ -1,54 +1,26 @@
 import { db } from "../../db.js";
 import jwt from "jsonwebtoken";
 
-export const authorize = (req, res, next) => {
-  const token = req.cookies.access_token;
-
-  if (!token) {
-    return res.status(401).json("Not authenticated!");
-  }
-
-  try {
-    const decodedToken = jwt.verify(token, "jwtkey");
-    req.userRole = decodedToken.role;
-    next();
-  } catch (err) {
-    return res.status(403).json("Token is not valid!");
-  }
-};
 export const getAllCourses = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const q = "SELECT * FROM courses";
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
 
-    const q = "SELECT * FROM courses";
-
-    db.query(q, (err, data) => {
-      if (err) return res.status(500).json(err);
-
-      return res.status(200).json(data);
-    });
+    return res.status(200).json(data);
   });
 };
 
 export const getCourses = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const userId = req.userInfo.id;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const userId = userInfo.id;
-
-    let q = "";
-    if (userInfo.role === "teacher") {
-      q = `SELECT courses.*,teachers.TeacherName  FROM teachers 
+  let q = "";
+  if (req.userInfo.role === "teacher") {
+    q = `SELECT courses.*,teachers.TeacherName  FROM teachers 
       JOIN courses ON courses.TeacherId = teachers.TeacherId 
       WHERE teachers.UserId = ? AND teachers.TeacherId = courses.TeacherId`;
-    } else if (userInfo.role === "student") {
-      q = `
+  } else if (req.userInfo.role === "student") {
+    q = `
       SELECT courses.*,teachers.TeacherName
       FROM courses
       JOIN classes ON courses.CourseId = classes.CourseId
@@ -57,29 +29,23 @@ export const getCourses = (req, res) => {
       JOIN students ON class_student.StudentId = students.StudentId
       WHERE students.UserId = ? 
      `;
-    }
+  }
 
-    db.query(q, [userId], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.status(200).json(data);
-    });
+  db.query(q, [userId], (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
   });
 };
 export const getCourseById = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const userId = userInfo.id;
-    let q = "";
-    if (userInfo.role === "teacher") {
-      q = `SELECT courses.*,teachers.TeacherName  FROM teachers 
+  const userId = req.userInfo.id;
+  const userRole = req.userInfo.role;
+  let q = "";
+  if (userRole === "teacher") {
+    q = `SELECT courses.*,teachers.TeacherName  FROM teachers 
     JOIN courses ON courses.TeacherId = teachers.TeacherId 
     WHERE teachers.UserId = ? AND teachers.TeacherId = courses.TeacherId AND courses.CourseId = ?`;
-    } else if (userInfo.role === "student") {
-      q = `
+  } else if (userRole === "student") {
+    q = `
       SELECT courses.*,teachers.TeacherName, classes.ClassCode
       FROM courses
       JOIN classes ON courses.CourseId = classes.CourseId
@@ -88,141 +54,92 @@ export const getCourseById = (req, res) => {
       JOIN students ON class_student.StudentId = students.StudentId
       WHERE students.UserId = ?  AND courses.CourseId = ?
      `;
-    }
-    db.query(q, [userId, req.params.id], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.status(200).json(data[0]);
-    });
+  }
+  db.query(q, [userId, req.params.id], (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data[0]);
   });
 };
 
 export const addCourse = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json({ message: "Not authenticated!" });
+  const teacherQuery = "SELECT * FROM teachers WHERE UserId = ?";
+  const userId = req.userInfo.id;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json({ message: "Token is not valid!" });
+  db.query(teacherQuery, [userId], (teacherErr, teacherData) => {
+    if (teacherErr) return res.status(500).json(teacherErr);
 
-    const teacherQuery = "SELECT * FROM teachers WHERE UserId = ?";
-    const userId = userInfo.id;
+    if (teacherData.length === 0) {
+      return res
+        .status(403)
+        .json({ message: "User does not have permission to add courses!" });
+    }
 
-    db.query(teacherQuery, [userId], (teacherErr, teacherData) => {
-      if (teacherErr) return res.status(500).json(teacherErr);
+    const teacherId = teacherData[0].TeacherId;
 
-      if (teacherData.length === 0) {
-        return res.status(403).json({ message: "User does not have permission to add courses!" });
-      }
+    // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
+    const insertQuery =
+      "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?)";
+    const insertValues = [req.body.courseTitle, teacherId, req.body.courseCode];
 
-      const teacherId = teacherData[0].TeacherId;
+    db.query(insertQuery, [insertValues], (insertErr, insertData) => {
+      if (insertErr) return res.status(500).json(insertErr);
 
-      // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
-      const insertQuery = "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?)";
-      const insertValues = [req.body.courseTitle, teacherId, req.body.courseCode];
-
-      db.query(insertQuery, [insertValues], (insertErr, insertData) => {
-        if (insertErr) return res.status(500).json(insertErr);
-
-        const courseId = insertData.insertId; // Lấy courseId sau khi tạo thành công
-        return res
-          .status(201)
-          .json({ message: "Course has been created.", courseId: courseId });
-      });
+      const courseId = insertData.insertId; // Lấy courseId sau khi tạo thành công
+      return res
+        .status(201)
+        .json({ message: "Course has been created.", courseId: courseId });
     });
   });
 };
 
 export const deleteCourse = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
+  if (req.userInfo.role === "student") {
+    return res.status(403).json("Unauthorized!");
+  }
+  const q = "DELETE FROM courses WHERE `CourseId` = ? ";
+  db.query(q, [courseId], (err, data) => {
+    if (err) return res.status(403).json("You can delete only your post!");
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const courseId = req.params.id;
-    console.log(courseId)
-    const q = "DELETE FROM courses WHERE `CourseId` = ? ";
-
-    // Kiểm tra vai trò người dùng và quyền xóa khóa học
- 
-
-    db.query(q, [courseId], (err, data) => {
-      if (err) return res.status(403).json("You can delete only your post!");
-
-      return res.json("Post has been deleted!");
-    });
+    return res.json("Post has been deleted!");
   });
 };
 export const updateCourse = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
+  const q =
+    "UPDATE courses SET `title`=?, `desc`=?, `img`=?, `cat`=? , `StartDate`=?, `EndDate`=? WHERE `courseId` = ? ";
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const values = [
+    req.body.title,
+    req.body.desc,
+    req.body.img,
+    req.body.cat,
+    req.body.StartDate,
+    req.body.EndDate,
+    courseId,
+  ];
 
-    const courseId = req.params.id;
-    const q =
-      "UPDATE courses SET `title`=?, `desc`=?, `img`=?, `cat`=? , `StartDate`=?, `EndDate`=? WHERE `courseId` = ? ";
-
-    const values = [
-      req.body.title,
-      req.body.desc,
-      req.body.img,
-      req.body.cat,
-      req.body.StartDate,
-      req.body.EndDate,
-      courseId,
-    ];
-
-    // Kiểm tra vai trò người dùng và quyền cập nhật khóa học
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
-    db.query(q, values, (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.json("Post has been updated.");
-    });
+  // Kiểm tra vai trò người dùng và quyền cập nhật khóa học
+  if (req.userInfo.role !== "admin") {
+    return res.status(403).json("Unauthorized!");
+  }
+  db.query(q, values, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json("Post has been updated.");
   });
 };
-// export const getCourseTitle = (req, res) => {
-//   const token = req.cookies.access_token;
-//   if (!token) return res.status(401).json("Not authenticated!");
-
-//   jwt.verify(token, "jwtkey", (err, userInfo) => {
-//     if (err) return res.status(403).json("Token is not valid!");
-//     const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
-//     const lessonId = req.params.lessonId;
-//     const q = `
-//       SELECT course.*
-//       FROM course
-//       JOIN chapters ON lessons.ChapterId = chapters.ChapterId
-//       WHERE lessons.ChapterId = ? AND lessons.LessonId = ?`;
-
-//     db.query(q, [chapterId, lessonId], (err, data) => {
-//       if (err) return res.status(500).json(err);
-//       return res.status(200).json(data);
-//     });
-//   });
-// };
 
 export const getCourseTitle = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
+  const q = "SELECT title FROM courses WHERE CourseId = ? ";
+  db.query(q, [courseId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Course title not found" });
+    }
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const courseId = req.params.id;
-    const q = "SELECT title FROM courses WHERE CourseId = ? ";
-    db.query(q, [courseId], (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0) {
-        return res.status(404).json({ message: "Course title not found" });
-      }
-
-      const course = result[0];
-      return res.status(200).json({ courseTitle: course.title });
-    });
+    const course = result[0];
+    return res.status(200).json({ courseTitle: course.title });
   });
 };
 export const updateCourseTitle = (req, res) => {

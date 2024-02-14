@@ -40,8 +40,8 @@ export const login = (req, res) => {
       return res.status(400).json("Wrong username or password!");
 
     const token = jwt.sign({ id: user.UserId, role: user.Role }, "jwtkey");
-    const { password: _, ...userData } = user; 
-
+    const userData = { ...user };
+    delete userData.Password; // Remove the Password field from userData
     res
       .cookie("access_token", token, {
         httpOnly: true,
@@ -52,8 +52,11 @@ export const login = (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("access_token",{
-    sameSite:"none",
-    secure:true
-  }).status(200).json("User has been logged out.")
+  res
+    .clearCookie("access_token", {
+      sameSite: "none",
+      secure: true,
+    })
+    .status(200)
+    .json("User has been logged out.");
 };
