@@ -252,6 +252,7 @@ router.post(
   upload.single("document"),
   (req, res) => {
     const { assignmentId } = req.params;
+    console.log(req.file);
     if (req.file) {
       cloudinary.uploader
         .upload(req.file.path, {
@@ -288,22 +289,98 @@ router.post(
   }
 );
 
+function submitAssignment(
+  assignmentId,
+  studentId,
+  chapterId,
+  courseId,
+  assignmentFileId,
+  fileTitle,
+  fileUrl,
+  req,
+  res
+) {
+  let score = 0;
+  const submissionFile = [
+    {
+      assignmentFileId,
+      fileTitle,
+      fileUrl,
+    },
+  ];
+  const query = `INSERT INTO submissions ( AssignmentId,
+    StudentId,
+    ChapterId,
+    CourseId,
+    SubmissionDate,
+    Score,
+    SubmissionFile)
+    VALUES (?,?,?,NOW(),?,?);`;
+
+  db.query(
+    query,
+    [assignmentId, studentId, chapterId, courseId, 1, submissionFile],
+    (err, result) => {
+      if (err) {
+        console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
+        res.status(500).json({
+          success: false,
+          message: "Lỗi",
+        });
+      } else {
+        console.log("Dữ liệu tài liệu đã được chèn vào cơ sở dữ liệu");
+        res.status(201).json({
+          success: true,
+          message: "fileUrl đã được tải lên!",
+          data: result,
+        });
+      }
+    }
+  );
+}
+
 router.post(
   "/chapters/uploadAssignmentFile/:assignmentId/submission",
-  upload.single("document"),
+  upload.single("documentSubmit"),
   (req, res) => {
+    // const assignmentId = req.body.assignmentId;
+    // const chapterId = req.body.chapterId;
+    // const studentId = req.body.studentId;
+    // const courseId = req.body.courseId;
+    // console.log(assignmentId);
+    // console.log(chapterId);
+    // console.log(studentId);
+    // console.log(courseId);
+    console.log(req.file);
+
     if (req.file) {
       cloudinary.uploader
         .upload(req.file.path, {
           folder: "CourseAssignment/Student",
           resource_type: "raw",
         })
-        .then((result) => {})
+        .then((result) => {
+          const assignmentFileId = result.asset_id;
+          const fileTitle = result.original_filename;
+          const fileUrl = result.url;
+          console.log(result);
+          // submitAssignment(
+          //   assignmentId,
+          //   studentId,
+          //   chapterId,
+          //   courseId,
+          //   assignmentFileId,
+          //   fileTitle,
+          //   fileUrl,
+          //   req,
+          //   res
+          // );
+        })
         .catch((err) => {
           console.log(err);
           res.status(500).json({
             success: false,
-            message: err,
+            message: "Lỗi",
           });
         });
     } else {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { AuthContext } from "../../../context/authContext";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../course/course.scss";
@@ -20,20 +19,22 @@ import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
 export default function CourseAssignment() {
-  const { currentUser } = useContext(AuthContext);
   const location = useLocation();
   const listRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState(null);
   const fileInputRef = useRef(null);
   const [assignment, setAssignment] = useState();
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
 
   const handleFileSelect = (event) => {
-    const files = event.target.files;
-    const fileArray = Array.from(files);
-    setSelectedFiles(fileArray);
+    // const files = event.target.files;
+    const newFile = event.target.files[0];
+    // const fileArray = Array.from(files);
+    setSelectedFiles(newFile);
+    console.log("file: " + newFile);
+
   };
 
   const handleChangeClick = () => {
@@ -76,7 +77,6 @@ export default function CourseAssignment() {
         `/courses/chapters/${chapterId}/assignments/${assignmentId}`
       );
       setAssignment(response.data);
-      console.table(response.data);
       fetchAssignmentFiles(assignmentId);
     } catch (err) {
       console.log(err);
@@ -85,19 +85,22 @@ export default function CourseAssignment() {
 
   const handleSubmit = async () => {
     try {
-      const requestBody = {
-        assignmentId: assignment.AssignmentId,
-        chapterId: location.state?.chapterId,
-        studentId: currentUser.UserId,
-        courseId: location.state?.courseId,
-        submissonFile: selectedFiles,
-      };
-      
-      console.table(requestBody.submissonFile);
+      const fileData = new FormData();
+      fileData.append("documentSubmit", selectedFiles);
+      console.log(selectedFiles);
+
+      console.log(fileData);
+      // const requestBody = {
+      //   assignmentId: assignment.AssignmentId,
+      //   chapterId: location.state?.chapterId,
+      //   studentId: currentUser.UserId,
+      //   courseId: location.state?.courseId,
+      //   fileData: fileData,
+      // };
 
       await axios.post(
-        `/courses/chapters/${location.state?.chapterId}/submission`,
-        requestBody
+        `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
+        fileData
       );
     } catch (err) {
       console.log(err);
@@ -268,7 +271,6 @@ export default function CourseAssignment() {
                               ref={fileInputRef}
                               type="file"
                               style={{ display: "none" }}
-                              multiple
                               onChange={handleFileSelect}
                             />
 
@@ -283,9 +285,9 @@ export default function CourseAssignment() {
                           <div>
                             {selectedFiles && (
                               <>
-                                {selectedFiles.map((file, index) => (
+                                {/* {selectedFiles.map((file, index) => ( */}
                                   <li
-                                    key={index}
+                                    // key={index}
                                     className="flex mx-8 border-b border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
                                   >
                                     <div className="flex w-0 flex-1 items-center">
@@ -295,12 +297,12 @@ export default function CourseAssignment() {
                                       />
                                       <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                         <span className="truncate font-medium text-blue-500">
-                                          {file.name}
+                                          {selectedFiles.name}
                                         </span>
                                       </div>
                                     </div>
                                   </li>
-                                ))}
+                                {/* ))} */}
                               </>
                             )}
                           </div>
