@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../course/course.scss";
+import { AuthContext } from "../../../context/authContext";
+
 import ReactQuill from "react-quill";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDate, getText } from "../../../js/TAROHelper";
@@ -19,22 +21,26 @@ import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
 export default function CourseAssignment() {
+  const { currentUser } = useContext(AuthContext);
   const location = useLocation();
   const listRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [assignment, setAssignment] = useState();
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
 
   const handleFileSelect = (event) => {
-    // const files = event.target.files;
-    const newFile = event.target.files[0];
-    // const fileArray = Array.from(files);
-    setSelectedFiles(newFile);
-    console.log("file: " + newFile);
-
+    const files = event.target.files;
+    if (files) {
+      const updatedList = [...selectedFiles];
+      for (let i = 0; i < files.length; i++) {
+        updatedList.push(files[i]);
+      }
+      setSelectedFiles(updatedList);
+      console.log("files:", updatedList);
+    }
   };
 
   const handleChangeClick = () => {
@@ -86,17 +92,14 @@ export default function CourseAssignment() {
   const handleSubmit = async () => {
     try {
       const fileData = new FormData();
-      fileData.append("documentSubmit", selectedFiles);
-      console.log(selectedFiles);
+      for (let i = 0; i < selectedFiles.length; i++) {
+        fileData.append("documentSubmit", selectedFiles[i]);
+      }
 
-      console.log(fileData);
-      // const requestBody = {
-      //   assignmentId: assignment.AssignmentId,
-      //   chapterId: location.state?.chapterId,
-      //   studentId: currentUser.UserId,
-      //   courseId: location.state?.courseId,
-      //   fileData: fileData,
-      // };
+      fileData.append("assignmentId", assignment.AssignmentId);
+      fileData.append("chapterId", location.state?.chapterId);
+      fileData.append("userId", currentUser.UserId);
+      fileData.append("courseId", location.state?.courseId);
 
       await axios.post(
         `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
@@ -272,6 +275,7 @@ export default function CourseAssignment() {
                               type="file"
                               style={{ display: "none" }}
                               onChange={handleFileSelect}
+                              multiple
                             />
 
                             <button
@@ -285,9 +289,9 @@ export default function CourseAssignment() {
                           <div>
                             {selectedFiles && (
                               <>
-                                {/* {selectedFiles.map((file, index) => ( */}
+                                {selectedFiles.map((file, index) => (
                                   <li
-                                    // key={index}
+                                    key={index}
                                     className="flex mx-8 border-b border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
                                   >
                                     <div className="flex w-0 flex-1 items-center">
@@ -297,12 +301,12 @@ export default function CourseAssignment() {
                                       />
                                       <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                         <span className="truncate font-medium text-blue-500">
-                                          {selectedFiles.name}
+                                          {file.name}
                                         </span>
                                       </div>
                                     </div>
                                   </li>
-                                {/* ))} */}
+                                ))}
                               </>
                             )}
                           </div>

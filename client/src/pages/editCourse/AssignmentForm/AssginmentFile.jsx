@@ -34,8 +34,7 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
     try {
       const formData = new FormData();
       formData.append("document", selectedFile);
-      console.log(selectedFile);
-      console.log(formData);
+ 
       const response = await axios.post(
         `/users/chapters/uploadAssignmentFile/${assignmentId}`,
         formData

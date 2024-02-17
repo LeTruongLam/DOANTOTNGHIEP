@@ -291,35 +291,21 @@ router.post(
 
 function submitAssignment(
   assignmentId,
-  studentId,
+  userId,
   chapterId,
   courseId,
-  assignmentFileId,
-  fileTitle,
-  fileUrl,
+  submissionFiles,
   req,
   res
 ) {
-  let score = 0;
-  const submissionFile = [
-    {
-      assignmentFileId,
-      fileTitle,
-      fileUrl,
-    },
-  ];
-  const query = `INSERT INTO submissions ( AssignmentId,
-    StudentId,
-    ChapterId,
-    CourseId,
-    SubmissionDate,
-    Score,
-    SubmissionFile)
-    VALUES (?,?,?,NOW(),?,?);`;
+  console.log("hi", submissionFiles);
+  const score = 0;
 
+  const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, Score, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?, ?);`;
+  const submissionFilesJson = JSON.stringify(submissionFiles);
   db.query(
     query,
-    [assignmentId, studentId, chapterId, courseId, 1, submissionFile],
+    [assignmentId, userId, chapterId, courseId, score, submissionFilesJson],
     (err, result) => {
       if (err) {
         console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
@@ -341,55 +327,60 @@ function submitAssignment(
 
 router.post(
   "/chapters/uploadAssignmentFile/:assignmentId/submission",
-  upload.single("documentSubmit"),
-  (req, res) => {
-    // const assignmentId = req.body.assignmentId;
-    // const chapterId = req.body.chapterId;
-    // const studentId = req.body.studentId;
-    // const courseId = req.body.courseId;
-    // console.log(assignmentId);
-    // console.log(chapterId);
-    // console.log(studentId);
-    // console.log(courseId);
-    console.log(req.file);
+  upload.array("documentSubmit", 10),
+  (req, res, next) => {
+    const assignmentId = req.body.assignmentId;
+    const chapterId = req.body.chapterId;
+    const userId = req.body.userId;
+    const courseId = req.body.courseId;
+    const submissionFiles = []; // Mảng để lưu thông tin các tệp đã tải lên
 
-    if (req.file) {
-      cloudinary.uploader
-        .upload(req.file.path, {
-          folder: "CourseAssignment/Student",
-          resource_type: "raw",
-        })
-        .then((result) => {
-          const assignmentFileId = result.asset_id;
-          const fileTitle = result.original_filename;
-          const fileUrl = result.url;
-          console.log(result);
-          // submitAssignment(
-          //   assignmentId,
-          //   studentId,
-          //   chapterId,
-          //   courseId,
-          //   assignmentFileId,
-          //   fileTitle,
-          //   fileUrl,
-          //   req,
-          //   res
-          // );
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(500).json({
-            success: false,
-            message: "Lỗi",
-          });
-        });
-    } else {
-      res.status(400).json({
+    let files = req.files;
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
         success: false,
         message: "Không có tệp được tải lên",
+      });
+    } else {
+      files.map((file, index) => {
+        cloudinary.uploader
+          .upload(file.path, {
+            folder: "CourseAssignment/Student",
+            resource_type: "raw",
+          })
+          .then((result) => {
+            const assignmentFileId = result.asset_id;
+            const fileTitle = result.original_filename;
+            const fileUrl = result.url;
+            // Thêm thông tin vào mảng uploadedFiles
+            submissionFiles.push({
+              assignmentFileId,
+              fileTitle,
+              fileUrl,
+            });
+
+            // Kiểm tra xem đã tải lên và lưu thông tin của tất cả các tệp hay chưa
+            if (submissionFiles.length === files.length) {
+              submitAssignment(
+                assignmentId,
+                userId,
+                chapterId,
+                courseId,
+                submissionFiles,
+                req,
+                res
+              );
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(500).json({
+              success: false,
+              message: "Lỗi server",
+            });
+          });
       });
     }
   }
 );
-
 export default router;
