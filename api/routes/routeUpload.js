@@ -298,9 +298,7 @@ function submitAssignment(
   req,
   res
 ) {
-  console.log("hi", submissionFiles);
   const score = 0;
-
   const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, Score, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?, ?);`;
   const submissionFilesJson = JSON.stringify(submissionFiles);
   db.query(

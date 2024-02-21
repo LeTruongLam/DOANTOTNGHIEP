@@ -12,16 +12,19 @@ export const getAllCourses = (req, res) => {
 };
 
 export const getCourses = (req, res) => {
-  const userId = req.userInfo.id;
+  const userInfo = req.userInfo;
+  const userRole = userInfo.role;
 
   let q = "";
-  if (req.userInfo.role === "teacher") {
-    q = `SELECT courses.*,teachers.TeacherName  FROM teachers 
+  if (userRole === "teacher") {
+    // Query for teacher role
+    q = `SELECT courses.*, teachers.TeacherName FROM teachers 
       JOIN courses ON courses.TeacherId = teachers.TeacherId 
       WHERE teachers.UserId = ? AND teachers.TeacherId = courses.TeacherId`;
-  } else if (req.userInfo.role === "student") {
+  } else if (userRole === "student") {
+    // Query for student role
     q = `
-      SELECT courses.*,teachers.TeacherName
+      SELECT courses.*, teachers.TeacherName
       FROM courses
       JOIN classes ON courses.CourseId = classes.CourseId
       JOIN teachers ON courses.TeacherId = teachers.TeacherId
@@ -31,14 +34,15 @@ export const getCourses = (req, res) => {
      `;
   }
 
-  db.query(q, [userId], (err, data) => {
+  db.query(q, [userInfo.id], (err, data) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data);
   });
 };
 export const getCourseById = (req, res) => {
-  const userId = req.userInfo.id;
-  const userRole = req.userInfo.role;
+  const userInfo = req.userInfo;
+  const userId = userInfo.id;
+  const userRole = userInfo.role;
   let q = "";
   if (userRole === "teacher") {
     q = `SELECT courses.*,teachers.TeacherName  FROM teachers 
@@ -57,6 +61,9 @@ export const getCourseById = (req, res) => {
   }
   db.query(q, [userId, req.params.id], (err, data) => {
     if (err) return res.status(500).json(err);
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
     return res.status(200).json(data[0]);
   });
 };
@@ -78,10 +85,10 @@ export const addCourse = (req, res) => {
 
     // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
     const insertQuery =
-      "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?)";
+      "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?, ?, ?)";
     const insertValues = [req.body.courseTitle, teacherId, req.body.courseCode];
 
-    db.query(insertQuery, [insertValues], (insertErr, insertData) => {
+    db.query(insertQuery, insertValues, (insertErr, insertData) => {
       if (insertErr) return res.status(500).json(insertErr);
 
       const courseId = insertData.insertId; // Lấy courseId sau khi tạo thành công
@@ -94,14 +101,22 @@ export const addCourse = (req, res) => {
 
 export const deleteCourse = (req, res) => {
   const courseId = req.params.id;
-  if (req.userInfo.role === "student") {
-    return res.status(403).json("Unauthorized!");
-  }
-  const q = "DELETE FROM courses WHERE `CourseId` = ? ";
-  db.query(q, [courseId], (err, data) => {
-    if (err) return res.status(403).json("You can delete only your post!");
 
-    return res.json("Post has been deleted!");
+  if (req.userInfo.role === "student") {
+    return res.status(403).json({ error: "Unauthorized!" });
+  }
+
+  const deleteQuery = "DELETE FROM courses WHERE CourseId = ?";
+  db.query(deleteQuery, [courseId], (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to delete course!" });
+    }
+
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Course not found!" });
+    }
+
+    return res.json({ message: "Course has been deleted!" });
   });
 };
 export const updateCourse = (req, res) => {
@@ -121,21 +136,40 @@ export const updateCourse = (req, res) => {
 
   // Kiểm tra vai trò người dùng và quyền cập nhật khóa học
   if (req.userInfo.role !== "admin") {
-    return res.status(403).json("Unauthorized!");
+    return res.status(403).json({ error: "Unauthorized!" });
   }
-  db.query(q, values, (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.json("Post has been updated.");
+
+  const updateQuery = "SELECT * FROM courses WHERE CourseId = ?";
+  db.query(updateQuery, [courseId], (err, courseData) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to update course!" });
+    }
+
+    if (courseData.length === 0) {
+      return res.status(404).json({ error: "Course not found!" });
+    }
+
+    db.query(q, values, (updateErr, updateData) => {
+      if (updateErr) {
+        return res.status(500).json({ error: "Failed to update course!" });
+      }
+
+      return res.json({ message: "Course has been updated." });
+    });
   });
 };
 
 export const getCourseTitle = (req, res) => {
   const courseId = req.params.id;
-  const q = "SELECT title FROM courses WHERE CourseId = ? ";
-  db.query(q, [courseId], (err, result) => {
-    if (err) return res.status(500).json(err);
+  const query = "SELECT title FROM courses WHERE CourseId = ?";
+
+  db.query(query, [courseId], (error, result) => {
+    if (error) {
+      return res.status(500).json({ error: "Failed to fetch course title!" });
+    }
+
     if (result.length === 0) {
-      return res.status(404).json({ message: "Course title not found" });
+      return res.status(404).json({ error: "Course title not found!" });
     }
 
     const course = result[0];

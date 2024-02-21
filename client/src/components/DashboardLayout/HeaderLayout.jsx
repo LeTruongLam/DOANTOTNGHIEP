@@ -3,9 +3,6 @@ import { useContext } from "react";
 
 import { useNavigate } from "react-router-dom";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
-import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import Button from "@mui/material/Button";
@@ -24,7 +21,15 @@ const HeaderLayout = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const [checked, setChecked] = React.useState(false);
+  const [checked, setChecked] = React.useState(() => {
+    const initialChecked = localStorage.getItem("teacherMode");
+    return initialChecked;
+  });
+  
+  React.useEffect(() => {
+    localStorage.setItem("teacherMode", true);
+  }, [checked]);
+
   const handleChecked = (event) => {
     setChecked(event.target.checked);
     if (event.target.checked) {

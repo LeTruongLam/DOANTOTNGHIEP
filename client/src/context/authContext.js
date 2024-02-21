@@ -1,17 +1,20 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 
-const  SESSIONTIMEOUT = 10000000000000; // 10s
+const SESSIONTIMEOUT = 10000000000000; // 10s
 export const AuthContext = createContext();
 
 export const AuthContexProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
+  const [courses, setCourses] = useState([]);
+
   const [expiredToken, setExpiredToken] = useState(false);
   const login = async (inputs) => {
     const res = await axios.post("/auth/login", inputs);
-    setCurrentUser(res.data);
+    setCurrentUser(res.data.userData);
+    localStorage.setItem("token", res.data.token);
     // Lưu thời gian hết hạn của phiên đăng nhập vào localStorage
     const expirationTime = Date.now() + SESSIONTIMEOUT;
     localStorage.setItem("expirationTime", expirationTime);
@@ -21,6 +24,34 @@ export const AuthContexProvider = ({ children }) => {
       const reschapter = await axios.get(`/courses/${CourseId}/chapters`);
 
       return reschapter.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchCourses = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`/courses`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      });
+      console.table(res.data);
+      setCourses(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const fetchCourseById = async (courseId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`/courses/${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      });
+      return res.data;
     } catch (err) {
       console.log(err);
     }
@@ -50,6 +81,7 @@ export const AuthContexProvider = ({ children }) => {
     await axios.post("/auth/logout");
     setCurrentUser(null);
     localStorage.removeItem("expirationTime");
+    localStorage.removeItem("token");
     localStorage.removeItem("user"); // Xóa thông tin người dùng từ localStorage
   };
 
@@ -69,12 +101,14 @@ export const AuthContexProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         currentUser,
-        expiredToken,
+        courses,
+        fetchCourses,
         login,
         logout,
         fetchChapter,
         fetchLesson,
         fetchAssignment,
+        fetchCourseById,
       }}
     >
       {children}

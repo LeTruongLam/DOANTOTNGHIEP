@@ -15,7 +15,12 @@ export default function CourseTitle({ title, subTitle }) {
   const [isEditing, setIsEditing] = useState(false);
   const fetchCourseTitle = async () => {
     try {
-      const res = await axios.get(`/courses/title/${location.state.CourseId}`);
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`/courses/title/${location.state.CourseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      });
       setCourseTitle(res.data.courseTitle);
     } catch (error) {
       message.error(error.message);
@@ -55,7 +60,7 @@ export default function CourseTitle({ title, subTitle }) {
           {!isEditing ? (
             <div onClick={handleIconClick} className="course-title-action">
               <EditIcon fontSize="small" />
-              <span >{subTitle}</span>
+              <span>{subTitle}</span>
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">

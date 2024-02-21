@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 import "./course.scss";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import { formatDate, getText, truncateString } from "../../js/TAROHelper";
 import SchoolIcon from "@mui/icons-material/School";
-import CircularProgress from "@mui/material/CircularProgress";
-import Backdrop from "@mui/material/Backdrop";
 
 const Course = () => {
+  const { courses, fetchCourses } = useContext(AuthContext);
+
   const navigate = useNavigate();
-  const cat = useLocation().search;
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const handleCourseClick = (course) => {
     navigate(`/course/${course.title}`, {
@@ -21,31 +18,20 @@ const Course = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`/courses/${cat}`);
-        console.table(res.data);
-        setCourses(res.data);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [cat]);
-
+    fetchCourses();
+  }, []);
   return (
-    <div className="section-row ml-10">
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
+    <div className="section-row mx-5">
       <div className="title-course mt-6 mb-3">
         <h1 className="font-bold text-3xl ml-3">My Courses</h1>
+        <input
+          type="text"
+          name="search-course"
+          id="search-course"
+          autoComplete="given-name"
+          placeholder="Search course"
+          className="mr-10 outline-none block w-80 rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
+        />
       </div>
       <div className="section-items">
         {courses.map((course) => (
@@ -61,7 +47,10 @@ const Course = () => {
                 <div className="course-glimpse-wrapper">
                   <div>
                     <span className="font-normal text-base">
-                      Created by <span className="font-semibold">{course.TeacherName}</span>
+                      Created by{" "}
+                      <span className="font-semibold">
+                        {course.TeacherName}
+                      </span>
                     </span>
                   </div>
                   <div className="course-glimpse-info">
@@ -97,7 +86,9 @@ const Course = () => {
                       />
                       <span>{course.CourseCode}</span>
                     </p>
-                    <p className="font-medium hover:text-primary-purple hover:cursor-pointer">View More</p>
+                    <p className="font-medium hover:text-primary-purple hover:cursor-pointer">
+                      View More
+                    </p>
                   </div>
                 </div>
               </div>

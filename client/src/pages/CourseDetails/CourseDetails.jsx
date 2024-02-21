@@ -24,7 +24,7 @@ import Comment from "./Comment/Comment";
 import TheBreadcrumbs from "../../components/Breadcrumbs";
 import ChapterList from "./CourseChapter/ChapterList";
 const CourseDetails = () => {
-  const { fetchLesson } = useContext(AuthContext);
+  const { fetchLesson,fetchCourseById } = useContext(AuthContext);
   const location = useLocation();
   const [courseId, setCourseId] = useState(location.state?.courseId);
   const navigate = useNavigate();
@@ -35,8 +35,14 @@ const CourseDetails = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem("token");
+    
       try {
-        const res = await axios.get(`/courses/${courseId}`);
+        const res = await axios.get(`/courses/${courseId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        });
         setCourse(res.data);
         // console.table(res.data);
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);

@@ -57,7 +57,7 @@ const ChapterStepper = ({
           <div className="editorContainer">
             <ChapterDesc
               chapterId={chapterId}
-              title="Chapter Desccription"
+              title="Chapter Description"
               subTitle="Edit "
             />
           </div>

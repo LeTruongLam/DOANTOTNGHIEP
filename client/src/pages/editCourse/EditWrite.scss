@@ -118,7 +118,7 @@
 }
 
 .course-title-body {
-    max-height: 300px;
+    // max-height: 300px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -178,7 +178,8 @@
 .lesson-content-left {
     display: flex;
     align-items: center;
-    gap: 10px
+    gap: 10px;
+    height: 100%;
 }
 
 .course-custom-title {

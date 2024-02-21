@@ -71,7 +71,7 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            lessonDesc == null ? (
+            !lessonDesc  ? (
               <div className="italic text-slate-400		">No lesson description </div>
             ) : (
               <div

@@ -24,7 +24,6 @@ export default function TheLesson({
   const [isEditing, setIsEditing] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [lessonTitle, setLessonTitle] = useState("");
-  const [openForm, setOpenForm] = useState(false);
 
   const onDrop = ({ removedIndex, addedIndex }) => {
     setLessons((items) => arrayMove(items, removedIndex, addedIndex));
@@ -119,8 +118,8 @@ export default function TheLesson({
       <div className="course-title-wrapper">
         <div className="course-title-header mt-3 mb-3">
           <p>{title}</p>
-          {chapterId ? (
-            !isEditing ? (
+          {chapterId &&
+            (!isEditing ? (
               <div onClick={handleIconClick} className="course-title-action">
                 <AddCircleOutlineOutlinedIcon fontSize="small" />
                 <span>{subTitle}</span>
@@ -129,22 +128,21 @@ export default function TheLesson({
               <div onClick={handleCancelClick} className="course-title-action">
                 <span>Cancel</span>
               </div>
-            )
-          ) : (
-            <div className="course-title-action">
-              <span>Please select a chapter</span>
-            </div>
-          )}
+            ))}
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <Container
-              dragHandleSelector=".drag-handle"
-              lockAxis="y"
-              onDrop={onDrop}
-            >
-              {lessonItems}
-            </Container>
+            !lessons[0] ? (
+              <div className="italic text-slate-400		">No lessons</div>
+            ) : (
+              <Container
+                dragHandleSelector=".drag-handle"
+                lockAxis="y"
+                onDrop={onDrop}
+              >
+                {lessonItems}
+              </Container>
+            )
           ) : (
             <div className="grid">
               <TextField

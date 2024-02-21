@@ -128,7 +128,11 @@ export default function CourseAssignment({ title, subTitle, chapterId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <>{assignmentItems}</>
+            !assignments[0] ? (
+              <div className="italic text-slate-400		">No assignments</div>
+            ) : (
+              <>{assignmentItems}</>
+            )
           ) : (
             <div className="grid">
               <TextField

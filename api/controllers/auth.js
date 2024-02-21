@@ -42,12 +42,12 @@ export const login = (req, res) => {
     const token = jwt.sign({ id: user.UserId, role: user.Role }, "jwtkey");
     const userData = { ...user };
     delete userData.Password; // Remove the Password field from userData
-    res
-      .cookie("access_token", token, {
-        httpOnly: true,
-      })
-      .status(200)
-      .json(userData);
+    delete userData.Email; // Remove the Password field from userData
+    delete userData.Img; // Remove the Password field from userData
+    res.cookie("access_token", token, {
+      httpOnly: true,
+    });
+    res.status(200).json({ userData, token });
   });
 };
 

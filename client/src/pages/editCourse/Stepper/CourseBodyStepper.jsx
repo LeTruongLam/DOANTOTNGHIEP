@@ -16,7 +16,7 @@ import CourseClass from "../CourseComponent/CourseClass";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
-
+import Dialog from "../../../components/Dialogs/Dialog";
 const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,8 +41,14 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
     handleNext();
   };
   const handleDelete = async () => {
+    const token = localStorage.getItem("token");
+
     try {
-      await axios.delete(`/courses/${location.state?.CourseId}`);
+      await axios.delete(`/courses/${location.state?.CourseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      });
       message.success("Xóa thành công");
       navigate("/dashboard");
     } catch (err) {
@@ -53,6 +59,7 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
   return (
     <div className="grow-[3]">
       <div className="flex justify-between py-3 m-3 items-center	">
+        <Dialog title="Bạn có muốn xóa môn học" content="Xóa đi !" type="1" />
         <p className="text-2xl	font-semibold	">Course Setup</p>
         <p>
           <button

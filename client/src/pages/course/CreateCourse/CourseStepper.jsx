@@ -59,11 +59,20 @@ export default function CourseStepper() {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
   const handleSaveClick = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const response = await axios.post("/courses", {
-        courseTitle: courseTitle,
-        courseCode: courseCode,
-      });
+      const response = await axios.post(
+        "/courses",
+        {
+          courseTitle: courseTitle,
+          courseCode: courseCode,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
       setCourse((prevCourse) => ({
         ...prevCourse,
         CourseId: response.data.courseId,

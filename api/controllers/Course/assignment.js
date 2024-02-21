@@ -42,7 +42,6 @@ export const getAssignment = (req, res) => {
 export const getAssignments = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
-
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
     const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
@@ -54,6 +53,7 @@ export const getAssignments = (req, res) => {
 
     db.query(q, [chapterId], (err, data) => {
       if (err) return res.status(500).json(err);
+      if (data.length === 0) return res.status(200).json([]);
       return res.status(200).json(data);
     });
   });

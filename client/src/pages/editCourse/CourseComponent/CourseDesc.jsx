@@ -69,11 +69,15 @@ export default function CourseDesc({ title, subTitle }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(courseDesc),
-              }}
-            ></div>
+            !courseDesc ? (
+              <div className="italic text-slate-400		">No course description</div>
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(courseDesc),
+                }}
+              ></div>
+            )
           ) : (
             <ReactQuill
               className="editor bg-main"

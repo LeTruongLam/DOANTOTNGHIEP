@@ -4,6 +4,9 @@ import axios from "axios";
 import "../../course/course.scss";
 import { AuthContext } from "../../../context/authContext";
 
+import CircularProgress from "@mui/material/CircularProgress";
+import Backdrop from "@mui/material/Backdrop";
+
 import ReactQuill from "react-quill";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDate, getText } from "../../../js/TAROHelper";
@@ -30,6 +33,7 @@ export default function CourseAssignment() {
   const [assignment, setAssignment] = useState();
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleFileSelect = (event) => {
     const files = event.target.files;
@@ -51,6 +55,7 @@ export default function CourseAssignment() {
   };
 
   const fetchAssignmentData = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(
         `/courses/chapters/${location.state?.chapterId}/assignments`
@@ -58,10 +63,13 @@ export default function CourseAssignment() {
       setAssignment(response.data[0]);
       fetchAssignmentFiles(response.data[0].AssignmentId);
       setAssignmentList(response.data);
+      setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
     }
   };
+
   const fetchAssignmentFiles = async (assignmentId) => {
     try {
       const response = await axios.get(
@@ -72,6 +80,7 @@ export default function CourseAssignment() {
       console.error("Error fetching assignment files:", error);
     }
   };
+
   useEffect(() => {
     fetchAssignmentData();
   }, [location.state?.chapterId]);
@@ -109,6 +118,20 @@ export default function CourseAssignment() {
       console.log(err);
     }
   };
+  if (loading) {
+    return (
+      <Backdrop
+        sx={{
+          color: "rgba(0, 0, 0, 0.8)",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
+  }
   return (
     <>
       {assignment ? (
@@ -160,8 +183,12 @@ export default function CourseAssignment() {
               <h3 className="text-2xl font-semibold leading-7 text-gray-900">
                 Assignment
               </h3>
-              <button onClick={handleSubmit}>Submit</button>
-              {/* <MainButton onClick={handleSubmit} content="Submit" /> */}
+              <button
+                className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                onClick={handleSubmit}
+              >
+                Submit
+              </button>
             </div>
             <div className="mt-6 border-t border-gray-100">
               <dl className="divide-y divide-gray-100">

@@ -8,12 +8,7 @@ import { message } from "antd";
 
 import "../EditWrite.scss";
 
-export default function LessonTitle({
-  title,
-  subTitle,
-  chapterId,
-  lessonId,
-}) {
+export default function LessonTitle({ title, subTitle, chapterId, lessonId }) {
   const [lessonTitle, setLessonTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const fetchLessonTitle = async () => {
@@ -71,7 +66,11 @@ export default function LessonTitle({
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div>{lessonTitle}</div>
+            !lessonTitle  ? (
+              <div className="italic text-slate-400		">No lesson title</div>
+            ) : (
+              <div>{lessonTitle}</div>
+            )
           ) : (
             <div className="grid">
               <TextField

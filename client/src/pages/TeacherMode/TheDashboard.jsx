@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
+import { AuthContext } from "../../context/authContext";
+
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,12 +10,8 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { formatDate, getText } from "../../js/TAROHelper";
-import axios from "axios";
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
 
 const columns = [
   { id: "title", label: "Title", minWidth: 170 },
@@ -45,11 +43,9 @@ function createData(title, code, start, end, options) {
 }
 
 export default function TheDashboard() {
-  const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
-  const cat = useLocation().search;
-  const [loading, setLoading] = useState(true);
+  const { courses, fetchCourses } = useContext(AuthContext);
 
+  const navigate = useNavigate();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -71,18 +67,10 @@ export default function TheDashboard() {
       </button>
     )
   );
-  const fetchData = async () => {
-    try {
-      const res = await axios.get(`/courses/${cat}`);
-      setCourses(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+
   useEffect(() => {
-    fetchData();
-    setLoading(false);
-  }, [cat]);
+    fetchCourses();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -118,67 +106,60 @@ export default function TheDashboard() {
           </button>
         </div>
       </div>
-      {loading ? (
-        <div className="w-full h-[500px] justify-center flex  items-center">
-          <Box sx={{ display: "flex" }}>
-            <CircularProgress />
-          </Box>
-        </div>
-      ) : (
-        <Paper sx={{ width: "100%", overflow: "hidden" }}>
-          <TableContainer sx={{ height: 500 }}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={column.id}
-                      align={column.align}
-                      style={{ minWidth: column.minWidth }}
+
+      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+        <TableContainer sx={{ height: 500 }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.align}
+                    style={{ minWidth: column.minWidth }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.code}
                     >
-                      {column.label}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row.code}
-                      >
-                        {columns.map((column) => {
-                          const value = row[column.id];
-                          return (
-                            <TableCell key={column.id} align={column.align}>
-                              {column.format && typeof value === "number"
-                                ? column.format(value)
-                                : value}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
-      )}
+                      {columns.map((column) => {
+                        const value = row[column.id];
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {column.format && typeof value === "number"
+                              ? column.format(value)
+                              : value}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
     </div>
   );
 }

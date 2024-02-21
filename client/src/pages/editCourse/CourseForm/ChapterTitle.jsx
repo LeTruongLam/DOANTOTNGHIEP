@@ -61,7 +61,11 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <div>{chapterTitle}</div>
+            !chapterTitle ? (
+              <div className="italic text-slate-400		">No chapter title</div>
+            ) : (
+              <div>{chapterTitle}</div>
+            )
           ) : (
             <div className="grid">
               <TextField

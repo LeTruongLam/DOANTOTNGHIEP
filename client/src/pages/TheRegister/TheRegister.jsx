@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import image from "../../img/register_2.jpg";
-import "../login/Login";
+import "../TheLogin/Login";
 import Button from "@mui/material/Button";
 const TheRegister = () => {
   const [inputs, setInputs] = useState({

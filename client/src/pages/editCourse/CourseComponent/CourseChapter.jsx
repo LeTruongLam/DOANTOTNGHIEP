@@ -19,9 +19,11 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
   const [chapterData, setChapterData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [chapterTitle, setChapterTitle] = useState("");
+  const [isDrop, setIsDrop] = useState(false);
 
   const onDrop = ({ removedIndex, addedIndex }) => {
     setChapterData((items) => arrayMove(items, removedIndex, addedIndex));
+    setIsDrop(true);
   };
 
   const fetchData = async () => {
@@ -104,13 +106,17 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            <Container
-              dragHandleSelector=".drag-handle"
-              lockAxis="y"
-              onDrop={onDrop}
-            >
-              {chapterItems}
-            </Container>
+            !chapterData[0] ? (
+              <div className="italic text-slate-400		">No chapters</div>
+            ) : (
+              <Container
+                dragHandleSelector=".drag-handle"
+                lockAxis="y"
+                onDrop={onDrop}
+              >
+                {chapterItems}
+              </Container>
+            )
           ) : (
             <div className="grid">
               <TextField
@@ -130,6 +136,26 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
                 Save
               </Button>
             </div>
+          )}
+        </div>
+        <div className="course-title-footer ">
+          {isDrop ? (
+            <Button
+              sx={{ color: "white", backgroundColor: "black" }}
+              style={{
+                marginTop: "12px",
+                width: "max-content",
+              }}
+              variant="contained"
+            >
+              Save
+            </Button>
+          ) : (
+            chapterData[0] && (
+              <div className=" text-slate-400	 italic">
+                Click the icon and drag and drop to change the chapter order
+              </div>
+            )
           )}
         </div>
       </div>

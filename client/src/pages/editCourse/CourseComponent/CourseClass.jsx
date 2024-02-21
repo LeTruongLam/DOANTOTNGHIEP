@@ -79,7 +79,13 @@ export default function CourseClass({ title, subTitle }) {
         </div>
         <div>
           {!isEditing ? (
-            <>{classItems}</>
+            <>
+              {classes[0] ? (
+                <>{classItems}</>
+              ) : (
+                <div className=" text-slate-400	 italic">No course class </div>
+              )}
+            </>
           ) : (
             <div className="grid">
               <TextField
