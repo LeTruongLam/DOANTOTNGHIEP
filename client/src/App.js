@@ -19,7 +19,8 @@ import TheDashboard from "./pages/TeacherMode/TheDashboard.jsx";
 import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
 import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
 import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
-import TheAssignment from "./pages/TeacherMode/TheAssignment.jsx";
+import TheAssignment from "./pages/TeacherMode/TheAssignment/TheAssignment.jsx";
+import AssignmentDetail from "./pages/TeacherMode/TheAssignment/AssignmentDetail.jsx";
 import PrivateRouter from "./utils/PrivateRouter.jsx";
 import TeacherRouter from "./utils/TeacherRouter.jsx";
 const Layout = ({ children }) => (
@@ -123,6 +124,14 @@ function App() {
                 element={
                   <LayoutTeacher>
                     <TheAssignment />
+                  </LayoutTeacher>
+                }
+              />
+              <Route
+                path="/assignmentDetail/:assignmentId"
+                element={
+                  <LayoutTeacher>
+                    <AssignmentDetail />
                   </LayoutTeacher>
                 }
               />

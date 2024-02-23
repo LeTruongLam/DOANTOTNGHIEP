@@ -308,6 +308,41 @@ export const updateAssignmentFile = (
     });
   });
 };
+
+export const getAssignmentSubmission = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    console.log("hi");
+
+    console.log(userInfo.id);
+
+    const q = `SELECT *  FROM submissions 
+    JOIN courses ON courses.CourseId = submissions.CourseId 
+    JOIN teachers ON teachers.TeacherId = courses.TeacherId 
+    JOIN students ON students.UserId = submissions.UserId 
+    JOIN assignments ON assignments.AssignmentId = submissions.AssignmentId 
+    JOIN chapters ON submissions.ChapterId = chapters.ChapterId 
+    WHERE teachers.UserId = ?`;
+
+    db.query(q, [userInfo.id], (err, data) => {
+      console.log(err);
+
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+
+      if (data.length === 0) {
+        return res.json({ message: "assignmentId not found." });
+      }
+
+      const chapter = data[0];
+      return res.json(data);
+    });
+  });
+};
+
 export const AssignmentSubmission = (req, res) => {
   const assignmentId = req.body.assignmentId;
   const chapterId = req.body.chapterId;

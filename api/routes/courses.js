@@ -50,6 +50,7 @@ import {
   updateAssignmentDate,
   getAssignmentFile,
   AssignmentSubmission,
+  getAssignmentSubmission,
 } from "../controllers/Course/assignment.js";
 import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
@@ -60,8 +61,8 @@ router.get("/all", authorize, getAllCourses);
 router.get("/:id", authorize, getCourseById);
 router.post("/", authorize, addCourse);
 router.delete("/:id", authorize, deleteCourse);
-router.put("/:id",authorize, updateCourse);
-router.get("/title/:id",authorize, getCourseTitle);
+router.put("/:id", authorize, updateCourse);
+router.get("/title/:id", authorize, getCourseTitle);
 router.put("/title/:id", updateCourseTitle);
 router.get("/code/:id", getCourseCode);
 
@@ -110,6 +111,7 @@ router.get(
   "/chapters/:chapterId/assignmentfile/:assignmentId",
   getAssignmentFile
 );
+router.get("/assignments/submission", getAssignmentSubmission);
 
 router.get(
   "/chapters/:chapterId/assignments/title/:assignmentId",
