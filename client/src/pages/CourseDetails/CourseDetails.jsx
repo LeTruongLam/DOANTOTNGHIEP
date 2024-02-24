@@ -23,8 +23,10 @@ import ClassList from "./CourseClass/ClassList";
 import Comment from "./Comment/Comment";
 import TheBreadcrumbs from "../../components/Breadcrumbs";
 import ChapterList from "./CourseChapter/ChapterList";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 const CourseDetails = () => {
-  const { fetchLesson,fetchCourseById } = useContext(AuthContext);
+  const { fetchLesson, fetchCourseById } = useContext(AuthContext);
   const location = useLocation();
   const [courseId, setCourseId] = useState(location.state?.courseId);
   const navigate = useNavigate();
@@ -32,11 +34,11 @@ const CourseDetails = () => {
   const [openIndex, setOpenIndex] = useState(null);
   const [course, setCourse] = useState({});
   const [lessons, setLessons] = useState([]);
-
+  const [loading, setLoading] = React.useState(false);
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-    
+
       try {
         const res = await axios.get(`/courses/${courseId}`, {
           headers: {
@@ -47,6 +49,7 @@ const CourseDetails = () => {
         // console.table(res.data);
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
+        setLoading(true);
       } catch (err) {
         console.log(err);
       }
@@ -129,185 +132,202 @@ const CourseDetails = () => {
   };
 
   return (
-    <div className="single">
-      <div className="single-container">
-        <div className="header-single">
-          <div className="bg-black min-h-20 h-[300px]">
-            <div className="mx-10 w-[60%] h-full pt-5">
-              <TheBreadcrumbs courseTitle={course.title} />
-              <div className="flex items-center gap-5 ">
-                <span className="text-white font-medium py-2 px-3 bg-gray rounded-lg">
-                  Created
-                </span>
-                <span className="text-white">
-                  <span className=" text-gray-50">by </span>
-                  <span className="font-medium	">{course.TeacherName}</span>
-                </span>
+    <>
+      {!loading ? (
+        <>
+          <Backdrop
+            sx={{
+              color: "rgba(0, 0, 0, 0.8)",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+            }}
+            open={!loading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </>
+      ) : (
+        <div className="single">
+          <div className="single-container">
+            <div className="header-single">
+              <div className="bg-black min-h-20 h-[300px]">
+                <div className="mx-10 w-[60%] h-full pt-5">
+                  <TheBreadcrumbs courseTitle={course.title} />
+                  <div className="flex items-center gap-5 ">
+                    <span className="text-white font-medium py-2 px-3 bg-gray rounded-lg">
+                      Created
+                    </span>
+                    <span className="text-white">
+                      <span className=" text-gray-50">by </span>
+                      <span className="font-medium	">{course.TeacherName}</span>
+                    </span>
+                  </div>
+                  <div className="text-white text-4xl my-5 font-medium	">
+                    {course.title}
+                  </div>
+                  <div className=" flex gap-5  mb-3 text-white w-full">
+                    <ul className="flex gap-2 items-center">
+                      <SchoolIcon
+                        style={{
+                          color: "rgb(101, 163, 13)",
+                        }}
+                      />
+                      <span>{course.CourseCode}</span>
+                    </ul>
+                    <ul className="flex gap-2 items-center">
+                      <ScheduleIcon
+                        style={{
+                          color: "rgb(101, 163, 13)",
+                        }}
+                      />
+                      <span>15h</span>
+                    </ul>
+                    <ul className="flex gap-2 items-center">
+                      <GroupsIcon
+                        style={{
+                          color: "rgb(101, 163, 13)",
+                        }}
+                      />
+                      <span>160</span>
+                    </ul>
+                    <ul className="flex gap-2 items-center">
+                      <InsertDriveFileIcon
+                        style={{
+                          color: "rgb(101, 163, 13)",
+                        }}
+                      />
+                      <span>{chapterData.length}</span>
+                    </ul>
+                  </div>
+                </div>
               </div>
-              <div className="text-white text-4xl my-5 font-medium	">
-                {course.title}
-              </div>
-              <div className=" flex gap-5  mb-3 text-white w-full">
-                <ul className="flex gap-2 items-center">
-                  <SchoolIcon
-                    style={{
-                      color: "rgb(101, 163, 13)",
-                    }}
+            </div>
+            <div className="header-sub drop-shadow-2xl">
+              <div className="header-sub-wrapper">
+                {course.img && <img src={`../upload/${course.img}`} alt="" />}
+                <ListItem>
+                  <ListItemIcon>
+                    <CalendarMonthIcon
+                      style={{
+                        color: "rgb(101, 163, 13)",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`Ngày bắt đầu: ${formatDate(course.StartDate)}`}
                   />
-                  <span>{course.CourseCode}</span>
-                </ul>
-                <ul className="flex gap-2 items-center">
-                  <ScheduleIcon
-                    style={{
-                      color: "rgb(101, 163, 13)",
-                    }}
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <CalendarMonthIcon
+                      style={{
+                        color: "rgb(101, 163, 13)",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`Ngày kết thúc: ${formatDate(course.EndDate)}`}
                   />
-                  <span>15h</span>
-                </ul>
-                <ul className="flex gap-2 items-center">
-                  <GroupsIcon
-                    style={{
-                      color: "rgb(101, 163, 13)",
-                    }}
-                  />
-                  <span>160</span>
-                </ul>
-                <ul className="flex gap-2 items-center">
-                  <InsertDriveFileIcon
-                    style={{
-                      color: "rgb(101, 163, 13)",
-                    }}
-                  />
-                  <span>{chapterData.length}</span>
-                </ul>
+                </ListItem>
+                <Button variant="contained" sx={{ width: "100%" }}>
+                  MEETING
+                </Button>
               </div>
             </div>
           </div>
-        </div>
-        <div className="header-sub drop-shadow-2xl">
-          <div className="header-sub-wrapper">
-            {course.img && <img src={`../upload/${course.img}`} alt="" />}
-            <ListItem>
-              <ListItemIcon>
-                <CalendarMonthIcon
-                  style={{
-                    color: "rgb(101, 163, 13)",
+          <div className="single-content mt-4 ">
+            <Box sx={{ width: "100%" }}>
+              <Box
+                sx={{
+                  border: 1,
+                  borderColor: "divider",
+                  borderRadius: "12px 12px 0 0 ",
+                }}
+              >
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                >
+                  <Tab
+                    label="Mô tả"
+                    {...a11yProps(0)}
+                    sx={{
+                      textTransform: "none",
+
+                      "&.Mui-selected": {
+                        backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                      },
+                    }}
+                  />
+                  <Tab
+                    label="Danh sách bài học"
+                    {...a11yProps(1)}
+                    sx={{
+                      textTransform: "none",
+
+                      "&.Mui-selected": {
+                        backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                      },
+                    }}
+                  />
+                  <Tab
+                    label="Trao đổi"
+                    {...a11yProps(2)}
+                    sx={{
+                      textTransform: "none",
+                      "&.Mui-selected": {
+                        backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                      },
+                    }}
+                  />
+                  <Tab
+                    label="Danh sách lớp"
+                    {...a11yProps(3)}
+                    sx={{
+                      textTransform: "none",
+
+                      "&.Mui-selected": {
+                        backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                      },
+                    }}
+                  />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={value} index={0}>
+                <p
+                  style={{ backgroundColor: "#F5F5F5" }}
+                  className=" p-5 rounded-b-xl "
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(course.desc),
                   }}
+                ></p>
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
+                <ChapterList
+                  openIndex={openIndex}
+                  chapterData={chapterData}
+                  lessons={lessons}
+                  handleClick={handleClick}
+                  handleToVideo={handleToVideo}
+                  handleToAssignment={handleToAssignment}
+                  handleToFile={handleToFile}
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={`Ngày bắt đầu: ${formatDate(course.StartDate)}`}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <CalendarMonthIcon
-                  style={{
-                    color: "rgb(101, 163, 13)",
-                  }}
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={2}>
+                <Comment />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={3}>
+                <ClassList
+                  courseId={courseId}
+                  classCodeStudent={course?.ClassCode}
                 />
-              </ListItemIcon>
-              <ListItemText
-                primary={`Ngày kết thúc: ${formatDate(course.EndDate)}`}
-              />
-            </ListItem>
-            <Button variant="contained" sx={{ width: "100%" }}>
-              MEETING
-            </Button>
+              </CustomTabPanel>
+            </Box>
           </div>
         </div>
-      </div>
-      <div className="single-content mt-4 ">
-        <Box sx={{ width: "100%" }}>
-          <Box
-            sx={{
-              border: 1,
-              borderColor: "divider",
-              borderRadius: "12px 12px 0 0 ",
-            }}
-          >
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-            >
-              <Tab
-                label="Mô tả"
-                {...a11yProps(0)}
-                sx={{
-                  textTransform: "none",
-
-                  "&.Mui-selected": {
-                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
-                  },
-                }}
-              />
-              <Tab
-                label="Danh sách bài học"
-                {...a11yProps(1)}
-                sx={{
-                  textTransform: "none",
-
-                  "&.Mui-selected": {
-                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
-                  },
-                }}
-              />
-              <Tab
-                label="Trao đổi"
-                {...a11yProps(2)}
-                sx={{
-                  textTransform: "none",
-                  "&.Mui-selected": {
-                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
-                  },
-                }}
-              />
-              <Tab
-                label="Danh sách lớp"
-                {...a11yProps(3)}
-                sx={{
-                  textTransform: "none",
-
-                  "&.Mui-selected": {
-                    backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
-                  },
-                }}
-              />
-            </Tabs>
-          </Box>
-          <CustomTabPanel value={value} index={0}>
-            <p
-              style={{ backgroundColor: "#F5F5F5" }}
-              className=" p-5 rounded-b-xl "
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(course.desc),
-              }}
-            ></p>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-            <ChapterList
-              openIndex={openIndex}
-              chapterData={chapterData}
-              lessons={lessons}
-              handleClick={handleClick}
-              handleToVideo={handleToVideo}
-              handleToAssignment={handleToAssignment}
-              handleToFile={handleToFile}
-            />
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={2}>
-            <Comment />
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={3}>
-            <ClassList
-              courseId={courseId}
-              classCodeStudent={course?.ClassCode}
-            />
-          </CustomTabPanel>
-        </Box>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

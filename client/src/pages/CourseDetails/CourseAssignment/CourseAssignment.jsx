@@ -118,252 +118,259 @@ export default function CourseAssignment() {
       console.log(err);
     }
   };
-  if (loading) {
-    return (
-      <Backdrop
-        sx={{
-          color: "rgba(0, 0, 0, 0.8)",
-          backgroundColor: "rgba(255, 255, 255, 0.8)",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-  }
   return (
     <>
-      {assignment ? (
-        <div className="course-file-viewer gap-5 ">
-          <div className="list-file">
-            <List
-              sx={{ width: "100%", maxWidth: 350, bgcolor: "background.paper" }}
-              component="nav"
-              aria-labelledby="nested-list-subheader"
-              ref={listRef}
-            >
-              <ListItemButton component="div" id="nested-list-subheader">
-                <Box
+      {loading ? (
+        <>
+          <Backdrop
+            sx={{
+              color: "rgba(0, 0, 0, 0.8)",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+            }}
+            open={loading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        </>
+      ) : (
+        <>
+          {assignment ? (
+            <div className="course-file-viewer gap-5 ">
+              <div className="list-file">
+                <List
                   sx={{
-                    fontWeight: "700",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
+                    width: "100%",
+                    maxWidth: 350,
+                    bgcolor: "background.paper",
                   }}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                  ref={listRef}
                 >
-                  <AssignmentOutlinedIcon />
-                  <span onClick={handleToggle}>Upcoming</span>
-                </Box>
-                {open ? (
-                  <ExpandLessIcon onClick={handleToggle} />
-                ) : (
-                  <ExpandMoreIcon onClick={handleToggle} />
-                )}
-              </ListItemButton>
-              <Collapse in={open} timeout="auto" unmountOnExit>
-                {assignmentList.map((assignment, index) => (
-                  <ListItemText
-                    key={index}
-                    onClick={() =>
-                      handleNextAssignment(assignment.AssignmentId)
-                    }
-                  >
-                    <div className="flex gap-3 items-center ml-10">
-                      <AssessmentOutlinedIcon />
-                      <ListItemText primary={assignment.AssignmentTitle} />
-                    </div>
-                  </ListItemText>
-                ))}
-              </Collapse>
-            </List>
-          </div>
-          <div className="file-container outline-none mt-5  " tabIndex="0">
-            <div className="px-4 sm:px-0 flex justify-between">
-              <h3 className="text-2xl font-semibold leading-7 text-gray-900">
-                Assignment
-              </h3>
-              <button
-                className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                onClick={handleSubmit}
-              >
-                Submit
-              </button>
-            </div>
-            <div className="mt-6 border-t border-gray-100">
-              <dl className="divide-y divide-gray-100">
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-base	 font-medium leading-6 text-gray-900">
-                    Title
-                  </dt>
-                  <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {assignment?.AssignmentTitle}
-                  </dd>
-                </div>
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-base	 font-medium leading-6 text-gray-900">
-                    Date
-                  </dt>
-                  <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {assignment?.StartDate ? (
-                      <span>{formatDate(assignment?.StartDate)} - </span>
-                    ) : (
-                      <span>
-                        <em>None - </em>
-                      </span>
-                    )}
-                    {assignment?.EndDate ? (
-                      <span>{formatDate(assignment?.EndDate)}</span>
-                    ) : (
-                      <span>
-                        <em>None</em>
-                      </span>
-                    )}
-                  </dd>
-                </div>
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-base	 font-medium leading-6 text-gray-900">
-                    About
-                  </dt>
-                  <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {assignment?.AssignmentDesc ? (
-                      <span>{getText(assignment?.AssignmentDesc)}</span>
-                    ) : (
-                      <span>
-                        <em>None</em>
-                      </span>
-                    )}
-                  </dd>
-                </div>
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-base	 font-medium leading-6 text-gray-900">
-                    Attachments
-                  </dt>
-                  <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                    <ul
-                      role="list"
-                      className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                  <ListItemButton component="div" id="nested-list-subheader">
+                    <Box
+                      sx={{
+                        fontWeight: "700",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
                     >
-                      {attachFile?.length > 0 ? (
-                        <>
-                          {attachFile?.map((file, index) => (
-                            <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                              <div className="flex w-0 flex-1 items-center">
-                                <PaperClipIcon
-                                  className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                  aria-hidden="true"
+                      <AssignmentOutlinedIcon />
+                      <span onClick={handleToggle}>Upcoming</span>
+                    </Box>
+                    {open ? (
+                      <ExpandLessIcon onClick={handleToggle} />
+                    ) : (
+                      <ExpandMoreIcon onClick={handleToggle} />
+                    )}
+                  </ListItemButton>
+                  <Collapse in={open} timeout="auto" unmountOnExit>
+                    {assignmentList.map((assignment, index) => (
+                      <ListItemText
+                        key={index}
+                        onClick={() =>
+                          handleNextAssignment(assignment.AssignmentId)
+                        }
+                      >
+                        <div className="flex gap-3 items-center ml-10">
+                          <AssessmentOutlinedIcon />
+                          <ListItemText primary={assignment.AssignmentTitle} />
+                        </div>
+                      </ListItemText>
+                    ))}
+                  </Collapse>
+                </List>
+              </div>
+              <div className="file-container outline-none mt-5  " tabIndex="0">
+                <div className="px-4 sm:px-0 flex justify-between">
+                  <h3 className="text-2xl font-semibold leading-7 text-gray-900">
+                    Assignment
+                  </h3>
+                  <button
+                    className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </button>
+                </div>
+                <div className="mt-6 border-t border-gray-100">
+                  <dl className="divide-y divide-gray-100">
+                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-base	 font-medium leading-6 text-gray-900">
+                        Title
+                      </dt>
+                      <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {assignment?.AssignmentTitle}
+                      </dd>
+                    </div>
+                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-base	 font-medium leading-6 text-gray-900">
+                        Date
+                      </dt>
+                      <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {assignment?.StartDate ? (
+                          <span>{formatDate(assignment?.StartDate)} - </span>
+                        ) : (
+                          <span>
+                            <em>None - </em>
+                          </span>
+                        )}
+                        {assignment?.EndDate ? (
+                          <span>{formatDate(assignment?.EndDate)}</span>
+                        ) : (
+                          <span>
+                            <em>None</em>
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-base	 font-medium leading-6 text-gray-900">
+                        About
+                      </dt>
+                      <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {assignment?.AssignmentDesc ? (
+                          <span>{getText(assignment?.AssignmentDesc)}</span>
+                        ) : (
+                          <span>
+                            <em>None</em>
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-base	 font-medium leading-6 text-gray-900">
+                        Attachments
+                      </dt>
+                      <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <ul
+                          role="list"
+                          className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                        >
+                          {attachFile?.length > 0 ? (
+                            <>
+                              {attachFile?.map((file, index) => (
+                                <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
+                                  <div className="flex w-0 flex-1 items-center">
+                                    <PaperClipIcon
+                                      className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                                      <span className="truncate font-medium">
+                                        {file?.FileTitle}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="ml-4 flex-shrink-0 flex items-center gap-4">
+                                    <a
+                                      href={file?.FileUrl}
+                                      download
+                                      className="font-medium  text-indigo-600 hover:text-indigo-500"
+                                    >
+                                      Download
+                                    </a>
+                                    <VisibilityIcon className="hover:text-indigo-500 cursor-pointer" />
+                                  </div>
+                                </li>
+                              ))}
+                            </>
+                          ) : (
+                            <span>
+                              <em>None</em>
+                            </span>
+                          )}
+                        </ul>
+                      </dd>
+                    </div>
+
+                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-base	font-medium leading-6 text-gray-900">
+                        My work
+                      </dt>
+                      <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <ul
+                          role="list"
+                          className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                        >
+                          <div className="  flex-col  divide-y divide-gray-100">
+                            <div className="flex-col">
+                              <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
+                                <div className="flex items-center justify-center gap-1">
+                                  <AttachmentIcon />
+                                  <span>Attach</span>
+                                </div>
+                                <input
+                                  ref={fileInputRef}
+                                  type="file"
+                                  style={{ display: "none" }}
+                                  onChange={handleFileSelect}
+                                  multiple
                                 />
-                                <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                                  <span className="truncate font-medium">
-                                    {file?.FileTitle}
-                                  </span>
+
+                                <button
+                                  onClick={handleChangeClick}
+                                  type="button"
+                                  className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                >
+                                  Select files
+                                </button>
+                              </p>
+                              <div>
+                                {selectedFiles && (
+                                  <>
+                                    {selectedFiles.map((file, index) => (
+                                      <li
+                                        key={index}
+                                        className="flex mx-8 border-b border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                                      >
+                                        <div className="flex w-0 flex-1 items-center">
+                                          <PaperClipIcon
+                                            className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                          />
+                                          <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                                            <span className="truncate font-medium text-blue-500">
+                                              {file.name}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </li>
+                                    ))}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
+                            <p className="flex-col">
+                              <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
+                                <div className="flex items-center justify-center gap-1">
+                                  <EditNoteIcon />
+                                  <span>Note</span>
                                 </div>
                               </div>
-                              <div className="ml-4 flex-shrink-0 flex items-center gap-4">
-                                <a
-                                  href={file?.FileUrl}
-                                  download
-                                  className="font-medium  text-indigo-600 hover:text-indigo-500"
-                                >
-                                  Download
-                                </a>
-                                <VisibilityIcon className="hover:text-indigo-500 cursor-pointer" />
-                              </div>
-                            </li>
-                          ))}
-                        </>
-                      ) : (
-                        <span>
-                          <em>None</em>
-                        </span>
-                      )}
-                    </ul>
-                  </dd>
-                </div>
 
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-base	font-medium leading-6 text-gray-900">
-                    My work
-                  </dt>
-                  <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                    <ul
-                      role="list"
-                      className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                    >
-                      <div className="  flex-col  divide-y divide-gray-100">
-                        <div className="flex-col">
-                          <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
-                            <div className="flex items-center justify-center gap-1">
-                              <AttachmentIcon />
-                              <span>Attach</span>
-                            </div>
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              style={{ display: "none" }}
-                              onChange={handleFileSelect}
-                              multiple
-                            />
-
-                            <button
-                              onClick={handleChangeClick}
-                              type="button"
-                              className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            >
-                              Select files
-                            </button>
-                          </p>
-                          <div>
-                            {selectedFiles && (
-                              <>
-                                {selectedFiles.map((file, index) => (
-                                  <li
-                                    key={index}
-                                    className="flex mx-8 border-b border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
-                                  >
-                                    <div className="flex w-0 flex-1 items-center">
-                                      <PaperClipIcon
-                                        className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                        aria-hidden="true"
-                                      />
-                                      <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                                        <span className="truncate font-medium text-blue-500">
-                                          {file.name}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </li>
-                                ))}
-                              </>
-                            )}
+                              <ReactQuill
+                                className="editor bg-main mx-4 mb-4 rounded-xl"
+                                theme="snow"
+                              />
+                            </p>
                           </div>
-                        </div>
-
-                        <p className="flex-col">
-                          <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
-                            <div className="flex items-center justify-center gap-1">
-                              <EditNoteIcon />
-                              <span>Note</span>
-                            </div>
-                          </div>
-
-                          <ReactQuill
-                            className="editor bg-main mx-4 mb-4 rounded-xl"
-                            theme="snow"
-                          />
-                        </p>
-                      </div>
-                    </ul>
-                  </dd>
+                        </ul>
+                      </dd>
+                    </div>
+                  </dl>
                 </div>
-              </dl>
+              </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="h-[100vh - 60px]">
-          <NoResultFound />
-        </div>
+          ) : (
+            <div className="h-[100vh - 60px]">
+              <NoResultFound />
+            </div>
+          )}
+        </>
       )}
     </>
   );

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../course/course.scss";
-import { AuthContext } from "../../../context/authContext";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import ReactQuill from "react-quill";
@@ -13,12 +12,21 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 export default function AssignmentDetail() {
   const location = useLocation();
-  console.log(location.state?.assignment);
+  const navigate = useNavigate();
+
   const [assignment, setAssignment] = useState(location.state?.assignment);
   const [assignmentFiles, setAssignmentFiles] = useState(
     location.state?.assignment.SubmissionFiles
   );
-  console.table(assignmentFiles);
+  const [isEditPoint, setIsEditPoint] = useState(false);
+  const [isEditReview, setIsEditReview] = useState(false);
+
+  const handleEditPointClick = () => {
+    setIsEditPoint(true);
+  };
+  const handleEditReviewClick = () => {
+    setIsEditReview(true);
+  };
 
   return (
     <>
@@ -28,8 +36,13 @@ export default function AssignmentDetail() {
             <h3 className="text-2xl font-semibold leading-7 text-gray-900">
               {assignment.title}
             </h3>
-            <button className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-              Submit
+            <button
+              onClick={() => {
+                navigate(-1);
+              }}
+              className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            >
+              Done
             </button>
           </div>
           <div className="mt-6 border-t border-gray-100">
@@ -152,16 +165,27 @@ export default function AssignmentDetail() {
                               type="number"
                               id="number-input"
                               aria-describedby="helper-text-explanation"
-                              class=" border border-gray-50 text-gray-900 text-sm rounded-lg  block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
+                              className={`border${
+                                isEditPoint ? "" : " disabled"
+                              } border-gray-50 text-gray-900 text-sm rounded-lg block w-full py-2.5 px-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-center`}
                               required
                               min={0}
                               max={10}
-                              disabled
+                              disabled={!isEditPoint}
                             />
                           </div>
-                          <p className="font-medium  text-indigo-600 hover:text-indigo-500">
-                            Edit
-                          </p>
+                          {isEditPoint ? (
+                            <p className="font-medium text-indigo-600 hover:text-indigo-500">
+                              Save
+                            </p>
+                          ) : (
+                            <p
+                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                              onClick={handleEditPointClick}
+                            >
+                              Edit
+                            </p>
+                          )}
                         </p>
                       </div>
 
@@ -171,10 +195,21 @@ export default function AssignmentDetail() {
                             <ReviewsIcon />
                             <span>Review</span>
                           </div>
-                          <p className="font-medium  text-indigo-600 hover:text-indigo-500">
-                            Edit
-                          </p>
+                          {isEditReview ? (
+                            <p className="font-medium text-indigo-600 hover:text-indigo-500">
+                              Save
+                            </p>
+                          ) : (
+                            <p
+                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                              onClick={handleEditReviewClick}
+                            >
+                              Edit
+                            </p>
+                          )}
+                          <></>
                         </div>
+                        {isEditReview && <ReactQuill className="m-4" />}
                       </p>
                     </div>
                   </ul>
