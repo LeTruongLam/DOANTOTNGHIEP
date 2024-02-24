@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../course/course.scss";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
+import axios from "axios";
 import ReactQuill from "react-quill";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import { formatDate, getText } from "../../../js/TAROHelper";
@@ -10,6 +10,8 @@ import ReviewsIcon from "@mui/icons-material/Reviews";
 import AttachmentIcon from "@mui/icons-material/Attachment";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
+import Button from "@mui/material/Button";
+
 export default function AssignmentDetail() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,6 +20,13 @@ export default function AssignmentDetail() {
   const [assignmentFiles, setAssignmentFiles] = useState(
     location.state?.assignment.SubmissionFiles
   );
+  const [assignmentReview, setAssignmentReview] = useState(
+    location.state?.assignment.Review
+  );
+  const [assignmentPoint, setAssignmentPoint] = useState(
+    location.state?.assignment.Score
+  );
+
   const [isEditPoint, setIsEditPoint] = useState(false);
   const [isEditReview, setIsEditReview] = useState(false);
 
@@ -26,6 +35,36 @@ export default function AssignmentDetail() {
   };
   const handleEditReviewClick = () => {
     setIsEditReview(true);
+  };
+  const handleCloseEditPoint = () => {
+    setIsEditPoint(false);
+  };
+  const handleCloseEditReview = () => {
+    setIsEditReview(false);
+  };
+  const updateAssignmentReview = async () => {
+    try {
+      await axios.put(
+        `/courses/assignments/review/${assignment.SubmissionId}`,
+        {
+          assignmentReview: assignmentReview,
+        }
+      );
+      setIsEditReview(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const updateAssignmentPoint = async () => {
+    try {
+      console.log(assignmentPoint);
+      await axios.put(`/courses/assignments/score/${assignment.SubmissionId}`, {
+        assignmentPoint: assignmentPoint,
+      });
+      setIsEditPoint(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -171,12 +210,21 @@ export default function AssignmentDetail() {
                               required
                               min={0}
                               max={10}
+                              value={assignmentPoint}
+                              onChange={(e) =>
+                                setAssignmentPoint(e.target.value)
+                              }
                               disabled={!isEditPoint}
                             />
                           </div>
                           {isEditPoint ? (
-                            <p className="font-medium text-indigo-600 hover:text-indigo-500">
-                              Save
+                            <p
+                              className="font-medium text-black hover:text-indigo-500"
+                              onClick={() => {
+                                handleCloseEditPoint();
+                              }}
+                            >
+                              Cancle
                             </p>
                           ) : (
                             <p
@@ -187,6 +235,21 @@ export default function AssignmentDetail() {
                             </p>
                           )}
                         </p>
+                        {isEditPoint && (
+                          <div className="mx-3 mb-3">
+                            <Button
+                              sx={{ color: "white", backgroundColor: "black" }}
+                              style={{
+                                marginTop: "12px",
+                                width: "max-content",
+                              }}
+                              variant="contained"
+                              onClick={updateAssignmentPoint}
+                            >
+                              Save
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
                       <p className="flex-col">
@@ -196,8 +259,13 @@ export default function AssignmentDetail() {
                             <span>Review</span>
                           </div>
                           {isEditReview ? (
-                            <p className="font-medium text-indigo-600 hover:text-indigo-500">
-                              Save
+                            <p
+                              className="font-medium text-black hover:text-indigo-500"
+                              onClick={() => {
+                                handleCloseEditReview();
+                              }}
+                            >
+                              Cancle
                             </p>
                           ) : (
                             <p
@@ -207,9 +275,31 @@ export default function AssignmentDetail() {
                               Edit
                             </p>
                           )}
-                          <></>
                         </div>
-                        {isEditReview && <ReactQuill className="m-4" />}
+
+                        {isEditReview ? (
+                          <div className="m-3">
+                            <ReactQuill
+                              value={assignmentReview}
+                              onChange={setAssignmentReview}
+                            />
+                            <Button
+                              sx={{ color: "white", backgroundColor: "black" }}
+                              style={{
+                                marginTop: "12px",
+                                width: "max-content",
+                              }}
+                              variant="contained"
+                              onClick={updateAssignmentReview}
+                            >
+                              Save
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="m-4 mt-0">
+                            {getText(assignmentReview)}
+                          </div>
+                        )}
                       </p>
                     </div>
                   </ul>

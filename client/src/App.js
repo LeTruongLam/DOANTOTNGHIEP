@@ -128,7 +128,7 @@ function App() {
                 }
               />
               <Route
-                path="/assignmentDetail/:assignmentId"
+                path="/assignmentDetail/:submissionId"
                 element={
                   <LayoutTeacher>
                     <AssignmentDetail />

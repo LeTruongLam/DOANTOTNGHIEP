@@ -46,7 +46,7 @@ const TheAssignment = () => {
   const [assignments, setAssignments] = useState([]);
 
   const handleToAssignment = (assignment) => {
-    navigate(`/assignmentDetail/${assignment.AssignmentId}`, {
+    navigate(`/assignmentDetail/${assignment.SubmissionId}`, {
       state: { assignment: assignment },
     });
   };
@@ -119,9 +119,10 @@ const TheAssignment = () => {
                       {assignment.title} / {assignment.ChapterTitle}
                     </p>
                     <p className="text-sm italic leading-6 text-gray-900">
-                      {assignment.AssignmentTitle} / Submitted at {assignment.SubmissionDate}
+                      {assignment.AssignmentTitle} / Submitted at{" "}
+                      {assignment.SubmissionDate}
                     </p>
-                    
+
                     {/* {assignment.lastSeen ? (
                     <p className="mt-1 text-xs leading-5 text-gray-500">
                       <time dateTime={assignment.lastSeenDateTime}>
