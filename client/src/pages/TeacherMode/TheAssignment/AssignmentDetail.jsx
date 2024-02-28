@@ -5,10 +5,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
-import { formatDate, getText } from "../../../js/TAROHelper";
+import { formatDateString, getText } from "../../../js/TAROHelper";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import AttachmentIcon from "@mui/icons-material/Attachment";
-import EditNoteIcon from "@mui/icons-material/EditNote";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import Button from "@mui/material/Button";
 
@@ -100,7 +99,7 @@ export default function AssignmentDetail() {
                 </dt>
                 <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                   {assignment?.AssignmentDesc ? (
-                    <span>{formatDate(assignment?.SubmissionDate)}</span>
+                    <span>{formatDateString(assignment?.SubmissionDate)}</span>
                   ) : (
                     <span>
                       <em>None</em>

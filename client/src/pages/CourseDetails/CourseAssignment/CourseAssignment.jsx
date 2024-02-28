@@ -2,14 +2,14 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../course/course.scss";
-import { AuthContext } from "../../../context/authContext";
+import Confetti from "react-confetti";
 
+import { AuthContext } from "../../../context/authContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
-
 import CloseIcon from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { formatDate, getText } from "../../../js/TAROHelper";
+import { formatDate, formatDateString, getText } from "../../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
@@ -33,7 +33,10 @@ export default function CourseAssignment() {
   const [assignment, setAssignment] = useState();
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
-  const [assignmenSubmitted, setAssignmentSubmitted] = useState(null);
+  const [assignmentSubmitted, setAssignmentSubmitted] = useState(null);
+  const [submissionFiles, setSubmissionFiles] = useState([]);
+  const [submissionStatus, setSubmissionStatus] = useState();
+  const [congratulation, setCongratulation] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -96,7 +99,9 @@ export default function CourseAssignment() {
       );
 
       if (response.data) {
-        console.log(response.data);
+        // console.log(response.data[0].Status);
+        setSubmissionStatus(response.data[0].Status);
+        setSubmissionFiles(response.data[0].SubmissionFiles);
         setAssignmentSubmitted(response.data[0]);
       } else {
         setAssignmentSubmitted([]);
@@ -124,6 +129,12 @@ export default function CourseAssignment() {
   };
 
   const handleSubmit = async () => {
+    setCongratulation(true);
+
+    setTimeout(function () {
+      setCongratulation(false);
+    }, 3000);
+
     try {
       const fileData = new FormData();
       for (let i = 0; i < selectedFiles.length; i++) {
@@ -139,9 +150,11 @@ export default function CourseAssignment() {
         `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
         fileData
       );
+      setSelectedFiles([]);
     } catch (err) {
       console.log(err);
     }
+    setCongratulation(true);
   };
   return (
     <>
@@ -162,6 +175,8 @@ export default function CourseAssignment() {
         <>
           {assignment ? (
             <div className="course-file-viewer gap-5 ">
+              {congratulation && <Confetti />}
+
               <div className="list-file">
                 <List
                   sx={{
@@ -214,14 +229,17 @@ export default function CourseAssignment() {
                     Assignment
                   </h3>
                   <div className="flex gap-5 italic text-sm	font-semibold items-center">
-                    {assignmenSubmitted && (
-                      <p>Submited in {assignmenSubmitted.SubmissionDate}</p>
+                    {assignmentSubmitted && (
+                      <p>
+                        Submited in{" "}
+                        {formatDateString(assignmentSubmitted.SubmissionDate)}
+                      </p>
                     )}
                     <button
                       className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                       onClick={handleSubmit}
                     >
-                      {assignmenSubmitted ? "Undo Submit" : " Submit"}
+                      {assignmentSubmitted ? "Undo Submit" : " Submit"}
                     </button>
                   </div>
                 </div>
@@ -241,14 +259,16 @@ export default function CourseAssignment() {
                       </dt>
                       <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
                         {assignment?.StartDate ? (
-                          <span>{formatDate(assignment?.StartDate)} - </span>
+                          <span>
+                            {formatDateString(assignment?.StartDate)} -{" "}
+                          </span>
                         ) : (
                           <span>
                             <em>None - </em>
                           </span>
                         )}
                         {assignment?.EndDate ? (
-                          <span>{formatDate(assignment?.EndDate)}</span>
+                          <span>{formatDateString(assignment?.EndDate)}</span>
                         ) : (
                           <span>
                             <em>None</em>
@@ -338,17 +358,50 @@ export default function CourseAssignment() {
                                   style={{ display: "none" }}
                                   onChange={handleFileSelect}
                                   multiple
+                                  disabled={submissionStatus === 1}
                                 />
 
                                 <button
                                   onClick={handleChangeClick}
                                   type="button"
-                                  className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                  className={`rounded-md ${
+                                    submissionStatus === 1 &&
+                                    "	 cursor-not-allowed	"
+                                  } bg-white  px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50`}
                                 >
                                   Select files
                                 </button>
                               </p>
-
+                              <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
+                                {submissionFiles && (
+                                  <>
+                                    {/* <div className="mx-5 font-semibold">
+                                      Attached
+                                    </div> */}
+                                    {submissionFiles.map(
+                                      (submissionFile, index) => (
+                                        <li
+                                          key={index}
+                                          className="flex mx-8  border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                                        >
+                                          <div className="flex w-0 flex-1 items-center">
+                                            <PaperClipIcon
+                                              className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                              aria-hidden="true"
+                                            />
+                                            <div className="ml-4 flex min-w-0 flex-1 gap-2 justify-between">
+                                              <span className="truncate font-medium text-blue-500">
+                                                {submissionFile.fileTitle}
+                                              </span>
+                                              <CloseIcon fontSize="small" />
+                                            </div>
+                                          </div>
+                                        </li>
+                                      )
+                                    )}
+                                  </>
+                                )}
+                              </dd>
                               <div>
                                 {selectedFiles && (
                                   <>
@@ -379,7 +432,7 @@ export default function CourseAssignment() {
                         </ul>
                       </dd>
                     </div>
-                    {assignmenSubmitted && (
+                    {assignmentSubmitted && (
                       <>
                         <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                           <dt className="text-base	 font-medium leading-6 text-gray-900">
@@ -395,7 +448,7 @@ export default function CourseAssignment() {
                                   <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center justify-between ">
                                     <div className="flex w-full gap-4">
                                       <span>Points</span>
-                                      <span>{assignmenSubmitted.Score}</span>
+                                      <span>{assignmentSubmitted.Score}</span>
                                     </div>
                                   </p>
                                 </div>
@@ -404,7 +457,7 @@ export default function CourseAssignment() {
                                     <div className="flex flex-col gap-4">
                                       <span>Review</span>
                                       <span className="font-normal">
-                                        {getText(assignmenSubmitted.Review)}
+                                        {getText(assignmentSubmitted.Review)}
                                       </span>
                                     </div>
                                   </div>

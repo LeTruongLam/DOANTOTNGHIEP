@@ -5,14 +5,30 @@ export const formatDate = (date) => {
 };
 
 export const getText = (html) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent;
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent;
+};
+
+export const truncateString = (str, maxLength) => {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return str.substring(0, maxLength) + "...";
+};
+export const formatDateString = (dateString) => {
+  const originalDate = new Date(dateString);
+
+  const options = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
   };
 
-  export  const truncateString = (str, maxLength) => {
-    if (str.length <= maxLength) {
-      return str;
-    }
-    return str.substring(0, maxLength) + "...";
-  };
-// Các hàm khác...
+  const formattedDateString = originalDate.toLocaleString("en-US", options);
+
+  return formattedDateString;
+};
