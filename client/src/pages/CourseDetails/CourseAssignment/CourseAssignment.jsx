@@ -7,7 +7,7 @@ import { AuthContext } from "../../../context/authContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 
-import ReactQuill from "react-quill";
+import CloseIcon from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDate, getText } from "../../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -19,10 +19,10 @@ import AttachmentIcon from "@mui/icons-material/Attachment";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
-import EditNoteIcon from "@mui/icons-material/EditNote";
 import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
+import Close from "@mui/icons-material/Close";
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -33,6 +33,8 @@ export default function CourseAssignment() {
   const [assignment, setAssignment] = useState();
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
+  const [assignmenSubmitted, setAssignmentSubmitted] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
   const handleFileSelect = (event) => {
@@ -62,6 +64,7 @@ export default function CourseAssignment() {
       );
       setAssignment(response.data[0]);
       fetchAssignmentFiles(response.data[0].AssignmentId);
+      fetchAssignmentSubmitted(response.data[0].AssignmentId);
       setAssignmentList(response.data);
       setLoading(false);
     } catch (err) {
@@ -80,7 +83,28 @@ export default function CourseAssignment() {
       console.error("Error fetching assignment files:", error);
     }
   };
+  const fetchAssignmentSubmitted = async (assignmentId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(
+        `/courses/assignments/${assignmentId}/submitted`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
 
+      if (response.data) {
+        console.log(response.data);
+        setAssignmentSubmitted(response.data[0]);
+      } else {
+        setAssignmentSubmitted([]);
+      }
+    } catch (error) {
+      console.error("Error fetching assignment Submitted:", error);
+    }
+  };
   useEffect(() => {
     fetchAssignmentData();
   }, [location.state?.chapterId]);
@@ -93,6 +117,7 @@ export default function CourseAssignment() {
       );
       setAssignment(response.data);
       fetchAssignmentFiles(assignmentId);
+      fetchAssignmentSubmitted(assignmentId);
     } catch (err) {
       console.log(err);
     }
@@ -188,12 +213,17 @@ export default function CourseAssignment() {
                   <h3 className="text-2xl font-semibold leading-7 text-gray-900">
                     Assignment
                   </h3>
-                  <button
-                    className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                    onClick={handleSubmit}
-                  >
-                    Submit
-                  </button>
+                  <div className="flex gap-5 italic text-sm	font-semibold items-center">
+                    {assignmenSubmitted && (
+                      <p>Submited in {assignmenSubmitted.SubmissionDate}</p>
+                    )}
+                    <button
+                      className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                      onClick={handleSubmit}
+                    >
+                      {assignmenSubmitted ? "Undo Submit" : " Submit"}
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-6 border-t border-gray-100">
                   <dl className="divide-y divide-gray-100">
@@ -318,6 +348,7 @@ export default function CourseAssignment() {
                                   Select files
                                 </button>
                               </p>
+
                               <div>
                                 {selectedFiles && (
                                   <>
@@ -331,10 +362,11 @@ export default function CourseAssignment() {
                                             className="h-5 w-5 flex-shrink-0 text-gray-400"
                                             aria-hidden="true"
                                           />
-                                          <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                                          <div className="ml-4 flex min-w-0 flex-1 gap-2 justify-between">
                                             <span className="truncate font-medium text-blue-500">
                                               {file.name}
                                             </span>
+                                            <CloseIcon fontSize="small" />
                                           </div>
                                         </div>
                                       </li>
@@ -343,24 +375,46 @@ export default function CourseAssignment() {
                                 )}
                               </div>
                             </div>
-
-                            <p className="flex-col">
-                              <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
-                                <div className="flex items-center justify-center gap-1">
-                                  <EditNoteIcon />
-                                  <span>Note</span>
-                                </div>
-                              </div>
-
-                              <ReactQuill
-                                className="editor bg-main mx-4 mb-4 rounded-xl"
-                                theme="snow"
-                              />
-                            </p>
                           </div>
                         </ul>
                       </dd>
                     </div>
+                    {assignmenSubmitted && (
+                      <>
+                        <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                          <dt className="text-base	 font-medium leading-6 text-gray-900">
+                            Teacher's evaluation
+                          </dt>
+                          <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
+                            <ul
+                              role="list"
+                              className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                            >
+                              <div className="  flex-col  divide-y divide-gray-100">
+                                <div className="flex-col">
+                                  <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center justify-between ">
+                                    <div className="flex w-full gap-4">
+                                      <span>Points</span>
+                                      <span>{assignmenSubmitted.Score}</span>
+                                    </div>
+                                  </p>
+                                </div>
+                                <p className="flex-col">
+                                  <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  justify-between ">
+                                    <div className="flex flex-col gap-4">
+                                      <span>Review</span>
+                                      <span className="font-normal">
+                                        {getText(assignmenSubmitted.Review)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </p>
+                              </div>
+                            </ul>
+                          </dd>
+                        </div>
+                      </>
+                    )}
                   </dl>
                 </div>
               </div>

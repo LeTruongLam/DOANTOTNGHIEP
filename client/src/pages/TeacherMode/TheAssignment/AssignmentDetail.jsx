@@ -21,7 +21,7 @@ export default function AssignmentDetail() {
     location.state?.assignment.SubmissionFiles
   );
   const [assignmentReview, setAssignmentReview] = useState(
-    location.state?.assignment.Review
+    location.state?.assignment.Review ? location.state.assignment.Review : ""
   );
   const [assignmentPoint, setAssignmentPoint] = useState(
     location.state?.assignment.Score
@@ -172,15 +172,6 @@ export default function AssignmentDetail() {
                           </dd>
                         </p>
                       </div>
-
-                      <p className="flex-col">
-                        <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  ">
-                          <div className="flex items-center justify-center gap-1">
-                            <EditNoteIcon />
-                            <span>Note</span>
-                          </div>
-                        </div>
-                      </p>
                     </div>
                   </ul>
                 </dd>

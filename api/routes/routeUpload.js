@@ -298,12 +298,11 @@ function submitAssignment(
   req,
   res
 ) {
-  const score = 0;
-  const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, Score, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?, ?);`;
+  const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?);`;
   const submissionFilesJson = JSON.stringify(submissionFiles);
   db.query(
     query,
-    [assignmentId, userId, chapterId, courseId, score, submissionFilesJson],
+    [assignmentId, userId, chapterId, courseId, submissionFilesJson],
     (err, result) => {
       if (err) {
         console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
@@ -332,7 +331,6 @@ router.post(
     const userId = req.body.userId;
     const courseId = req.body.courseId;
     const submissionFiles = []; // Mảng để lưu thông tin các tệp đã tải lên
-
     let files = req.files;
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({

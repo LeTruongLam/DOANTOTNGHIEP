@@ -53,6 +53,7 @@ import {
   getAssignmentSubmission,
   updateReviewAssignment,
   updatePointAssignment,
+  getAssignmentSubmitted,
 } from "../controllers/Course/assignment.js";
 import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
@@ -143,5 +144,10 @@ router.put(
 );
 router.put("/assignments/review/:submissionId", updateReviewAssignment);
 router.put("/assignments/score/:submissionId", updatePointAssignment);
+router.get(
+  "/assignments/:assignmentId/submitted",
+  authorize,
+  getAssignmentSubmitted
+);
 
 export default router;

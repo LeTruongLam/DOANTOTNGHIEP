@@ -308,7 +308,7 @@ export const updateAssignmentFile = (
     });
   });
 };
-
+// trả Api để giáo viên có thể xem các assignment mà sinh viên đã nộp
 export const getAssignmentSubmission = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
@@ -323,17 +323,12 @@ export const getAssignmentSubmission = (req, res) => {
     WHERE teachers.UserId = ?`;
 
     db.query(q, [userInfo.id], (err, data) => {
-      console.log(err);
-
       if (err) {
         return res.status(500).json({ error: err });
       }
-
       if (data.length === 0) {
         return res.json({ message: "assignmentId not found." });
       }
-
-      const chapter = data[0];
       return res.json(data);
     });
   });
@@ -358,7 +353,6 @@ export const assignmentSubmission = (req, res) => {
     status,
     submissonFile,
   ];
-  console.log(data);
   const q = `
     INSERT INTO submissions (AssignmentId, ChapterId, StudentId, CourseId, SubmissionDate, SubmissionContent, Status, SubmissonFile)
     VALUES (?, ?, ?, ?,NOW(), ?, ?, ?)
@@ -428,5 +422,29 @@ export const updatePointAssignment = (req, res) => {
       }
       return res.json("submissions score  has been updated.");
     });
+  });
+};
+
+// Sinh viên lấy thông tin bài đã nộp
+export const getAssignmentSubmitted = (req, res) => {
+  const userInfo = req.userInfo;
+
+  const assignmentId = req.params.assignmentId;
+  const userId = userInfo.id;
+  console.log(assignmentId);
+  console.log(userInfo);
+  const q = `SELECT * FROM submissions 
+               WHERE AssignmentId = ? AND UserId = ?`;
+
+  db.query(q, [assignmentId, userId], (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error!" });
+    }
+
+    if (data.length === 0) {
+      return res.json({ message: "No assignment submission found." });
+    }
+
+    return res.json(data);
   });
 };
