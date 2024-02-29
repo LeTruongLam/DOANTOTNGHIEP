@@ -98,13 +98,14 @@ export default function CourseAssignment() {
         }
       );
 
-      if (response.data) {
-        // console.log(response.data[0].Status);
+      if (response.data.length > 0) {
         setSubmissionStatus(response.data[0].Status);
         setSubmissionFiles(response.data[0].SubmissionFiles);
         setAssignmentSubmitted(response.data[0]);
       } else {
-        setAssignmentSubmitted([]);
+        setAssignmentSubmitted(null);
+        setSubmissionFiles(null);
+        setSubmissionStatus(null);
       }
     } catch (error) {
       console.error("Error fetching assignment Submitted:", error);
@@ -115,6 +116,8 @@ export default function CourseAssignment() {
   }, [location.state?.chapterId]);
 
   const handleNextAssignment = async (assignmentId) => {
+    setLoading(true);
+
     try {
       const chapterId = location.state?.chapterId;
       const response = await axios.get(
@@ -122,22 +125,17 @@ export default function CourseAssignment() {
       );
       setAssignment(response.data);
       fetchAssignmentFiles(assignmentId);
-      fetchAssignmentSubmitted(assignmentId);
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
   };
 
   const handleSubmit = async () => {
-    setCongratulation(true);
-
-    setTimeout(function () {
-      setCongratulation(false);
-    }, 3000);
-
     try {
       const fileData = new FormData();
-      for (let i = 0; i < selectedFiles.length; i++) {
+      const length = selectedFiles.length;
+      for (let i = 0; i < length; i++) {
         fileData.append("documentSubmit", selectedFiles[i]);
       }
 
@@ -150,11 +148,17 @@ export default function CourseAssignment() {
         `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
         fileData
       );
+      if (submissionStatus === 0) {
+        setCongratulation(true);
+
+        setTimeout(function () {
+          setCongratulation(false);
+        }, 3000);
+      }
       setSelectedFiles([]);
     } catch (err) {
       console.log(err);
     }
-    setCongratulation(true);
   };
   return (
     <>
@@ -210,9 +214,10 @@ export default function CourseAssignment() {
                     {assignmentList.map((assignment, index) => (
                       <ListItemText
                         key={index}
-                        onClick={() =>
-                          handleNextAssignment(assignment.AssignmentId)
-                        }
+                        onClick={() => {
+                          handleNextAssignment(assignment.AssignmentId);
+                          fetchAssignmentSubmitted(assignment.AssignmentId);
+                        }}
                       >
                         <div className="flex gap-3 items-center ml-10">
                           <AssessmentOutlinedIcon />
@@ -228,7 +233,7 @@ export default function CourseAssignment() {
                   <h3 className="text-2xl font-semibold leading-7 text-gray-900">
                     Assignment
                   </h3>
-                  <div className="flex gap-5 italic text-sm	font-semibold items-center">
+                  <div className="flex gap-5 text-red-700 italic text-sm	font-semibold items-center">
                     {assignmentSubmitted && (
                       <p>
                         Submited in{" "}
@@ -236,7 +241,7 @@ export default function CourseAssignment() {
                       </p>
                     )}
                     <button
-                      className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                      className="flex-none rounded-md  hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                       onClick={handleSubmit}
                     >
                       {assignmentSubmitted ? "Undo Submit" : " Submit"}
@@ -295,11 +300,11 @@ export default function CourseAssignment() {
                         Attachments
                       </dt>
                       <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                        <ul
-                          role="list"
-                          className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                        >
-                          {attachFile?.length > 0 ? (
+                        {attachFile?.length > 0 ? (
+                          <ul
+                            role="list"
+                            className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                          >
                             <>
                               {attachFile?.map((file, index) => (
                                 <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
@@ -327,12 +332,12 @@ export default function CourseAssignment() {
                                 </li>
                               ))}
                             </>
-                          ) : (
-                            <span>
-                              <em>None</em>
-                            </span>
-                          )}
-                        </ul>
+                          </ul>
+                        ) : (
+                          <span>
+                            <em>None</em>
+                          </span>
+                        )}
                       </dd>
                     </div>
 
@@ -375,14 +380,11 @@ export default function CourseAssignment() {
                               <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
                                 {submissionFiles && (
                                   <>
-                                    {/* <div className="mx-5 font-semibold">
-                                      Attached
-                                    </div> */}
                                     {submissionFiles.map(
                                       (submissionFile, index) => (
                                         <li
                                           key={index}
-                                          className="flex mx-8  border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                                          className="flex   border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
                                         >
                                           <div className="flex w-0 flex-1 items-center">
                                             <PaperClipIcon
@@ -393,7 +395,21 @@ export default function CourseAssignment() {
                                               <span className="truncate font-medium text-blue-500">
                                                 {submissionFile.fileTitle}
                                               </span>
-                                              <CloseIcon fontSize="small" />
+                                              <div className="flex gap-3 justify-center items-center">
+                                                <a
+                                                  href={submissionFile?.fileUrl}
+                                                  download
+                                                  className="font-medium  text-indigo-600 hover:text-indigo-500"
+                                                >
+                                                  Download
+                                                </a>
+
+                                                {submissionStatus === 0 ? (
+                                                  <CloseIcon fontSize="small" />
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </div>
                                             </div>
                                           </div>
                                         </li>
