@@ -49,11 +49,13 @@ import {
   getAssignmentDate,
   updateAssignmentDate,
   getAssignmentFile,
-  assignmentSubmission,
+  // assignmentSubmission,
   getAssignmentSubmission,
   updateReviewAssignment,
   updatePointAssignment,
   getAssignmentSubmitted,
+  updateSubmissionStatus,
+  insertAssignmentSubmission,
 } from "../controllers/Course/assignment.js";
 import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
@@ -125,7 +127,7 @@ router.put(
   updateAssignmentTitle
 );
 router.post("/chapters/assignments", addAssignmentTitle);
-router.post("/chapters/:chapterId/submission", assignmentSubmission);
+router.post("/chapters/:chapterId/submission", insertAssignmentSubmission);
 router.get(
   "/chapters/:chapterId/assignments/desc/:assignmentId",
   getAssignmentDesc
@@ -148,6 +150,11 @@ router.get(
   "/assignments/:assignmentId/submitted",
   authorize,
   getAssignmentSubmitted
+);
+router.put(
+  "/assignments/:assignmentId/submitted/status",
+  authorize,
+  updateSubmissionStatus
 );
 
 export default router;

@@ -36,6 +36,7 @@ export default function CourseAssignment() {
   const [assignmentSubmitted, setAssignmentSubmitted] = useState(null);
   const [submissionFiles, setSubmissionFiles] = useState([]);
   const [submissionStatus, setSubmissionStatus] = useState();
+  const [assignmentId, setAssignmentId] = useState();
   const [congratulation, setCongratulation] = useState(false);
 
   const [loading, setLoading] = useState(true);
@@ -102,6 +103,7 @@ export default function CourseAssignment() {
         setSubmissionStatus(response.data[0].Status);
         setSubmissionFiles(response.data[0].SubmissionFiles);
         setAssignmentSubmitted(response.data[0]);
+        setAssignmentId(response.data[0].AssignmentId);
       } else {
         setAssignmentSubmitted(null);
         setSubmissionFiles(null);
@@ -109,6 +111,32 @@ export default function CourseAssignment() {
       }
     } catch (error) {
       console.error("Error fetching assignment Submitted:", error);
+    }
+  };
+
+  const handleChangeStatus = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(
+        `/courses/assignments/${assignment.AssignmentId}/submitted/status`,
+        {
+          submissionStatus: !submissionStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (submissionStatus === 0) {
+        setSubmissionStatus(1);
+      } else if (submissionStatus === 1) {
+        setSubmissionStatus(0);
+      }
+      // Handle the response as needed
+    } catch (error) {
+      console.error("Error updating assignment status:", error);
+      // Handle the error as needed
     }
   };
   useEffect(() => {
@@ -132,34 +160,56 @@ export default function CourseAssignment() {
   };
 
   const handleSubmit = async () => {
-    try {
-      const fileData = new FormData();
-      const length = selectedFiles.length;
-      for (let i = 0; i < length; i++) {
-        fileData.append("documentSubmit", selectedFiles[i]);
+    if (selectedFiles.length > 0) {
+      try {
+        const fileData = new FormData();
+        const length = selectedFiles.length;
+        for (let i = 0; i < length; i++) {
+          fileData.append("documentSubmit", selectedFiles[i]);
+        }
+
+        fileData.append("assignmentId", assignment.AssignmentId);
+        fileData.append("chapterId", location.state?.chapterId);
+        fileData.append("userId", currentUser.UserId);
+        fileData.append("courseId", location.state?.courseId);
+
+        await axios.post(
+          `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
+          fileData
+        );
+        if (submissionStatus === 0) {
+          setCongratulation(true);
+          setTimeout(function () {
+            setCongratulation(false);
+          }, 3000);
+        }
+        setSelectedFiles([]);
+      } catch (err) {
+        console.log(err);
       }
-
-      fileData.append("assignmentId", assignment.AssignmentId);
-      fileData.append("chapterId", location.state?.chapterId);
-      fileData.append("userId", currentUser.UserId);
-      fileData.append("courseId", location.state?.courseId);
-
-      await axios.post(
-        `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
-        fileData
-      );
-      if (submissionStatus === 0) {
-        setCongratulation(true);
-
-        setTimeout(function () {
-          setCongratulation(false);
-        }, 3000);
+    } else {
+      try {
+        await axios.post(
+          `/courses/chapters/${assignment.ChapterId}/submission`,
+          {
+            assignmentId: assignment.AssignmentId,
+            chapterId: location.state?.chapterId,
+            userId: currentUser.UserId,
+            courseId: location.state?.courseId,
+          }
+        );
+        if (submissionStatus === 0) {
+          setCongratulation(true);
+          setTimeout(function () {
+            setCongratulation(false);
+          }, 3000);
+        }
+      } catch (error) {
+        console.log(error);
       }
-      setSelectedFiles([]);
-    } catch (err) {
-      console.log(err);
     }
   };
+
   return (
     <>
       {loading ? (
@@ -234,7 +284,7 @@ export default function CourseAssignment() {
                     Assignment
                   </h3>
                   <div className="flex gap-5 text-red-700 italic text-sm	font-semibold items-center">
-                    {assignmentSubmitted && (
+                    {submissionStatus === 1 && (
                       <p>
                         Submited in{" "}
                         {formatDateString(assignmentSubmitted.SubmissionDate)}
@@ -242,9 +292,16 @@ export default function CourseAssignment() {
                     )}
                     <button
                       className="flex-none rounded-md  hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                      onClick={handleSubmit}
+                      onClick={() => {
+                        if (submissionStatus === 1) {
+                          handleChangeStatus();
+                        } else {
+                          handleChangeStatus();
+                          handleSubmit();
+                        }
+                      }}
                     >
-                      {assignmentSubmitted ? "Undo Submit" : " Submit"}
+                      {submissionStatus === 1 ? "Undo Submit" : " Submit"}
                     </button>
                   </div>
                 </div>

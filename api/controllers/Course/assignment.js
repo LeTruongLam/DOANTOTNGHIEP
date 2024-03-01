@@ -334,49 +334,49 @@ export const getAssignmentSubmission = (req, res) => {
   });
 };
 
-export const assignmentSubmission = (req, res) => {
-  const assignmentId = req.body.assignmentId;
-  const chapterId = req.body.chapterId;
-  const studentId = req.body.studentId;
-  const courseId = req.body.courseId;
-  const submissonFile = JSON.stringify(req.body.submissonFile);
-  const submissionContent = req.body.submissionContent;
-  const submissionDate = new Date().toISOString();
-  const status = 1;
-  const data = [
-    assignmentId,
-    chapterId,
-    studentId,
-    courseId,
-    submissionDate,
-    submissionContent,
-    status,
-    submissonFile,
-  ];
-  const q = `
-    INSERT INTO submissions (AssignmentId, ChapterId, StudentId, CourseId, SubmissionDate, SubmissionContent, Status, SubmissonFile)
-    VALUES (?, ?, ?, ?,NOW(), ?, ?, ?)
-  `;
+// export const assignmentSubmission = (req, res) => {
+//   const assignmentId = req.body.assignmentId;
+//   const chapterId = req.body.chapterId;
+//   const studentId = req.body.studentId;
+//   const courseId = req.body.courseId;
+//   const submissonFile = JSON.stringify(req.body.submissonFile);
+//   const submissionContent = req.body.submissionContent;
+//   const submissionDate = new Date().toISOString();
+//   const status = 1;
+//   const data = [
+//     assignmentId,
+//     chapterId,
+//     studentId,
+//     courseId,
+//     submissionDate,
+//     submissionContent,
+//     status,
+//     submissonFile,
+//   ];
+//   const q = `
+//     INSERT INTO submissions (AssignmentId, ChapterId, StudentId, CourseId, SubmissionDate, SubmissionContent, Status, SubmissonFile)
+//     VALUES (?, ?, ?, ?,NOW(), ?, ?, ?)
+//   `;
 
-  db.query(
-    q,
-    [
-      assignmentId,
-      chapterId,
-      studentId,
-      courseId,
-      submissionContent,
-      status,
-      submissonFile,
-    ],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      return res
-        .status(201)
-        .json({ message: "Assignment submission successful" });
-    }
-  );
-};
+//   db.query(
+//     q,
+//     [
+//       assignmentId,
+//       chapterId,
+//       studentId,
+//       courseId,
+//       submissionContent,
+//       status,
+//       submissonFile,
+//     ],
+//     (err, result) => {
+//       if (err) return res.status(500).json(err);
+//       return res
+//         .status(201)
+//         .json({ message: "Assignment submission successful" });
+//     }
+//   );
+// };
 export const updateReviewAssignment = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
@@ -428,11 +428,8 @@ export const updatePointAssignment = (req, res) => {
 // Sinh viên lấy thông tin bài đã nộp
 export const getAssignmentSubmitted = (req, res) => {
   const userInfo = req.userInfo;
-
   const assignmentId = req.params.assignmentId;
   const userId = userInfo.id;
-  console.log(assignmentId);
-  console.log(userInfo);
   const q = `SELECT * FROM submissions 
                WHERE AssignmentId = ? AND UserId = ?`;
 
@@ -447,4 +444,48 @@ export const getAssignmentSubmitted = (req, res) => {
 
     return res.json(data);
   });
+};
+
+export const updateSubmissionStatus = (req, res) => {
+  const userInfo = req.userInfo;
+  const assignmentId = req.params.assignmentId;
+  const submissionStatus = req.body.submissionStatus;
+  const userId = userInfo.id;
+  const q = `UPDATE  submissions SET  Status = ?    WHERE AssignmentId = ? AND UserId = ?`;
+
+  db.query(q, [submissionStatus, assignmentId, userId], (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error!" });
+    }
+    return res.json(data);
+  });
+};
+
+export const insertAssignmentSubmission = (req, res) => {
+  const assignmentId = req.body.assignmentId;
+  const chapterId = req.body.chapterId;
+  const userId = req.body.userId;
+  const courseId = req.body.courseId;
+  const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate) VALUES (?, ?, ?, ?, NOW());`;
+
+  db.query(
+    query,
+    [assignmentId, userId, chapterId, courseId],
+    (err, result) => {
+      if (err) {
+        console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
+        res.status(500).json({
+          success: false,
+          message: "Lỗi",
+        });
+      } else {
+        console.log("Dữ liệu tài liệu đã được chèn vào cơ sở dữ liệu");
+        res.status(201).json({
+          success: true,
+          message: "fileUrl đã được tải lên!",
+          data: result,
+        });
+      }
+    }
+  );
 };

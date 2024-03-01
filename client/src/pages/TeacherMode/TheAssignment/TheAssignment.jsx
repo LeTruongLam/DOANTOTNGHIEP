@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { formatDateString } from "../../../js/TAROHelper";
 import axios from "axios";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
@@ -120,7 +121,7 @@ const TheAssignment = () => {
                     </p>
                     <p className="text-sm italic leading-6 text-gray-900">
                       {assignment.AssignmentTitle} / Submitted at{" "}
-                      {assignment.SubmissionDate}
+                      {formatDateString(assignment.SubmissionDate)}
                     </p>
 
                     {/* {assignment.lastSeen ? (
