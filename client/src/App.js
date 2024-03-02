@@ -23,6 +23,7 @@ import TheAssignment from "./pages/TeacherMode/TheAssignment/TheAssignment.jsx";
 import AssignmentDetail from "./pages/TeacherMode/TheAssignment/AssignmentDetail.jsx";
 import PrivateRouter from "./utils/PrivateRouter.jsx";
 import TeacherRouter from "./utils/TeacherRouter.jsx";
+import AssignmentView from "./pages/TeacherMode/TheAssignment/AssignmentView.jsx";
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -91,6 +92,16 @@ function App() {
                 }
               />
             </Route>
+            <Route element={<TeacherRouter />}>
+              <Route
+                path="/assignment/view"
+                element={
+                  <LayoutTeacher>
+                    <AssignmentView />
+                  </LayoutTeacher>
+                }
+              />
+            </Route>
 
             <Route
               path="/register"
@@ -120,7 +131,7 @@ function App() {
             </Route>
             <Route element={<TeacherRouter />}>
               <Route
-                path="/assignment"
+                path="/assignments"
                 element={
                   <LayoutTeacher>
                     <TheAssignment />

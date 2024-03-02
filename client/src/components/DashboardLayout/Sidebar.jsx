@@ -3,7 +3,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import styled from "styled-components";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import QuizIcon from "@mui/icons-material/Quiz";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 const Container = styled.div`
@@ -29,13 +29,13 @@ const Item = styled(NavLink)`
   width: 100%;
   padding: 1rem 0;
   cursor: pointer;
-  display: flex; 
+  display: flex;
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.25rem;
   padding-left: 1rem;
   &:hover {
-    border-right: 2px solid  rgb(209 213 219) ;
+    border-right: 2px solid rgb(209 213 219);
     color: rgb(147 51 234);
   }
 `;
@@ -45,6 +45,7 @@ const Text = styled.span`
 `;
 
 const Sidebar = () => {
+  const location = useLocation();
   return (
     <div className=" min-w-[250px] border-r border-slate-300 flex flex-col justify-between ">
       <Container>
@@ -53,7 +54,16 @@ const Sidebar = () => {
             <HomeIcon />
             <Text className="inline ">Home</Text>
           </Item>
-          <Item activeClassName="active" to="/dashboard">
+          <Item
+            activeClassName="active"
+            to="/dashboard"
+            className={
+              location.pathname.startsWith("/write") ||
+              location.pathname.startsWith("/course/create")
+                ? "active"
+                : ""
+            }
+          >
             <ListAltIcon />
             <Text>Courses</Text>
           </Item>
@@ -61,7 +71,16 @@ const Sidebar = () => {
             <CalendarMonthIcon />
             <Text>Calender</Text>
           </Item>
-          <Item activeClassName="active" to="/assignment">
+          <Item
+            activeClassName="active"
+            to="/assignments"
+            className={
+              location.pathname === "/assignment/view" ||
+              location.pathname.startsWith("/assignmentDetail/")
+                ? "active"
+                : ""
+            }
+          >
             <AssignmentIndIcon />
             <Text>Assignments</Text>
           </Item>

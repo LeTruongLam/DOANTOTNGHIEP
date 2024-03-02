@@ -3,13 +3,12 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../course/course.scss";
 import Confetti from "react-confetti";
-
 import { AuthContext } from "../../../context/authContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 import CloseIcon from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { formatDate, formatDateString, getText } from "../../../js/TAROHelper";
+import { formatDateString, getText } from "../../../js/TAROHelper";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
@@ -22,7 +21,8 @@ import Collapse from "@mui/material/Collapse";
 import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
-import Close from "@mui/icons-material/Close";
+import AssignmentLateOutlinedIcon from "@mui/icons-material/AssignmentLateOutlined";
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -49,7 +49,6 @@ export default function CourseAssignment() {
         updatedList.push(files[i]);
       }
       setSelectedFiles(updatedList);
-      console.log("files:", updatedList);
     }
   };
 
@@ -117,7 +116,7 @@ export default function CourseAssignment() {
   const handleChangeStatus = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await axios.put(
+      await axios.put(
         `/courses/assignments/${assignment.AssignmentId}/submitted/status`,
         {
           submissionStatus: !submissionStatus,
@@ -128,15 +127,9 @@ export default function CourseAssignment() {
           },
         }
       );
-      if (submissionStatus === 0) {
-        setSubmissionStatus(1);
-      } else if (submissionStatus === 1) {
-        setSubmissionStatus(0);
-      }
-      // Handle the response as needed
+      setSubmissionStatus(submissionStatus === 0 ? 1 : 0);
     } catch (error) {
       console.error("Error updating assignment status:", error);
-      // Handle the error as needed
     }
   };
   useEffect(() => {
@@ -167,11 +160,11 @@ export default function CourseAssignment() {
         for (let i = 0; i < length; i++) {
           fileData.append("documentSubmit", selectedFiles[i]);
         }
-
         fileData.append("assignmentId", assignment.AssignmentId);
         fileData.append("chapterId", location.state?.chapterId);
         fileData.append("userId", currentUser.UserId);
         fileData.append("courseId", location.state?.courseId);
+        fileData.append("submissionFiles", JSON.stringify(submissionFiles));
 
         await axios.post(
           `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
@@ -189,15 +182,19 @@ export default function CourseAssignment() {
       }
     } else {
       try {
-        await axios.post(
-          `/courses/chapters/${assignment.ChapterId}/submission`,
-          {
-            assignmentId: assignment.AssignmentId,
-            chapterId: location.state?.chapterId,
-            userId: currentUser.UserId,
-            courseId: location.state?.courseId,
-          }
-        );
+        const submissionData = {
+          assignmentId: assignment.AssignmentId,
+          chapterId: location.state?.chapterId,
+          userId: currentUser.UserId,
+          courseId: location.state?.courseId,
+        };
+
+        if (!assignmentSubmitted) {
+          await axios.post(
+            `/courses/chapters/${assignment.ChapterId}/submission`,
+            submissionData
+          );
+        }
         if (submissionStatus === 0) {
           setCongratulation(true);
           setTimeout(function () {
@@ -209,7 +206,9 @@ export default function CourseAssignment() {
       }
     }
   };
-
+  const handleDeleteFile = async (assignmentFileId) => {
+    alert(assignmentFileId);
+  };
   return (
     <>
       {loading ? (
@@ -242,7 +241,11 @@ export default function CourseAssignment() {
                   aria-labelledby="nested-list-subheader"
                   ref={listRef}
                 >
-                  <ListItemButton component="div" id="nested-list-subheader">
+                  <ListItemButton
+                    component="div"
+                    id="nested-list-subheader"
+                    onClick={handleToggle}
+                  >
                     <Box
                       sx={{
                         fontWeight: "700",
@@ -250,9 +253,10 @@ export default function CourseAssignment() {
                         alignItems: "center",
                         gap: "8px",
                       }}
+                      onClick={handleToggle}
                     >
                       <AssignmentOutlinedIcon />
-                      <span onClick={handleToggle}>Upcoming</span>
+                      <span>Upcoming</span>
                     </Box>
                     {open ? (
                       <ExpandLessIcon onClick={handleToggle} />
@@ -276,6 +280,69 @@ export default function CourseAssignment() {
                       </ListItemText>
                     ))}
                   </Collapse>
+
+                  <ListItemButton
+                    component="div"
+                    id="nested-list-subheader"
+                    onClick={handleToggle}
+                  >
+                    <Box
+                      sx={{
+                        fontWeight: "700",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                      onClick={handleToggle}
+                    >
+                      <AssignmentLateOutlinedIcon className="text-red-800" />
+                      <span>Past due</span>
+                    </Box>
+                    {open ? (
+                      <ExpandLessIcon onClick={handleToggle} />
+                    ) : (
+                      <ExpandMoreIcon onClick={handleToggle} />
+                    )}
+                  </ListItemButton>
+                  <Collapse in={open} timeout="auto" unmountOnExit>
+                    {assignmentList.map((assignment, index) => (
+                      <ListItemText
+                        key={index}
+                        onClick={() => {
+                          handleNextAssignment(assignment.AssignmentId);
+                          fetchAssignmentSubmitted(assignment.AssignmentId);
+                        }}
+                      >
+                        <div className="flex gap-3 items-center ml-10">
+                          <AssessmentOutlinedIcon />
+                          <ListItemText primary={assignment.AssignmentTitle} />
+                        </div>
+                      </ListItemText>
+                    ))}
+                  </Collapse>
+                  <ListItemButton
+                    component="div"
+                    id="nested-list-subheader"
+                    onClick={handleToggle}
+                  >
+                    <Box
+                      sx={{
+                        fontWeight: "700",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                      onClick={handleToggle}
+                    >
+                      <AssignmentTurnedInOutlinedIcon className="text-green-600" />
+                      <span>Completed</span>
+                    </Box>
+                    {open ? (
+                      <ExpandLessIcon onClick={handleToggle} />
+                    ) : (
+                      <ExpandMoreIcon onClick={handleToggle} />
+                    )}
+                  </ListItemButton>
                 </List>
               </div>
               <div className="file-container outline-none mt-5  " tabIndex="0">
@@ -462,7 +529,14 @@ export default function CourseAssignment() {
                                                 </a>
 
                                                 {submissionStatus === 0 ? (
-                                                  <CloseIcon fontSize="small" />
+                                                  <CloseIcon
+                                                    onClick={() =>
+                                                      handleDeleteFile(
+                                                        submissionFile.assignmentFileId
+                                                      )
+                                                    }
+                                                    fontSize="small"
+                                                  />
                                                 ) : (
                                                   <></>
                                                 )}

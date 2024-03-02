@@ -1,156 +1,150 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
+import { AuthContext } from "../../../context/authContext";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import { formatDate, getText } from "../../../js/TAROHelper";
 import { Link, useNavigate } from "react-router-dom";
-import { formatDateString } from "../../../js/TAROHelper";
-import axios from "axios";
-import PropTypes from "prop-types";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
+const columns = [
+  { id: "title", label: "Title", minWidth: 170 },
+  { id: "code", label: "Code", minWidth: 100 },
+  {
+    id: "start",
+    label: "Start Date",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toLocaleString("en-US"),
+  },
+  {
+    id: "end",
+    label: "End Date",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toLocaleString("en-US"),
+  },
+  {
+    id: "options",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toFixed(2),
+  },
+];
+function createData(title, code, start, end, options) {
+  return { title, code, start, end, options };
 }
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
 const TheAssignment = () => {
+  const { courses, fetchCourses } = useContext(AuthContext);
+
   const navigate = useNavigate();
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const [value, setValue] = React.useState(0);
-  const [assignments, setAssignments] = useState([]);
-
-  const handleToAssignment = (assignment) => {
-    navigate(`/assignmentDetail/${assignment.SubmissionId}`, {
-      state: { assignment: assignment },
-    });
+  const handleEdit = async (courseId, course) => {
+    navigate(`/assignment/view`, { state: course });
   };
+
+  const rows = courses.map((course) =>
+    createData(
+      getText(course.title),
+      course.CourseCode,
+      formatDate(course.StartDate),
+      formatDate(course.EndDate),
+      <button
+        onClick={() => handleEdit(course.CourseId, course)} // Sử dụng hàm mô phỏng để truyền tham số
+        className="mr-2 text-xs	 rounded-2xl	 bg-black	 text-white px-2.5 py-1  font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
+      >
+        View
+      </button>
+    )
+  );
   useEffect(() => {
-    const fetchAssignmentSubmissons = async () => {
-      try {
-        const res = await axios.get(`/courses/assignments/submission`);
-        setAssignments(res.data);
-        console.table(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchAssignmentSubmissons();
+    fetchCourses();
   }, []);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   return (
     <>
-      <Box sx={{ width: "100%" }}>
-        <Box sx={{ borderBottom: 2, borderColor: "divider" }}>
-          <div className="flex justify-between items-center">
-            <Tabs value={value} onChange={handleChange}>
-              <Tab
-                label="Upcoming"
-                {...a11yProps(0)}
-                sx={{ textTransform: "none" }}
-              />
-              <Tab
-                label="Pass due"
-                {...a11yProps(1)}
-                sx={{ textTransform: "none" }}
-              />
-              <Tab
-                label="Completed"
-                {...a11yProps(2)}
-                sx={{ textTransform: "none" }}
-              />
-            </Tabs>
-            <FilterAltOutlinedIcon />
+      <div>
+        <div>
+          <div className="my-6 flex justify-between">
+            <input
+              type="text"
+              name="search-course"
+              id="search-course"
+              autoComplete="given-name"
+              placeholder="Search course"
+              className=" outline-none block w-80 rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
+            />
           </div>
-        </Box>
-        <CustomTabPanel value={value} index={0}>
-          <ul role="list" className="divide-y divide-slate-200 mt-3">
-            {assignments.map((assignment) => (
-              <li key={assignment.SubmissionId}>
-                <div
-                  onClick={() => handleToAssignment(assignment)}
-                  className="flex justify-between gap-x-6 py-5 hover:text-indigo-500  hover:bg-slate-50	hover:cursor-pointer"
-                >
-                  <div className="flex min-w-0 gap-x-4">
-                    <img
-                      className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                      src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
-                    <div className="min-w-0 flex-auto">
-                      <p className="text-sm font-semibold leading-6 text-gray-900">
-                        {assignment.StudentName}
-                      </p>
-                      <p className="mt-1 truncate text-sm leading-5 text-gray-500">
-                        {assignment.StudentCode}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                    <p className=" font-semibold	 text-sm leading-6 text-gray-900">
-                      {assignment.title} / {assignment.ChapterTitle}
-                    </p>
-                    <p className="text-sm italic leading-6 text-gray-900">
-                      {assignment.AssignmentTitle} / Submitted at{" "}
-                      {formatDateString(assignment.SubmissionDate)}
-                    </p>
+        </div>
 
-                    {/* {assignment.lastSeen ? (
-                    <p className="mt-1 text-xs leading-5 text-gray-500">
-                      <time dateTime={assignment.lastSeenDateTime}>
-                        {assignment.lastSeen}
-                      </time>
-                    </p>
-                  ) : (
-                    <div className="mt-1 flex items-center gap-x-1.5">
-                      <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      </div>
-                      <p className="text-xs leading-5 text-gray-500">Online</p>
-                    </div>
-                  )} */}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          {assignments}
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={2}>
-          Item Three
-        </CustomTabPanel>
-      </Box>
+        <Paper sx={{ width: "100%", overflow: "hidden" }}>
+          <TableContainer sx={{ height: 500 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align={column.align}
+                      style={{ minWidth: column.minWidth }}
+                    >
+                      {column.label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => {
+                    return (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={row.code}
+                      >
+                        {columns.map((column) => {
+                          const value = row[column.id];
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.format && typeof value === "number"
+                                ? column.format(value)
+                                : value}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      </div>
     </>
   );
 };

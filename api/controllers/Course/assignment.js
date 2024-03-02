@@ -447,16 +447,20 @@ export const getAssignmentSubmitted = (req, res) => {
 };
 
 export const updateSubmissionStatus = (req, res) => {
-  const userInfo = req.userInfo;
   const assignmentId = req.params.assignmentId;
   const submissionStatus = req.body.submissionStatus;
-  const userId = userInfo.id;
-  const q = `UPDATE  submissions SET  Status = ?    WHERE AssignmentId = ? AND UserId = ?`;
+  const userId = req.userInfo.id;
+  const q = `UPDATE submissions SET Status = ?, SubmissionDate = NOW() WHERE AssignmentId = ? AND UserId = ?;`;
 
   db.query(q, [submissionStatus, assignmentId, userId], (err, data) => {
     if (err) {
-      return res.status(500).json({ error: "Database error!" });
+      console.error(
+        "Lỗi khi cập nhật trạng thái nộp bài trong cơ sở dữ liệu: ",
+        err
+      );
+      return res.status(500).json({ error: "Lỗi cơ sở dữ liệu!" });
     }
+    console.log("Trạng thái nộp bài đã được cập nhật trong cơ sở dữ liệu");
     return res.json(data);
   });
 };

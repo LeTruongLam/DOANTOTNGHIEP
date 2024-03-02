@@ -295,33 +295,49 @@ function submitAssignment(
   chapterId,
   courseId,
   submissionFiles,
+  submittedFiles,
   req,
   res
 ) {
-  const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?);`;
-  const submissionFilesJson = JSON.stringify(submissionFiles);
-  db.query(
-    query,
-    [assignmentId, userId, chapterId, courseId, submissionFilesJson],
-    (err, result) => {
-      if (err) {
-        console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
-        res.status(500).json({
-          success: false,
-          message: "Lỗi",
-        });
-      } else {
-        console.log("Dữ liệu tài liệu đã được chèn vào cơ sở dữ liệu");
-        res.status(201).json({
-          success: true,
-          message: "fileUrl đã được tải lên!",
-          data: result,
-        });
-      }
-    }
-  );
-}
+  const combinedFiles = [
+    ...submissionFiles,
+    ...(submittedFiles ? JSON.parse(submittedFiles) : []),
+  ];
+  const submissionFilesJson = JSON.stringify(combinedFiles);
+  let query;
 
+  if (submittedFiles) {
+    query = `UPDATE submissions SET  SubmissionFiles = ? WHERE AssignmentId = ? AND UserId = ?`;
+  } else {
+    query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?);`;
+  }
+
+  const queryParams = submittedFiles
+    ? [submissionFilesJson, assignmentId, userId]
+    : [assignmentId, userId, chapterId, courseId, submissionFilesJson];
+
+  db.query(query, queryParams, (err, result) => {
+    if (err) {
+      console.error(
+        "Lỗi khi chèn hoặc cập nhật dữ liệu tài liệu vào cơ sở dữ liệu: ",
+        err
+      );
+      res.status(500).json({
+        success: false,
+        message: "Lỗi",
+      });
+    } else {
+      console.log(
+        "Dữ liệu tài liệu đã được chèn hoặc cập nhật vào cơ sở dữ liệu"
+      );
+      res.status(201).json({
+        success: true,
+        message: "fileUrl đã được tải lên!",
+        data: result,
+      });
+    }
+  });
+}
 router.post(
   "/chapters/uploadAssignmentFile/:assignmentId/submission",
   upload.array("documentSubmit", 10),
@@ -330,6 +346,7 @@ router.post(
     const chapterId = req.body.chapterId;
     const userId = req.body.userId;
     const courseId = req.body.courseId;
+    const submittedFiles = req.body.submissionFiles;
     const submissionFiles = []; // Mảng để lưu thông tin các tệp đã tải lên
     let files = req.files;
     if (!req.files || req.files.length === 0) {
@@ -363,6 +380,7 @@ router.post(
                 chapterId,
                 courseId,
                 submissionFiles,
+                submittedFiles,
                 req,
                 res
               );
