@@ -1,15 +1,15 @@
 import React, { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
-
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { formatDateString } from "../../../js/TAROHelper";
+
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -21,7 +21,7 @@ function CustomTabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 2 }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -44,26 +44,44 @@ function a11yProps(index) {
 
 const AssignmentView = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [value, setValue] = React.useState(0);
   const [assignments, setAssignments] = useState([]);
 
   const handleToAssignment = (assignment) => {
-    navigate(`/assignmentDetail/${assignment.SubmissionId}`, {
-      state: { assignment: assignment },
+    console.table(assignment);
+    navigate(`/assignments/${location.state.courseTitle}/classroom`, {
+      state: {
+        assignment: assignment,
+        assignmentId: assignment.AssignmentId,
+        courseId: location.state?.courseId,
+      },
     });
   };
+
+  const fetchAssignments = async () => {
+    try {
+      const response = await axios.get(
+        `/courses/${location.state?.courseId}/assignments`
+      );
+      setAssignments(response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
-    const fetchAssignmentSubmissons = async () => {
-      try {
-        const res = await axios.get(`/courses/assignments/submission`);
-        setAssignments(res.data);
-        console.table(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchAssignmentSubmissons();
+    fetchAssignments();
+    // const fetchAssignmentSubmissons = async () => {
+    //   try {
+    //     const res = await axios.get(`/courses/assignments/submission`);
+    //     setAssignments(res.data);
+    //     console.table(res.data);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // };
+    // fetchAssignmentSubmissons();
   }, []);
 
   const handleChange = (event, newValue) => {
@@ -72,7 +90,7 @@ const AssignmentView = () => {
   return (
     <>
       <Box sx={{ width: "100%" }}>
-        <Box sx={{ borderBottom: 2, borderColor: "divider" }}>
+        <Box>
           <div className="flex justify-between items-center">
             <Tabs value={value} onChange={handleChange}>
               <Tab
@@ -85,57 +103,43 @@ const AssignmentView = () => {
                 {...a11yProps(1)}
                 sx={{ textTransform: "none" }}
               />
-              <Tab
-                label="Completed"
-                {...a11yProps(2)}
-                sx={{ textTransform: "none" }}
-              />
             </Tabs>
-            <FilterAltOutlinedIcon />
           </div>
         </Box>
-        <CustomTabPanel value={value} index={0}>
+        <CustomTabPanel value={value} index={0}></CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
           <ul role="list" className="divide-y divide-slate-200 mt-3">
             {assignments.map((assignment) => (
-              <li key={assignment.SubmissionId}>
-                <div
-                  onClick={() => handleToAssignment(assignment)}
-                  className="flex justify-between gap-x-6 py-5 hover:text-indigo-500  hover:bg-slate-50	hover:cursor-pointer"
-                >
+              <li
+                onClick={() => handleToAssignment(assignment)}
+                key={assignment.AssignmentId}
+                className=" border border-gray-50 rounded-lg shadow mb-4"
+              >
+                <div className="px-4 flex justify-between gap-x-6 py-5 hover:text-indigo-500  hover:bg-slate-50	hover:cursor-pointer">
                   <div className="flex min-w-0 gap-x-4">
-                    <img
-                      className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                      src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
                     <div className="min-w-0 flex-auto">
                       <p className="text-sm font-semibold leading-6 text-gray-900">
-                        {assignment.StudentName}
+                        {assignment.AssignmentTitle}
                       </p>
                       <p className="mt-1 truncate text-sm leading-5 text-gray-500">
-                        {assignment.StudentCode}
+                        Deadline is {formatDateString(assignment.EndDate)}
                       </p>
                     </div>
                   </div>
-                  <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                    <p className=" font-semibold	 text-sm leading-6 text-gray-900">
-                      {assignment.title} / {assignment.ChapterTitle}
-                    </p>
-                    <p className="text-sm italic leading-6 text-gray-900">
-                      {assignment.AssignmentTitle} / Submitted at{" "}
-                      {formatDateString(assignment.SubmissionDate)}
-                    </p>
+                  <div className="flex justify-items-center items-center pr-4 gap-4">
+                    <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                      <p className=" font-semibold	 text-sm leading-6 text-gray-900">
+                        {assignment.title}
+                      </p>
+                      <p className="text-sm italic leading-6 text-gray-900">
+                        {assignment.CourseCode}/ {assignment.ChapterTitle}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          {assignments}
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={2}>
-          Item Three
         </CustomTabPanel>
       </Box>
     </>

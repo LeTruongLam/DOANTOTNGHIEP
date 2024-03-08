@@ -76,13 +76,14 @@ export const deleteAssignment = (req, res) => {
 export const addAssignmentTitle = (req, res) => {
   const assignmentTitle = req.body.assignmentTitle;
   const chapterId = req.body.chapterId;
+  const courseId = req.body.courseId;
 
   const q = `
-      INSERT INTO assignments (AssignmentTitle, ChapterId)
-      VALUES (?, ?)
+      INSERT INTO assignments (AssignmentTitle, ChapterId, CourseId)
+      VALUES (?, ?, ?)
     `;
 
-  db.query(q, [assignmentTitle, chapterId], (err, result) => {
+  db.query(q, [assignmentTitle, chapterId, courseId], (err, result) => {
     if (err) return res.status(500).json(err);
     return res.status(201).json({ message: "Assignment added successfully" });
   });
@@ -314,20 +315,42 @@ export const getAssignmentSubmission = (req, res) => {
   if (!token) return res.status(401).json("Not authenticated!");
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
-    const q = `SELECT *  FROM submissions 
-    JOIN courses ON courses.CourseId = submissions.CourseId 
-    JOIN teachers ON teachers.TeacherId = courses.TeacherId 
-    JOIN students ON students.UserId = submissions.UserId 
-    JOIN assignments ON assignments.AssignmentId = submissions.AssignmentId 
-    JOIN chapters ON submissions.ChapterId = chapters.ChapterId 
-    WHERE teachers.UserId = ?`;
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
 
-    db.query(q, [userInfo.id], (err, data) => {
+    const assignmentId = req.params.assignmentId;
+    const q = `SELECT
+        submissions.SubmissionId,
+        submissions.SubmissionDate,
+        submissions.Score,
+        courses.CourseId,
+        courses.title,
+        teachers.TeacherId,
+        teachers.TeacherName,
+        students.UserId,
+        students.StudentName,
+        students.StudentCode,
+        assignments.AssignmentId,
+        assignments.AssignmentTitle,
+        chapters.ChapterId,
+        chapters.ChapterTitle
+      FROM 
+        submissions
+        JOIN courses ON courses.CourseId = submissions.CourseId 
+        JOIN teachers ON teachers.TeacherId = courses.TeacherId 
+        JOIN students ON students.UserId = submissions.UserId 
+        JOIN assignments ON assignments.AssignmentId = submissions.AssignmentId 
+        JOIN chapters ON submissions.ChapterId = chapters.ChapterId 
+      WHERE 
+        submissions.AssignmentId = ? AND submissions.Status = 1 `;
+
+    db.query(q, [assignmentId], (err, data) => {
       if (err) {
         return res.status(500).json({ error: err });
       }
       if (data.length === 0) {
-        return res.json({ message: "assignmentId not found." });
+        return res.json({ message: "assignment submited none." });
       }
       return res.json(data);
     });
@@ -427,9 +450,10 @@ export const updatePointAssignment = (req, res) => {
 
 // Sinh viên lấy thông tin bài đã nộp
 export const getAssignmentSubmitted = (req, res) => {
-  const userInfo = req.userInfo;
+  // const userInfo = req.userInfo;
   const assignmentId = req.params.assignmentId;
-  const userId = userInfo.id;
+  const userId = req.params.userId;
+  // const userId = userInfo.id;
   const q = `SELECT * FROM submissions 
                WHERE AssignmentId = ? AND UserId = ?`;
 
@@ -441,8 +465,7 @@ export const getAssignmentSubmitted = (req, res) => {
     if (data.length === 0) {
       return res.json({ message: "No assignment submission found." });
     }
-
-    return res.json(data);
+    return res.json(data[0]);
   });
 };
 
@@ -492,4 +515,46 @@ export const insertAssignmentSubmission = (req, res) => {
       }
     }
   );
+};
+export const deleteAssignmentFile = (req, res) => {
+  const userInfo = req.userInfo;
+  const assignmentId = req.params.assignmentId;
+  const userId = userInfo.id;
+  const q = `SELECT * FROM submissions 
+               WHERE AssignmentId = ? AND UserId = ?`;
+
+  db.query(q, [assignmentId, userId], (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error!" });
+    }
+
+    if (data.length === 0) {
+      return res.json({ message: "No assignment submission found." });
+    }
+
+    return res.json(data);
+  });
+};
+
+// Lấy tất cả assignment của 1 môn học
+export const getAllAssignmentsOfCourse = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const courseId = req.params.courseId;
+    const q = `
+      SELECT *
+      FROM assignments
+      JOIN courses ON assignments.CourseId = courses.CourseId
+      JOIN chapters ON chapters.ChapterId = assignments.ChapterId
+      WHERE assignments.CourseId = ?`;
+
+    db.query(q, [courseId], (err, data) => {
+      if (err) return res.status(500).json(err);
+      if (data.length === 0) return res.status(200).json([]);
+      return res.status(200).json(data);
+    });
+  });
 };

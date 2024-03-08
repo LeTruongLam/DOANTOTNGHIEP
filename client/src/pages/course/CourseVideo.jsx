@@ -74,7 +74,7 @@ const CourseVideo = () => {
         </>
       ) : (
         <div className="course-video">
-          <div className="container-left">
+          <div >
             <List
               sx={{ width: "100%", maxWidth: 350, bgcolor: "background.paper" }}
               component="nav"

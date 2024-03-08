@@ -56,7 +56,6 @@ export default function AssignmentDetail() {
   };
   const updateAssignmentPoint = async () => {
     try {
-      console.log(assignmentPoint);
       await axios.put(`/courses/assignments/score/${assignment.SubmissionId}`, {
         assignmentPoint: assignmentPoint,
       });

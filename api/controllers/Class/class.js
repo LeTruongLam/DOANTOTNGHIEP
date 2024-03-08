@@ -195,7 +195,7 @@ export const getClassStudent = (req, res) => {
     const courseId = req.params.courseId;
     const classCode = req.params.classCode;
     const q = `
-      SELECT *
+      SELECT students.StudentName, students.StudentCode,students.UserId, classes.*
       FROM class_student
       JOIN students ON class_student.StudentId =  students.StudentId
       JOIN classes ON class_student.ClassId = classes.ClassId

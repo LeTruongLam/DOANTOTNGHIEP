@@ -56,6 +56,7 @@ import {
   getAssignmentSubmitted,
   updateSubmissionStatus,
   insertAssignmentSubmission,
+  getAllAssignmentsOfCourse,
 } from "../controllers/Course/assignment.js";
 import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
@@ -116,7 +117,7 @@ router.get(
   "/chapters/:chapterId/assignmentfile/:assignmentId",
   getAssignmentFile
 );
-router.get("/assignments/submission", getAssignmentSubmission);
+router.get("/assignments/:assignmentId/submission", getAssignmentSubmission);
 
 router.get(
   "/chapters/:chapterId/assignments/title/:assignmentId",
@@ -147,8 +148,8 @@ router.put(
 router.put("/assignments/review/:submissionId", updateReviewAssignment);
 router.put("/assignments/score/:submissionId", updatePointAssignment);
 router.get(
-  "/assignments/:assignmentId/submitted",
-  authorize,
+  "/assignments/:assignmentId/submitted/:userId",
+  // authorize,
   getAssignmentSubmitted
 );
 router.put(
@@ -156,5 +157,6 @@ router.put(
   authorize,
   updateSubmissionStatus
 );
+router.get("/:courseId/assignments", getAllAssignmentsOfCourse);
 
 export default router;

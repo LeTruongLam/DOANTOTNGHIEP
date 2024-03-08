@@ -208,6 +208,16 @@ export default function CourseAssignment() {
   };
   const handleDeleteFile = async (assignmentFileId) => {
     alert(assignmentFileId);
+    try {
+      const response = await axios.put(
+        `/courses/chapters/${location.state?.chapterId}/assignmentfile/${assignmentId}`,
+        {
+          assignmentFileId: assignmentFileId,
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching assignment files:", error);
+    }
   };
   return (
     <>

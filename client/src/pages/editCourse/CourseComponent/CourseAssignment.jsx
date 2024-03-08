@@ -10,7 +10,12 @@ import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined
 import "../EditWrite.scss";
 import AssginmentForm from "../AssignmentForm/AssginmentForm";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-export default function CourseAssignment({ title, subTitle, chapterId }) {
+export default function CourseAssignment({
+  title,
+  subTitle,
+  chapterId,
+  courseId,
+}) {
   const { fetchAssignment } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [assignments, setAssignments] = useState([]);
@@ -69,6 +74,7 @@ export default function CourseAssignment({ title, subTitle, chapterId }) {
       await axios.post(`/courses/chapters/assignments`, {
         assignmentTitle: assignmentTitle,
         chapterId: chapterId,
+        courseId: courseId,
       });
       fetchAssignmentData();
     } catch (error) {

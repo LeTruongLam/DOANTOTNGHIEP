@@ -45,6 +45,7 @@ export default function ClassList({ courseId, classCodeStudent }) {
   }, []);
   const handleChange = (event) => {
     setClassCode(event.target.value);
+    console.log(event.target.value);
     fetchClassStudent(event.target.value);
   };
 
