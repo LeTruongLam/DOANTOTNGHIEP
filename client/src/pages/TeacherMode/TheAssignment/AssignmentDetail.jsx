@@ -20,7 +20,7 @@ export default function AssignmentDetail() {
     location.state?.assignment.SubmissionFiles
   );
   const [assignmentReview, setAssignmentReview] = useState(
-    location.state?.assignment.Review ? location.state.assignment.Review : ""
+    location.state?.assignment.Review ? location.state?.assignment.Review : ""
   );
   const [assignmentPoint, setAssignmentPoint] = useState(
     location.state?.assignment.Score
@@ -44,7 +44,7 @@ export default function AssignmentDetail() {
   const updateAssignmentReview = async () => {
     try {
       await axios.put(
-        `/courses/assignments/review/${assignment.SubmissionId}`,
+        `/courses/assignments/review/${assignment?.SubmissionId}`,
         {
           assignmentReview: assignmentReview,
         }
@@ -56,7 +56,7 @@ export default function AssignmentDetail() {
   };
   const updateAssignmentPoint = async () => {
     try {
-      await axios.put(`/courses/assignments/score/${assignment.SubmissionId}`, {
+      await axios.put(`/courses/assignments/score/${assignment?.SubmissionId}`, {
         assignmentPoint: assignmentPoint,
       });
       setIsEditPoint(false);
@@ -71,7 +71,7 @@ export default function AssignmentDetail() {
         <div className="file-container outline-none mt-5  " tabIndex="0">
           <div className="px-4 sm:px-0 flex justify-between">
             <h3 className="text-2xl font-semibold leading-7 text-gray-900">
-              {assignment.title}
+              {assignment?.title}
             </h3>
             <button
               onClick={() => {
@@ -128,9 +128,9 @@ export default function AssignmentDetail() {
                               role="list"
                               className="divide-y divide-gray-100 rounded-md border border-gray-200"
                             >
-                              {assignmentFiles.length > 0 ? (
+                              {assignmentFiles?.length > 0 ? (
                                 <>
-                                  {assignmentFiles.map(
+                                  {assignmentFiles?.map(
                                     (assignmentFile, index) => (
                                       <li
                                         key={index}

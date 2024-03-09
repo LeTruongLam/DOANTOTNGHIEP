@@ -50,7 +50,6 @@ const AssignmentView = () => {
   const [assignments, setAssignments] = useState([]);
 
   const handleToAssignment = (assignment) => {
-    console.table(assignment);
     navigate(`/assignments/${location.state.courseTitle}/classroom`, {
       state: {
         assignment: assignment,
@@ -72,16 +71,6 @@ const AssignmentView = () => {
   };
   useEffect(() => {
     fetchAssignments();
-    // const fetchAssignmentSubmissons = async () => {
-    //   try {
-    //     const res = await axios.get(`/courses/assignments/submission`);
-    //     setAssignments(res.data);
-    //     console.table(res.data);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // };
-    // fetchAssignmentSubmissons();
   }, []);
 
   const handleChange = (event, newValue) => {

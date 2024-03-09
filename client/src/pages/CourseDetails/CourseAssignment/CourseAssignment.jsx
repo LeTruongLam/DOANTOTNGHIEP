@@ -589,41 +589,39 @@ export default function CourseAssignment() {
                         </ul>
                       </dd>
                     </div>
-                    {assignmentSubmitted && (
-                      <>
-                        <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                          <dt className="text-base	 font-medium leading-6 text-gray-900">
-                            Teacher's evaluation
-                          </dt>
-                          <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                            <ul
-                              role="list"
-                              className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                            >
-                              <div className="  flex-col  divide-y divide-gray-100">
-                                <div className="flex-col">
-                                  <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center justify-between ">
-                                    <div className="flex w-full gap-4">
-                                      <span>Points</span>
-                                      <span>{assignmentSubmitted.Score}</span>
-                                    </div>
-                                  </p>
-                                </div>
-                                <p className="flex-col">
-                                  <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  justify-between ">
-                                    <div className="flex flex-col gap-4">
-                                      <span>Review</span>
-                                      <span className="font-normal">
-                                        {getText(assignmentSubmitted.Review)}
-                                      </span>
-                                    </div>
+                    {assignmentSubmitted?.Status === 1 && (
+                      <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                        <dt className="text-base	 font-medium leading-6 text-gray-900">
+                          Teacher's evaluation
+                        </dt>
+                        <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
+                          <ul
+                            role="list"
+                            className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                          >
+                            <div className="  flex-col  divide-y divide-gray-100">
+                              <div className="flex-col">
+                                <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center justify-between ">
+                                  <div className="flex w-full gap-4">
+                                    <span>Points</span>
+                                    <span>{assignmentSubmitted.Score}</span>
                                   </div>
                                 </p>
                               </div>
-                            </ul>
-                          </dd>
-                        </div>
-                      </>
+                              <p className="flex-col">
+                                <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  justify-between ">
+                                  <div className="flex flex-col gap-4">
+                                    <span>Review</span>
+                                    <span className="font-normal">
+                                      {getText(assignmentSubmitted.Review)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </p>
+                            </div>
+                          </ul>
+                        </dd>
+                      </div>
                     )}
                   </dl>
                 </div>

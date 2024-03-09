@@ -57,6 +57,7 @@ import {
   updateSubmissionStatus,
   insertAssignmentSubmission,
   getAllAssignmentsOfCourse,
+  getAllStudentAndAssignmentStatus,
 } from "../controllers/Course/assignment.js";
 import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
@@ -147,16 +148,25 @@ router.put(
 );
 router.put("/assignments/review/:submissionId", updateReviewAssignment);
 router.put("/assignments/score/:submissionId", updatePointAssignment);
+
+// Lấy thông tin của bài submitted
 router.get(
-  "/assignments/:assignmentId/submitted/:userId",
-  // authorize,
+  "/assignments/:assignmentId/submitted",
+  authorize,
   getAssignmentSubmitted
 );
+// sửa Status của bài tập submitted
 router.put(
   "/assignments/:assignmentId/submitted/status",
   authorize,
   updateSubmissionStatus
 );
+// Lấy tất cả Bài tập của 1 môn học
 router.get("/:courseId/assignments", getAllAssignmentsOfCourse);
+// Lấy danh sách lớp và cả tình trạng bài nộp assgnmentsubmitted
+router.get(
+  "/assignments/:assignmentId/classroom/:classId",
+  getAllStudentAndAssignmentStatus
+);
 
 export default router;

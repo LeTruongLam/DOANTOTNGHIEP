@@ -23,11 +23,11 @@ import TableRow from "@mui/material/TableRow";
 import CheckIcon from "@mui/icons-material/Check";
 import BlockIcon from "@mui/icons-material/Block";
 const columns = [
-  { id: "title", label: "Name", minWidth: "40%" },
+  { id: "title", label: "Name", minWidth: 250 },
   {
     id: "start",
     label: "Status",
-    minWidth: "30%",
+    minWidth: 300,
     align: "left",
     format: (value) => value.toLocaleString("en-US"),
   },
@@ -35,14 +35,20 @@ const columns = [
   {
     id: "options",
     label: "Points",
-
-    minWidth: "20%",
+    minWidth: 60,
     align: "center",
     format: (value) => value.toFixed(2),
   },
+  {
+    id: "views",
+    minWidth: 40,
+
+    align: "right",
+    format: (value) => value.toFixed(2),
+  },
 ];
-function createData(title, start, options) {
-  return { title, start, options };
+function createData(title, start, options, views) {
+  return { title, start, options, views };
 }
 
 function CustomTabPanel(props) {
@@ -80,67 +86,57 @@ function a11yProps(index) {
 const AssignmentListStudent = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [assignmentsSubmitted, setAssignmentsSubmitted] = useState([]);
-
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [classes, setClasses] = useState([]);
-  const [classId, setClassId] = useState("");
+  const [classId, setClassId] = useState();
   const [classCode, setClassCode] = useState("");
   const [classStudent, setClassStudent] = useState([]);
-
-  const fetchAssignmentSubmissons = async () => {
-    try {
-      const res = await axios.get(
-        `/courses/assignments/${location.state?.assignmentId}/submission`
-      );
-      setAssignmentsSubmitted(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  useEffect(() => {
+    fetchClassesOfCourse();
+  }, []);
+  // Lấy danh sách lớp của môn học
   const fetchClassesOfCourse = async () => {
     try {
       const res = await axios.get(`/classes/${location.state?.courseId}`);
       setClasses(res.data);
       setClassCode(res.data[0]?.ClassCode);
+      fetchClassesFirst(res.data[0]?.ClassId);
     } catch (error) {
       console.error(error);
     }
   };
-  const fetchClassStudent = async (classCode) => {
+
+  const fetchClassesFirst = async (classId) => {
     try {
       const res = await axios.get(
-        `/classes/${location.state?.courseId}/class/${classCode}`
+        `/courses/assignments/${location.state?.assignmentId}/classroom/${classId}`
       );
       setClassStudent(res.data);
     } catch (error) {
       console.error(error);
     }
   };
-  useEffect(() => {
-    fetchAssignmentSubmissons();
-    fetchClassesOfCourse();
-  }, []);
-  const handleChangeClass = (event) => {
-    setClassCode(event.target.value);
-  };
-  const getAssignmentSubmitted = async (userId) => {
+  const fetchStudentAndAssignmentStatus = async (classId) => {
     try {
       const res = await axios.get(
-        `/courses/assignments/${location.state?.assignmentId}/submitted/${userId}`
+        `/courses/assignments/${location.state?.assignmentId}/classroom/${classId}`
       );
-      console.log(res.data);
-      return res.data;
+      setClassStudent(res.data);
     } catch (error) {
       console.error(error);
     }
   };
+  const handleToAssignmentDetail = (student) => {
+    navigate(`/assignmentDetail/${student?.SubmissionId}`, {});
+  };
+  const handleChangeClass = (event) => {
+    setClassCode(event.target.value);
+  };
   const rows = classStudent?.map((student, index) => {
-    let assignmentSubmitted = getAssignmentSubmitted(student.UserId);
     return createData(
       `${student?.StudentName}  ${student?.StudentCode}`,
-      assignmentSubmitted.Status ===1 ? (
+      student.Status === 1 ? (
         <div className="flex justify-start items-center gap-2">
           <CheckIcon color="primary" />
           <span className="text-blue-800">
@@ -153,25 +149,17 @@ const AssignmentListStudent = () => {
           <span className="text-red-800">Not turned in</span>
         </div>
       ),
-      <div className="rounded-md opacity-50 bg-gray-50 px-3.5 py-2.5 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+      <div className="rounded-md opacity-50 bg-gray-50 py-2.5 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
         {student?.Score} / 10
-      </div>
+      </div>,
+      <button
+        onClick={() => handleToAssignmentDetail(student)} // Sử dụng hàm mô phỏng để truyền tham số
+        className="mr-2 text-sm	 	 text-blue-700 px-2.5 py-1  font-semibold text-gray-900   ring-gray-300"
+      >
+        View
+      </button>
     );
   });
-  //   const rows = assignmentsSubmitted?.map((assignment, index) =>
-  //   createData(
-  //     `${assignment?.StudentName}  ${assignment?.StudentCode}`,
-  //     <div className="flex justify-start items-center gap-2">
-  //       <CheckIcon color="primary" />
-  //       <span className="text-blue-800">
-  //         Turned in {formatDateString(assignment?.SubmissionDate)}
-  //       </span>
-  //     </div>,
-  //     <div className="rounded-md opacity-50 bg-gray-50	px-3.5 py-2.5 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-  //       {assignment?.Score} / 10
-  //     </div>
-  //   )
-  // );
   const [value, setValue] = React.useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -244,8 +232,9 @@ const AssignmentListStudent = () => {
                       value={classItem.ClassCode}
                       onClick={() => {
                         setClassCode(classItem.ClassCode);
-                        fetchClassStudent(classItem.ClassCode);
+
                         setClassId(classItem.ClassId);
+                        fetchStudentAndAssignmentStatus(classItem.ClassId);
                       }}
                     >
                       {classItem.ClassCode}
@@ -267,6 +256,7 @@ const AssignmentListStudent = () => {
                           align={column.align}
                           style={{
                             minWidth: column.minWidth,
+                            maxWidth: column.maxWidth,
                             fontWeight: "bold",
                           }}
                         >

@@ -450,22 +450,19 @@ export const updatePointAssignment = (req, res) => {
 
 // Sinh viên lấy thông tin bài đã nộp
 export const getAssignmentSubmitted = (req, res) => {
-  // const userInfo = req.userInfo;
+  const userInfo = req.userInfo;
   const assignmentId = req.params.assignmentId;
-  const userId = req.params.userId;
-  // const userId = userInfo.id;
+  const userId = userInfo.id;
   const q = `SELECT * FROM submissions 
                WHERE AssignmentId = ? AND UserId = ?`;
-
   db.query(q, [assignmentId, userId], (err, data) => {
     if (err) {
       return res.status(500).json({ error: "Database error!" });
     }
-
     if (data.length === 0) {
       return res.json({ message: "No assignment submission found." });
     }
-    return res.json(data[0]);
+    return res.json(data);
   });
 };
 
@@ -553,6 +550,32 @@ export const getAllAssignmentsOfCourse = (req, res) => {
 
     db.query(q, [courseId], (err, data) => {
       if (err) return res.status(500).json(err);
+      if (data.length === 0) return res.status(200).json([]);
+      return res.status(200).json(data);
+    });
+  });
+};
+export const getAllStudentAndAssignmentStatus = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const classId = req.params.classId;
+    const assignmentId = req.params.assignmentId;
+    const q = `
+    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status, sb.SubmissionId
+    FROM students s
+    JOIN class_student sc ON s.StudentId = sc.StudentId
+    JOIN classes c ON sc.ClassId = c.ClassId
+    JOIN courses cs ON c.CourseId = cs.CourseId
+    LEFT JOIN submissions sb ON s.UserId = sb.UserId AND cs.CourseId = sb.CourseId AND sb.AssignmentId = ?
+    WHERE c.ClassId = ?`;
+    db.query(q, [assignmentId, classId], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
       if (data.length === 0) return res.status(200).json([]);
       return res.status(200).json(data);
     });
