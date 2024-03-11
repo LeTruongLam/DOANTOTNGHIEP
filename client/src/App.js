@@ -140,12 +140,8 @@ function App() {
                 }
               />
               <Route
-                path="/assignmentDetail/:submissionId"
-                element={
-                  <LayoutTeacher>
-                    <AssignmentDetail />
-                  </LayoutTeacher>
-                }
+                path="/Assignment-Detail/:submissionId"
+                element={<AssignmentDetail />}
               />
               <Route
                 path="/assignments/:courseTitle/classroom"

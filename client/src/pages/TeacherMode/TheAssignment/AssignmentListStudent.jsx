@@ -101,22 +101,12 @@ const AssignmentListStudent = () => {
       const res = await axios.get(`/classes/${location.state?.courseId}`);
       setClasses(res.data);
       setClassCode(res.data[0]?.ClassCode);
-      fetchClassesFirst(res.data[0]?.ClassId);
+      fetchStudentAndAssignmentStatus(res.data[0]?.ClassId);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchClassesFirst = async (classId) => {
-    try {
-      const res = await axios.get(
-        `/courses/assignments/${location.state?.assignmentId}/classroom/${classId}`
-      );
-      setClassStudent(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
   const fetchStudentAndAssignmentStatus = async (classId) => {
     try {
       const res = await axios.get(
@@ -128,7 +118,18 @@ const AssignmentListStudent = () => {
     }
   };
   const handleToAssignmentDetail = (student) => {
-    navigate(`/assignmentDetail/${student?.SubmissionId}`, {});
+    console.log(student);
+    navigate(
+      `/Assignment-Detail/${student?.SubmissionId}`,
+      {
+        state: {
+          assignmentId: location.state?.assignmentId,
+          student: student,
+          userId: student.UserId,
+          classStudent: classStudent,
+        },
+      }
+    );
   };
   const handleChangeClass = (event) => {
     setClassCode(event.target.value);
@@ -154,7 +155,7 @@ const AssignmentListStudent = () => {
       </div>,
       <button
         onClick={() => handleToAssignmentDetail(student)} // Sử dụng hàm mô phỏng để truyền tham số
-        className="mr-2 text-sm	 	 text-blue-700 px-2.5 py-1  font-semibold text-gray-900   ring-gray-300"
+        className="font-medium text-indigo-600 hover:text-indigo-500"
       >
         View
       </button>

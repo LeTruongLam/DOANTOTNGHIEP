@@ -67,13 +67,13 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
               navigate(-1);
             }}
             type="button"
-            className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 	"
+            className="bg-black hover:bg-blue-500 text-white  px-2.5 py-2  rounded text-sm font-semibold	"
           >
             Back
           </button>
           <button
             onClick={handleDelete}
-            className="bg-black hover:bg-blue-500 text-white px-2	py-1 rounded	"
+            className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 	"
           >
             <DeleteOutlineIcon />
           </button>

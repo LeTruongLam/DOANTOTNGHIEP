@@ -139,4 +139,6 @@ body::-webkit-scrollbar-thumb:hover {
 .css-19midj6 {
     padding: 0 !important;
 }
-
+.body-height{
+    height: calc(100vh - 64px);
+}

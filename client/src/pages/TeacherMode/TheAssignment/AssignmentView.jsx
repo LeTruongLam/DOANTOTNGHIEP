@@ -48,6 +48,8 @@ const AssignmentView = () => {
 
   const [value, setValue] = React.useState(0);
   const [assignments, setAssignments] = useState([]);
+  const [upComing, setUpComing] = useState([]);
+  const [passDue, setPassDue] = useState([]);
 
   const handleToAssignment = (assignment) => {
     navigate(`/assignments/${location.state.courseTitle}/classroom`, {
@@ -58,13 +60,26 @@ const AssignmentView = () => {
       },
     });
   };
-
   const fetchAssignments = async () => {
     try {
       const response = await axios.get(
         `/courses/${location.state?.courseId}/assignments`
       );
       setAssignments(response.data);
+      const now = new Date(); // Ngày và giờ hiện tại
+
+      const upcomingAssignments = [];
+      const passDueAssignments = [];
+      response.data.forEach((assignment) => {
+        console.log(assignment.EndDate)
+        if (new Date(assignment.EndDate) > now) {
+          upcomingAssignments.push(assignment);
+        } else {
+          passDueAssignments.push(assignment);
+        }
+      });
+      setUpComing(upcomingAssignments);
+      setPassDue(passDueAssignments);
     } catch (err) {
       console.log(err);
     }
@@ -95,10 +110,43 @@ const AssignmentView = () => {
             </Tabs>
           </div>
         </Box>
-        <CustomTabPanel value={value} index={0}></CustomTabPanel>
+        <CustomTabPanel value={value} index={0}>
+          <ul role="list" className="divide-y divide-slate-200 mt-3">
+            {upComing.map((assignment) => (
+              <li
+                onClick={() => handleToAssignment(assignment)}
+                key={assignment.AssignmentId}
+                className=" border border-gray-50 rounded-lg shadow mb-4"
+              >
+                <div className="px-4 flex justify-between gap-x-6 py-5 hover:text-indigo-500  hover:bg-slate-50	hover:cursor-pointer">
+                  <div className="flex min-w-0 gap-x-4">
+                    <div className="min-w-0 flex-auto">
+                      <p className="text-sm font-semibold leading-6 text-gray-900">
+                        {assignment.AssignmentTitle}
+                      </p>
+                      <p className="mt-1 truncate text-sm leading-5 text-gray-500">
+                        Deadline is {formatDateString(assignment.EndDate)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-items-center items-center pr-4 gap-4">
+                    <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                      <p className=" font-semibold	 text-sm leading-6 text-gray-900">
+                        {assignment.title}
+                      </p>
+                      <p className="text-sm italic leading-6 text-gray-900">
+                        {assignment.CourseCode}/ {assignment.ChapterTitle}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <ul role="list" className="divide-y divide-slate-200 mt-3">
-            {assignments.map((assignment) => (
+            {passDue.map((assignment) => (
               <li
                 onClick={() => handleToAssignment(assignment)}
                 key={assignment.AssignmentId}

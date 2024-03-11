@@ -61,7 +61,7 @@ export default function TheDashboard() {
       formatDate(course.EndDate),
       <button
         onClick={() => handleEdit(course.CourseId, course)} // Sử dụng hàm mô phỏng để truyền tham số
-        className="mr-2 text-xs	 rounded-2xl	 bg-black	 text-white px-2.5 py-1  font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
+        className="font-medium text-indigo-600 hover:text-indigo-500"
       >
         Edit
       </button>
@@ -116,8 +116,7 @@ export default function TheDashboard() {
                   <TableCell
                     key={column.id}
                     align={column.align}
-                    style={{ minWidth: column.minWidth, fontWeight:"bold" }}
-
+                    style={{ minWidth: column.minWidth, fontWeight: "bold" }}
                   >
                     {column.label}
                   </TableCell>

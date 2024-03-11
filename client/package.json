@@ -35,6 +35,7 @@
     "react-docs-viewer": "^0.0.5",
     "react-dom": "^18.2.0",
     "react-draggable-lists": "^1.0.1",
+    "react-file-viewer": "^1.2.1",
     "react-quill": "^2.0.0",
     "react-router": "^6.21.1",
     "react-router-dom": "^6.21.1",

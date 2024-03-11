@@ -50,7 +50,7 @@ const Sidebar = () => {
     <div className=" min-w-[250px] border-r border-slate-300 flex flex-col justify-between ">
       <Container>
         <SlickBar>
-          <Item exact activeClassName="active" to="/">
+          <Item exact className="mt-10 " activeClassName="active" to="/">
             <HomeIcon />
             <Text className="inline ">Home</Text>
           </Item>

@@ -1,33 +1,62 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, Fragment, useState } from "react";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../course/course.scss";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import { formatDateString, getText } from "../../../js/TAROHelper";
 import ReviewsIcon from "@mui/icons-material/Reviews";
-import AttachmentIcon from "@mui/icons-material/Attachment";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import Button from "@mui/material/Button";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import BlockIcon from "@mui/icons-material/Block";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export default function AssignmentDetail() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [selected, setSelected] = useState();
 
-  const [assignment, setAssignment] = useState(location.state?.assignment);
+  const [assignment, setAssignment] = useState();
+  const [classStudent, setClassStudent] = useState(
+    location.state?.classStudent
+  );
+
   const [assignmentFiles, setAssignmentFiles] = useState(
-    location.state?.assignment.SubmissionFiles
+    location.state?.student?.SubmissionFiles || []
   );
   const [assignmentReview, setAssignmentReview] = useState(
-    location.state?.assignment.Review ? location.state?.assignment.Review : ""
+    location.state?.student?.Review
   );
   const [assignmentPoint, setAssignmentPoint] = useState(
-    location.state?.assignment.Score
+    location.state?.student?.Score || null
   );
-
   const [isEditPoint, setIsEditPoint] = useState(false);
   const [isEditReview, setIsEditReview] = useState(false);
+  const fetchAssignmentSubmitted = async () => {
+    try {
+      const res = await axios.get(
+        `/courses/assignments/${location.state?.assignmentId}/submitted/${location.state?.userId}`
+      );
+      setSelected(res.data[0]);
+      setAssignment(res.data[0]);
+      setAssignmentPoint(res.data[0]?.Score);
+      setAssignmentFiles(res.data[0]?.SubmissionFiles[0]);
+      setAssignmentReview(res.data[0]?.Review);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log(location.state?.student);
+    fetchAssignmentSubmitted();
+  }, []);
 
   const handleEditPointClick = () => {
     setIsEditPoint(true);
@@ -56,9 +85,12 @@ export default function AssignmentDetail() {
   };
   const updateAssignmentPoint = async () => {
     try {
-      await axios.put(`/courses/assignments/score/${assignment?.SubmissionId}`, {
-        assignmentPoint: assignmentPoint,
-      });
+      await axios.put(
+        `/courses/assignments/score/${assignment?.SubmissionId}`,
+        {
+          assignmentPoint: assignmentPoint,
+        }
+      );
       setIsEditPoint(false);
     } catch (err) {
       console.log(err);
@@ -66,71 +98,160 @@ export default function AssignmentDetail() {
   };
 
   return (
-    <>
-      <div className="course-file-viewer gap-5 ">
-        <div className="file-container outline-none mt-5  " tabIndex="0">
-          <div className="px-4 sm:px-0 flex justify-between">
-            <h3 className="text-2xl font-semibold leading-7 text-gray-900">
-              {assignment?.title}
-            </h3>
-            <button
-              onClick={() => {
-                navigate(-1);
-              }}
-              className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            >
-              Done
-            </button>
+    <div className="flex flex-col">
+      <div className="navbar  mx-5">
+        <div className="navbar-container">
+          <div
+            className="logo"
+            style={{ display: "flex", alignItems: "center", gap: "16px" }}
+          >
+            <span className="font-semibold">
+              {assignment?.StudentName} {assignment?.StudentCode}
+            </span>
           </div>
-          <div className="mt-6 border-t border-gray-100">
-            <dl className="divide-y divide-gray-100">
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt className="text-base	 font-medium leading-6 text-gray-900">
-                  Assignment title
-                </dt>
-                <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {assignment?.AssignmentTitle}
-                </dd>
-              </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt className="text-base	 font-medium leading-6 text-gray-900">
-                  Submitted at
-                </dt>
-                <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  {assignment?.AssignmentDesc ? (
-                    <span>{formatDateString(assignment?.SubmissionDate)}</span>
-                  ) : (
-                    <span>
-                      <em>None</em>
+          <div className="links">
+            <ExitToAppIcon />
+            <span>Exit</span>
+          </div>
+        </div>
+      </div>
+      <div className="body-height flex flex-row gap-5">
+        <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
+          <div style={{ width: "100%", height: "100%" }}>
+            <iframe
+              title="Google Docs Viewer"
+              src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                assignmentFiles?.fileUrl
+              )}&embedded=true`}
+              style={{ width: "100%", height: "100%", border: "none" }}
+              allowFullScreen
+            />
+          </div>
+        </div>
+        <div className="course-file-viewer gap-5 w-[30%]  mr-5">
+          <div className="file-container outline-none mt-5  " tabIndex="0">
+            <Listbox value={selected} onChange={setSelected}>
+              {({ open }) => (
+                <div className="relative mt-2">
+                  <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                    <span className="flex items-center">
+                      <span className="ml-3 block truncate">
+                        {selected?.StudentName} {selected?.StudentCode}
+                      </span>
                     </span>
-                  )}
-                </dd>
-              </div>
+                    <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+                      <ChevronUpDownIcon
+                        className="h-5 w-5 text-gray-400"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </Listbox.Button>
 
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <Transition
+                    show={open}
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                      {classStudent.map((student) => (
+                        <Listbox.Option
+                          key={student.StudentId}
+                          className={({ active }) =>
+                            classNames(
+                              active
+                                ? "bg-indigo-600 text-white"
+                                : "text-gray-900",
+                              "relative cursor-default select-none py-2 pl-3 pr-9"
+                            )
+                          }
+                          value={student}
+                          onClick={() => {
+                            setSelected(student);
+                            navigate(
+                              `/Assignment-Detail/${student?.SubmissionId}`,
+                              {
+                                state: {
+                                  student: student,
+                                  classStudent: classStudent,
+                                  userId: student.UserId,
+                                  assignmentId: location.state?.assignmentId,
+                                },
+                              }
+                            );
+                          }}
+                        >
+                          {({ selected, active }) => (
+                            <>
+                              <div className="flex items-center">
+                                <span
+                                  className={classNames(
+                                    selected ? "font-semibold" : "font-normal",
+                                    "ml-3 block truncate"
+                                  )}
+                                >
+                                  {student.StudentName} {student.StudentCode}
+                                </span>
+                              </div>
+
+                              {selected ? (
+                                <span
+                                  className={classNames(
+                                    active ? "text-white" : "text-indigo-600",
+                                    "absolute inset-y-0 right-0 flex items-center pr-4"
+                                  )}
+                                >
+                                  <CheckIcon
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                              ) : null}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                </div>
+              )}
+            </Listbox>
+            {assignment?.Status === 1 ? (
+              <div className="flex mt-3 justify-start items-center gap-2">
+                <CheckIcon
+                  className="h-5 w-5 text-blue-800"
+                  aria-hidden="true"
+                />
+                <span className="text-blue-800">
+                  Turned in {formatDateString(assignment?.SubmissionDate)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex mt-3 justify-start items-center gap-2">
+                <BlockIcon color="error" />
+                <span className="text-red-800">Not turned in</span>
+              </div>
+            )}
+
+            <div className="mt-3 border-t border-slate-300">
+              <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                 <dt className="text-base	font-medium leading-6 text-gray-900">
                   Student responses
                 </dt>
                 <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
                   <ul
                     role="list"
-                    className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                    className="divide-y divide-slate-300 rounded-md border border-slate-300"
                   >
-                    <div className="  flex-col  divide-y divide-gray-100">
+                    <div className="  flex-col  divide-y divide-slate-300">
                       <div className="flex-col">
-                        <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
-                          <div className="flex items-center justify-center gap-1">
-                            <AttachmentIcon />
-                            <span>Attached</span>
-                          </div>
+                        <p className="font-semibold gap-4   flex items-center ">
                           <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
-                            <ul
-                              role="list"
-                              className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                            >
-                              {assignmentFiles?.length > 0 ? (
+                            <ul role="list ">
+                              {assignment?.Status === 1 ? (
                                 <>
-                                  {assignmentFiles?.map(
+                                  {assignment.SubmissionFiles?.map(
                                     (assignmentFile, index) => (
                                       <li
                                         key={index}
@@ -155,15 +276,14 @@ export default function AssignmentDetail() {
                                           >
                                             Download
                                           </a>
-                                          <VisibilityIcon className="hover:text-indigo-500 cursor-pointer" />
                                         </div>
                                       </li>
                                     )
                                   )}
                                 </>
                               ) : (
-                                <span>
-                                  <em>None</em>
+                                <span className=" px-4 italic opacity-50">
+                                  None
                                 </span>
                               )}
                             </ul>
@@ -174,18 +294,18 @@ export default function AssignmentDetail() {
                   </ul>
                 </dd>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                 <dt className="text-base	 font-medium leading-6 text-gray-900">
                   Review & evaluation
                 </dt>
                 <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
                   <ul
                     role="list"
-                    className="divide-y divide-gray-100 rounded-md border border-gray-200"
+                    className="divide-y divide-slate-300 rounded-md border border-slate-300"
                   >
-                    <div className="  flex-col  divide-y divide-gray-100">
+                    <div className="  flex-col  divide-y divide-slate-300">
                       <div className="flex-col">
-                        <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center justify-between ">
+                        <p className="font-semibold gap-4 py-2 pl-4 pr-5   flex items-center justify-between ">
                           <div className="flex items-center justify-center gap-1">
                             <CreditScoreIcon />
                             <span>Points</span>
@@ -195,7 +315,8 @@ export default function AssignmentDetail() {
                               aria-describedby="helper-text-explanation"
                               className={`border${
                                 isEditPoint ? "" : " disabled"
-                              } border-gray-50 text-gray-900 text-sm rounded-lg block w-full py-2.5 px-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-center`}
+                              } border-gray-50 text-gray-900 text-sm outline-blue-500
+                              rounded-lg block w-full my-2 py-1 px-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-center`}
                               required
                               min={0}
                               max={10}
@@ -208,7 +329,7 @@ export default function AssignmentDetail() {
                           </div>
                           {isEditPoint ? (
                             <p
-                              className="font-medium text-black hover:text-indigo-500"
+                              className="font-medium hover:cursor-pointer text-black hover:text-indigo-500"
                               onClick={() => {
                                 handleCloseEditPoint();
                               }}
@@ -217,7 +338,7 @@ export default function AssignmentDetail() {
                             </p>
                           ) : (
                             <p
-                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                              className="font-medium hover:cursor-pointer text-indigo-600 hover:text-indigo-500"
                               onClick={handleEditPointClick}
                             >
                               Edit
@@ -227,7 +348,10 @@ export default function AssignmentDetail() {
                         {isEditPoint && (
                           <div className="mx-3 mb-3">
                             <Button
-                              sx={{ color: "white", backgroundColor: "black" }}
+                              sx={{
+                                color: "white",
+                                backgroundColor: "black",
+                              }}
                               style={{
                                 marginTop: "12px",
                                 width: "max-content",
@@ -249,7 +373,7 @@ export default function AssignmentDetail() {
                           </div>
                           {isEditReview ? (
                             <p
-                              className="font-medium text-black hover:text-indigo-500"
+                              className="font-medium hover:cursor-pointer text-black hover:text-indigo-500"
                               onClick={() => {
                                 handleCloseEditReview();
                               }}
@@ -258,7 +382,7 @@ export default function AssignmentDetail() {
                             </p>
                           ) : (
                             <p
-                              className="font-medium text-indigo-600 hover:text-indigo-500"
+                              className="font-medium hover:cursor-pointer text-indigo-600 hover:text-indigo-500"
                               onClick={handleEditReviewClick}
                             >
                               Edit
@@ -273,7 +397,10 @@ export default function AssignmentDetail() {
                               onChange={setAssignmentReview}
                             />
                             <Button
-                              sx={{ color: "white", backgroundColor: "black" }}
+                              sx={{
+                                color: "white",
+                                backgroundColor: "black",
+                              }}
                               style={{
                                 marginTop: "12px",
                                 width: "max-content",
@@ -285,8 +412,8 @@ export default function AssignmentDetail() {
                             </Button>
                           </div>
                         ) : (
-                          <div className="m-4 mt-0">
-                            {getText(assignmentReview)}
+                          <div className=" mb-3 ml-4">
+                            <span>{getText(assignmentReview)}</span>
                           </div>
                         )}
                       </p>
@@ -294,10 +421,10 @@ export default function AssignmentDetail() {
                   </ul>
                 </dd>
               </div>
-            </dl>
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

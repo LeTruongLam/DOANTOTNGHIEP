@@ -49,7 +49,7 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
       </div>
       <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <Stack direction="row" spacing={1}>
-          <button className="mr-2 text-xs	 rounded-2xl	 	 text-black px-2.5 py-1  text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-100 bg-blue-50	">
+          <button className="mr-2 text-xs	 rounded-2xl	 	 text-black px-2.5 py-1  text-sm font-semibold text-gray-900   ring-gray-300 hover:text-blue-500	">
             Delete
           </button>
           <button

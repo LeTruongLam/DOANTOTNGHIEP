@@ -1,4 +1,3 @@
-
 .write-course {
     display: flex;
 }
@@ -56,7 +55,8 @@
 }
 
 .ql-container {
-    min-height: 200px;
+    min-height: 100px;
+    max-height: max-content;
 }
 
 .chapter-title,
@@ -207,6 +207,7 @@
 .form-wrapper {
     margin: 20px;
 }
-.drag-handle:hover{
+
+.drag-handle:hover {
     cursor: pointer;
 }

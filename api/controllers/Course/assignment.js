@@ -408,10 +408,7 @@ export const updateReviewAssignment = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const submissionId = req.params.submissionId;
-    console.log(submissionId);
-
     const assignmentReview = req.body.assignmentReview;
-    console.log(assignmentReview);
     const q = "UPDATE  submissions SET  `Review` = ?  WHERE  SubmissionId = ?";
     db.query(q, [assignmentReview, submissionId], (err, data) => {
       if (err)
@@ -450,22 +447,24 @@ export const updatePointAssignment = (req, res) => {
 
 // Sinh viên lấy thông tin bài đã nộp
 export const getAssignmentSubmitted = (req, res) => {
-  const userInfo = req.userInfo;
   const assignmentId = req.params.assignmentId;
-  const userId = userInfo.id;
-  const q = `SELECT * FROM submissions 
-               WHERE AssignmentId = ? AND UserId = ?`;
+  const userId = req.params.userId;
+  const q = `SELECT sb.*, s.StudentName, s.StudentCode FROM submissions sb
+          JOIN students s ON s.UserId = sb.UserId
+          WHERE sb.AssignmentId = ? AND sb.UserId = ?`;
+
   db.query(q, [assignmentId, userId], (err, data) => {
     if (err) {
       return res.status(500).json({ error: "Database error!" });
     }
+
     if (data.length === 0) {
       return res.json({ message: "No assignment submission found." });
     }
+
     return res.json(data);
   });
 };
-
 export const updateSubmissionStatus = (req, res) => {
   const assignmentId = req.params.assignmentId;
   const submissionStatus = req.body.submissionStatus;
@@ -542,11 +541,11 @@ export const getAllAssignmentsOfCourse = (req, res) => {
 
     const courseId = req.params.courseId;
     const q = `
-      SELECT *
-      FROM assignments
-      JOIN courses ON assignments.CourseId = courses.CourseId
-      JOIN chapters ON chapters.ChapterId = assignments.ChapterId
-      WHERE assignments.CourseId = ?`;
+      SELECT a.AssignmentId, a.AssignmentTitle, a.ChapterId , a.EndDate, c.CourseId, c.title, chapters.* , c.TeacherId, c.CourseCode
+      FROM assignments a
+      JOIN courses c ON a.CourseId = c.CourseId
+      JOIN chapters ON chapters.ChapterId = a.ChapterId
+      WHERE a.CourseId = ?`;
 
     db.query(q, [courseId], (err, data) => {
       if (err) return res.status(500).json(err);
@@ -564,13 +563,14 @@ export const getAllStudentAndAssignmentStatus = (req, res) => {
     const classId = req.params.classId;
     const assignmentId = req.params.assignmentId;
     const q = `
-    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status, sb.SubmissionId
+    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, sb.UserId
     FROM students s
     JOIN class_student sc ON s.StudentId = sc.StudentId
     JOIN classes c ON sc.ClassId = c.ClassId
     JOIN courses cs ON c.CourseId = cs.CourseId
     LEFT JOIN submissions sb ON s.UserId = sb.UserId AND cs.CourseId = sb.CourseId AND sb.AssignmentId = ?
-    WHERE c.ClassId = ?`;
+    WHERE c.ClassId = ?
+    ORDER BY s.StudentCode `;
     db.query(q, [assignmentId, classId], (err, data) => {
       if (err) {
         console.log(err);

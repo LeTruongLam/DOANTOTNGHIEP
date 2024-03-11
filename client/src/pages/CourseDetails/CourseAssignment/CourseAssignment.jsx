@@ -90,7 +90,7 @@ export default function CourseAssignment() {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        `/courses/assignments/${assignmentId}/submitted`,
+        `/courses/assignments/${assignmentId}/submitted/${currentUser.UserId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Pass the token in the Authorization header

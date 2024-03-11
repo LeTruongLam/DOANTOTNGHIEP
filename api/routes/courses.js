@@ -151,8 +151,7 @@ router.put("/assignments/score/:submissionId", updatePointAssignment);
 
 // Lấy thông tin của bài submitted
 router.get(
-  "/assignments/:assignmentId/submitted",
-  authorize,
+  "/assignments/:assignmentId/submitted/:userId",
   getAssignmentSubmitted
 );
 // sửa Status của bài tập submitted
