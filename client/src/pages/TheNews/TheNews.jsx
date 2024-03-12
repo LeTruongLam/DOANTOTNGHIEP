@@ -1,6 +1,5 @@
 import React from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import FileViewer from "react-file-viewer";
 
 export default function TheNews() {
   const docs = [

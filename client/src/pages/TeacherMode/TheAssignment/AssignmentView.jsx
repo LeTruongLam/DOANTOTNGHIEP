@@ -71,7 +71,6 @@ const AssignmentView = () => {
       const upcomingAssignments = [];
       const passDueAssignments = [];
       response.data.forEach((assignment) => {
-        console.log(assignment.EndDate)
         if (new Date(assignment.EndDate) > now) {
           upcomingAssignments.push(assignment);
         } else {

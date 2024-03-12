@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-redundant-roles */
 import React, { useEffect, Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
@@ -12,7 +13,21 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 import Button from "@mui/material/Button";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import BlockIcon from "@mui/icons-material/Block";
-
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+const docs = [
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
+  },
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001833/CourseDocument/a5l3oeffz42tcaqb2qum.pptx",
+  },
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/image/upload/v1701011815/CourseDocument/och5g3ajzkracjjiuebo.pdf",
+  },
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701012003/CourseDocument/jrxk54u3qs8ncidv6twr.xlsx",
+  },
+];
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -27,15 +42,10 @@ export default function AssignmentDetail() {
     location.state?.classStudent
   );
 
-  const [assignmentFiles, setAssignmentFiles] = useState(
-    location.state?.student?.SubmissionFiles || []
-  );
-  const [assignmentReview, setAssignmentReview] = useState(
-    location.state?.student?.Review
-  );
-  const [assignmentPoint, setAssignmentPoint] = useState(
-    location.state?.student?.Score || null
-  );
+  const [assignmentFiles, setAssignmentFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState({});
+  const [assignmentReview, setAssignmentReview] = useState("");
+  const [assignmentPoint, setAssignmentPoint] = useState();
   const [isEditPoint, setIsEditPoint] = useState(false);
   const [isEditReview, setIsEditReview] = useState(false);
   const fetchAssignmentSubmitted = async () => {
@@ -46,7 +56,8 @@ export default function AssignmentDetail() {
       setSelected(res.data[0]);
       setAssignment(res.data[0]);
       setAssignmentPoint(res.data[0]?.Score);
-      setAssignmentFiles(res.data[0]?.SubmissionFiles[0]);
+      setAssignmentFiles(res.data[0]?.SubmissionFiles);
+      setSelectedFile(res.data[0]?.SubmissionFiles[0]);
       setAssignmentReview(res.data[0]?.Review);
     } catch (error) {
       console.error(error);
@@ -54,7 +65,6 @@ export default function AssignmentDetail() {
   };
 
   useEffect(() => {
-    console.log(location.state?.student);
     fetchAssignmentSubmitted();
   }, []);
 
@@ -96,7 +106,23 @@ export default function AssignmentDetail() {
       console.log(err);
     }
   };
-
+  const handleNextAssignmentDetail = (student) => {
+    setAssignment(student);
+    setAssignmentPoint(student?.Score);
+    setAssignmentReview(student?.Review);
+    if (student?.SubmissionFiles) {
+      setSelectedFile(student?.SubmissionFiles[0]);
+    } else {
+      setSelectedFile([]);
+    }
+    navigate(`/Assignment-Detail/${student?.SubmissionId}`, {
+      state: {
+        assignmentId: location.state?.assignmentId,
+        userId: student.UserId,
+        classStudent: classStudent,
+      },
+    });
+  };
   return (
     <div className="flex flex-col">
       <div className="navbar  mx-5">
@@ -118,14 +144,15 @@ export default function AssignmentDetail() {
       <div className="body-height flex flex-row gap-5">
         <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
           <div style={{ width: "100%", height: "100%" }}>
-            <iframe
+            {/* <iframe
               title="Google Docs Viewer"
               src={`https://docs.google.com/gview?url=${encodeURIComponent(
                 assignmentFiles?.fileUrl
               )}&embedded=true`}
               style={{ width: "100%", height: "100%", border: "none" }}
               allowFullScreen
-            />
+            /> */}
+            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
           </div>
         </div>
         <div className="course-file-viewer gap-5 w-[30%]  mr-5">
@@ -169,17 +196,7 @@ export default function AssignmentDetail() {
                           value={student}
                           onClick={() => {
                             setSelected(student);
-                            navigate(
-                              `/Assignment-Detail/${student?.SubmissionId}`,
-                              {
-                                state: {
-                                  student: student,
-                                  classStudent: classStudent,
-                                  userId: student.UserId,
-                                  assignmentId: location.state?.assignmentId,
-                                },
-                              }
-                            );
+                            handleNextAssignmentDetail(student);
                           }}
                         >
                           {({ selected, active }) => (
@@ -248,7 +265,7 @@ export default function AssignmentDetail() {
                       <div className="flex-col">
                         <p className="font-semibold gap-4   flex items-center ">
                           <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
-                            <ul role="list ">
+                            <ul role="list">
                               {assignment?.Status === 1 ? (
                                 <>
                                   {assignment.SubmissionFiles?.map(

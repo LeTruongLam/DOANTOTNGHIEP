@@ -118,18 +118,13 @@ const AssignmentListStudent = () => {
     }
   };
   const handleToAssignmentDetail = (student) => {
-    console.log(student);
-    navigate(
-      `/Assignment-Detail/${student?.SubmissionId}`,
-      {
-        state: {
-          assignmentId: location.state?.assignmentId,
-          student: student,
-          userId: student.UserId,
-          classStudent: classStudent,
-        },
-      }
-    );
+    navigate(`/Assignment-Detail/${student?.SubmissionId}`, {
+      state: {
+        assignmentId: location.state?.assignmentId,
+        userId: student.UserId,
+        classStudent: classStudent,
+      },
+    });
   };
   const handleChangeClass = (event) => {
     setClassCode(event.target.value);
@@ -211,6 +206,15 @@ const AssignmentListStudent = () => {
                   <Tab
                     label={<span style={{ fontWeight: "bold" }}>Returned</span>}
                     {...a11yProps(1)}
+                    sx={{ textTransform: "none" }}
+                  />
+                  <Tab
+                    label={
+                      <span style={{ fontWeight: "bold" }}>
+                        Duplicate 
+                      </span>
+                    }
+                    {...a11yProps(2)}
                     sx={{ textTransform: "none" }}
                   />
                 </Tabs>
@@ -306,6 +310,10 @@ const AssignmentListStudent = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
             </Paper>
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={2}>
           </CustomTabPanel>
         </Box>
       </div>

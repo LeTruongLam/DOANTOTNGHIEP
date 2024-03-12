@@ -37,7 +37,6 @@ export const AuthContexProvider = ({ children }) => {
           Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
         },
       });
-      console.table(res.data);
       setCourses(res.data);
     } catch (err) {
       console.log(err);
