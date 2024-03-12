@@ -25,6 +25,7 @@ import PrivateRouter from "./utils/PrivateRouter.jsx";
 import TeacherRouter from "./utils/TeacherRouter.jsx";
 import AssignmentView from "./pages/TeacherMode/TheAssignment/AssignmentView.jsx";
 import AssignmentListStudent from "./pages/TeacherMode/TheAssignment/AssignmentListStudent.jsx";
+import TheCalender from "./pages/TeacherMode/TheCalender.jsx";
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -150,6 +151,10 @@ function App() {
                     <AssignmentListStudent />
                   </LayoutTeacher>
                 }
+              />
+                <Route
+                path="/calender"
+                element={<TheCalender />}
               />
             </Route>
             <Route element={<TeacherRouter />}>

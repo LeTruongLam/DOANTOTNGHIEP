@@ -14,20 +14,20 @@ import Button from "@mui/material/Button";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import BlockIcon from "@mui/icons-material/Block";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-const docs = [
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
-  },
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001833/CourseDocument/a5l3oeffz42tcaqb2qum.pptx",
-  },
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/image/upload/v1701011815/CourseDocument/och5g3ajzkracjjiuebo.pdf",
-  },
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701012003/CourseDocument/jrxk54u3qs8ncidv6twr.xlsx",
-  },
-];
+// const docs = [
+//   {
+//     uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
+//   },
+//   {
+//     uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001833/CourseDocument/a5l3oeffz42tcaqb2qum.pptx",
+//   },
+//   {
+//     uri: "https://res.cloudinary.com/ddwapzxdc/image/upload/v1701011815/CourseDocument/och5g3ajzkracjjiuebo.pdf",
+//   },
+//   {
+//     uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701012003/CourseDocument/jrxk54u3qs8ncidv6twr.xlsx",
+//   },
+// ];
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -63,7 +63,11 @@ export default function AssignmentDetail() {
       console.error(error);
     }
   };
-
+  const docs = [
+    {
+      uri: selectedFile.fileUrl || "",
+    },
+  ];
   useEffect(() => {
     fetchAssignmentSubmitted();
   }, []);
@@ -144,14 +148,6 @@ export default function AssignmentDetail() {
       <div className="body-height flex flex-row gap-5">
         <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
           <div style={{ width: "100%", height: "100%" }}>
-            {/* <iframe
-              title="Google Docs Viewer"
-              src={`https://docs.google.com/gview?url=${encodeURIComponent(
-                assignmentFiles?.fileUrl
-              )}&embedded=true`}
-              style={{ width: "100%", height: "100%", border: "none" }}
-              allowFullScreen
-            /> */}
             <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
           </div>
         </div>
@@ -272,28 +268,44 @@ export default function AssignmentDetail() {
                                     (assignmentFile, index) => (
                                       <li
                                         key={index}
-                                        className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                                        className="flex items-center justify-between first:pt-4 last:pb-4 py-2 pl-4 pr-5 text-sm leading-6"
                                       >
-                                        <div className="flex w-0 flex-1 items-center">
-                                          <PaperClipIcon
-                                            className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                            aria-hidden="true"
-                                          />
-                                          <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                                            <span className="truncate font-medium">
-                                              {assignmentFile.fileTitle}
-                                            </span>
+                                        <input
+                                          type="radio"
+                                          id={`hosting-small-${index}`}
+                                          name="hosting"
+                                          value="hosting-small"
+                                          className="hidden peer"
+                                          required
+                                        />
+                                        <label
+                                          htmlFor={`hosting-small-${index}`}
+                                          onClick={() => {
+                                            setSelectedFile(assignmentFile);
+                                          }}
+                                          class="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 		peer-checked:outline-1 peer-checked:outline	     peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100 "
+                                        >
+                                          <div className="flex w-0 flex-1 items-center">
+                                            <PaperClipIcon
+                                              className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                              aria-hidden="true"
+                                            />
+                                            <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                                              <span className="truncate font-medium">
+                                                {assignmentFile.fileTitle}
+                                              </span>
+                                            </div>
                                           </div>
-                                        </div>
-                                        <div className="ml-4 flex-shrink-0 flex items-center gap-4">
-                                          <a
-                                            href={assignmentFile?.fileUrl}
-                                            download
-                                            className="font-medium  text-indigo-600 hover:text-indigo-500"
-                                          >
-                                            Download
-                                          </a>
-                                        </div>
+                                          <div className="ml-4 flex-shrink-0 flex items-center gap-4">
+                                            <a
+                                              href={assignmentFile?.fileUrl}
+                                              download
+                                              className="font-medium  text-indigo-600 hover:text-indigo-500"
+                                            >
+                                              Download
+                                            </a>
+                                          </div>
+                                        </label>
                                       </li>
                                     )
                                   )}
