@@ -1,7 +1,8 @@
 import React, { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { formatDateString } from "../../../js/TAROHelper";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -44,27 +45,21 @@ function a11yProps(index) {
 
 const AssignmentView = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
+  const { fetchChapter, chapters } = useContext(AuthContext);
+  const { courseId } = useParams();
   const [value, setValue] = React.useState(0);
   const [assignments, setAssignments] = useState([]);
   const [upComing, setUpComing] = useState([]);
   const [passDue, setPassDue] = useState([]);
 
   const handleToAssignment = (assignment) => {
-    navigate(`/assignments/${location.state.courseTitle}/classroom`, {
-      state: {
-        assignment: assignment,
-        assignmentId: assignment.AssignmentId,
-        courseId: location.state?.courseId,
-      },
-    });
+    navigate(
+      `/course/${courseId}/assignment/${assignment.AssignmentId}/classrooms`
+    );
   };
   const fetchAssignments = async () => {
     try {
-      const response = await axios.get(
-        `/courses/${location.state?.courseId}/assignments`
-      );
+      const response = await axios.get(`/courses/${courseId}/assignments`);
       setAssignments(response.data);
       const now = new Date(); // Ngày và giờ hiện tại
 
@@ -85,6 +80,7 @@ const AssignmentView = () => {
   };
   useEffect(() => {
     fetchAssignments();
+    fetchChapter(courseId);
   }, []);
 
   const handleChange = (event, newValue) => {
@@ -107,6 +103,13 @@ const AssignmentView = () => {
                 sx={{ textTransform: "none" }}
               />
             </Tabs>
+            <button
+              type="submit"
+              className="flex-none rounded-md mt-2 hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            >
+              <AddCircleOutlineIcon className="mr-1" />
+              New Assignment
+            </button>
           </div>
         </Box>
         <CustomTabPanel value={value} index={0}>
@@ -151,7 +154,7 @@ const AssignmentView = () => {
                 key={assignment.AssignmentId}
                 className=" border border-gray-50 rounded-lg shadow mb-4"
               >
-                <div className="px-4 flex justify-between gap-x-6 py-5 hover:text-indigo-500  hover:bg-slate-50	hover:cursor-pointer">
+                <div className="px-4 flex justify-between gap-x-6 py-5 hover:outline-blue-500 hover:outline	 hover:outline-2 hover:rounded   hover:bg-slate-50	hover:cursor-pointer">
                   <div className="flex min-w-0 gap-x-4">
                     <div className="min-w-0 flex-auto">
                       <p className="text-sm font-semibold leading-6 text-gray-900">

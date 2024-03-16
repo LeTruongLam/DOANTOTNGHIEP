@@ -1,4 +1,14 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+/* eslint-disable jsx-a11y/no-redundant-roles */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import React, {
+  useEffect,
+  Fragment,
+  useState,
+  useRef,
+  useContext,
+} from "react";
+import CreditScoreIcon from "@mui/icons-material/CreditScore";
+import ReviewsIcon from "@mui/icons-material/Reviews";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../course/course.scss";
@@ -18,11 +28,56 @@ import AttachmentIcon from "@mui/icons-material/Attachment";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Collapse from "@mui/material/Collapse";
-import Box from "@mui/material/Box";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
 import AssignmentLateOutlinedIcon from "@mui/icons-material/AssignmentLateOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import BlockIcon from "@mui/icons-material/Block";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { Listbox, Transition } from "@headlessui/react";
+import AssignmentList from "./AssignmentList";
+import PropTypes from "prop-types";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 2 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -38,6 +93,7 @@ export default function CourseAssignment() {
   const [submissionStatus, setSubmissionStatus] = useState();
   const [assignmentId, setAssignmentId] = useState();
   const [congratulation, setCongratulation] = useState(false);
+  const [value, setValue] = React.useState(0);
 
   const [loading, setLoading] = useState(true);
 
@@ -55,10 +111,6 @@ export default function CourseAssignment() {
   const handleChangeClick = () => {
     fileInputRef.current.click();
   };
-  const handleToggle = () => {
-    setOpen(!open);
-  };
-
   const fetchAssignmentData = async () => {
     setLoading(true);
     try {
@@ -136,76 +188,75 @@ export default function CourseAssignment() {
     fetchAssignmentData();
   }, [location.state?.chapterId]);
 
-  const handleNextAssignment = async (assignmentId) => {
-    setLoading(true);
+  // const handleNextAssignment = async (assignmentId) => {
+  //   setLoading(true);
+  //   try {
+  //     const chapterId = location.state?.chapterId;
+  //     const response = await axios.get(
+  //       `/courses/chapters/${chapterId}/assignments/${assignmentId}`
+  //     );
+  //     setAssignment(response.data);
+  //     fetchAssignmentFiles(assignmentId);
+  //     setLoading(false);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-    try {
-      const chapterId = location.state?.chapterId;
-      const response = await axios.get(
-        `/courses/chapters/${chapterId}/assignments/${assignmentId}`
-      );
-      setAssignment(response.data);
-      fetchAssignmentFiles(assignmentId);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const handleSubmit = async () => {
+  //   if (selectedFiles.length > 0) {
+  //     try {
+  //       const fileData = new FormData();
+  //       const length = selectedFiles.length;
+  //       for (let i = 0; i < length; i++) {
+  //         fileData.append("documentSubmit", selectedFiles[i]);
+  //       }
+  //       fileData.append("assignmentId", assignment.AssignmentId);
+  //       fileData.append("chapterId", location.state?.chapterId);
+  //       fileData.append("userId", currentUser.UserId);
+  //       fileData.append("courseId", location.state?.courseId);
+  //       fileData.append("submissionFiles", JSON.stringify(submissionFiles));
 
-  const handleSubmit = async () => {
-    if (selectedFiles.length > 0) {
-      try {
-        const fileData = new FormData();
-        const length = selectedFiles.length;
-        for (let i = 0; i < length; i++) {
-          fileData.append("documentSubmit", selectedFiles[i]);
-        }
-        fileData.append("assignmentId", assignment.AssignmentId);
-        fileData.append("chapterId", location.state?.chapterId);
-        fileData.append("userId", currentUser.UserId);
-        fileData.append("courseId", location.state?.courseId);
-        fileData.append("submissionFiles", JSON.stringify(submissionFiles));
+  //       await axios.post(
+  //         `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
+  //         fileData
+  //       );
+  //       if (submissionStatus === 0) {
+  //         setCongratulation(true);
+  //         setTimeout(function () {
+  //           setCongratulation(false);
+  //         }, 3000);
+  //       }
+  //       setSelectedFiles([]);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   } else {
+  //     try {
+  //       const submissionData = {
+  //         assignmentId: assignment.AssignmentId,
+  //         chapterId: location.state?.chapterId,
+  //         userId: currentUser.UserId,
+  //         courseId: location.state?.courseId,
+  //       };
 
-        await axios.post(
-          `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
-          fileData
-        );
-        if (submissionStatus === 0) {
-          setCongratulation(true);
-          setTimeout(function () {
-            setCongratulation(false);
-          }, 3000);
-        }
-        setSelectedFiles([]);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      try {
-        const submissionData = {
-          assignmentId: assignment.AssignmentId,
-          chapterId: location.state?.chapterId,
-          userId: currentUser.UserId,
-          courseId: location.state?.courseId,
-        };
-
-        if (!assignmentSubmitted) {
-          await axios.post(
-            `/courses/chapters/${assignment.ChapterId}/submission`,
-            submissionData
-          );
-        }
-        if (submissionStatus === 0) {
-          setCongratulation(true);
-          setTimeout(function () {
-            setCongratulation(false);
-          }, 3000);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+  //       if (!assignmentSubmitted) {
+  //         await axios.post(
+  //           `/courses/chapters/${assignment.ChapterId}/submission`,
+  //           submissionData
+  //         );
+  //       }
+  //       if (submissionStatus === 0) {
+  //         setCongratulation(true);
+  //         setTimeout(function () {
+  //           setCongratulation(false);
+  //         }, 3000);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  // };
   const handleDeleteFile = async (assignmentFileId) => {
     alert(assignmentFileId);
     try {
@@ -218,6 +269,9 @@ export default function CourseAssignment() {
     } catch (error) {
       console.error("Error fetching assignment files:", error);
     }
+  };
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
   };
   return (
     <>
@@ -237,211 +291,108 @@ export default function CourseAssignment() {
       ) : (
         <>
           {assignment ? (
-            <div className="course-file-viewer gap-5 ">
-              {congratulation && <Confetti />}
-
-              <div className="list-file">
-                <List
-                  sx={{
-                    width: "100%",
-                    maxWidth: 350,
-                    bgcolor: "background.paper",
-                  }}
-                  component="nav"
-                  aria-labelledby="nested-list-subheader"
-                  ref={listRef}
-                >
-                  <ListItemButton
-                    component="div"
-                    id="nested-list-subheader"
-                    onClick={handleToggle}
-                  >
-                    <Box
-                      sx={{
-                        fontWeight: "700",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                      onClick={handleToggle}
-                    >
-                      <AssignmentOutlinedIcon />
-                      <span>Upcoming</span>
+            <>
+              <div className="body-height flex flex-row gap-5">
+                <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
+                  <Box>
+                    <Box>
+                      <div className="flex justify-between items-center">
+                        <Tabs value={value} onChange={handleChange}>
+                          <Tab
+                            label="Upcoming"
+                            {...a11yProps(0)}
+                            sx={{ textTransform: "none" }}
+                          />
+                          <Tab
+                            label="Pass due"
+                            {...a11yProps(1)}
+                            sx={{ textTransform: "none" }}
+                          />
+                          <Tab
+                            label="Completed"
+                            {...a11yProps(3)}
+                            sx={{ textTransform: "none" }}
+                          />
+                        </Tabs>
+                      </div>
                     </Box>
-                    {open ? (
-                      <ExpandLessIcon onClick={handleToggle} />
+                    <CustomTabPanel value={value} index={0}></CustomTabPanel>
+                  </Box>
+                  <div className="w-full h-full">
+                    {/* {assignmentFiles ? (
+                      <DocViewer
+                        documents={docs}
+                        pluginRenderers={DocViewerRenderers}
+                      />
                     ) : (
-                      <ExpandMoreIcon onClick={handleToggle} />
-                    )}
-                  </ListItemButton>
-                  <Collapse in={open} timeout="auto" unmountOnExit>
-                    {assignmentList.map((assignment, index) => (
-                      <ListItemText
-                        key={index}
-                        onClick={() => {
-                          handleNextAssignment(assignment.AssignmentId);
-                          fetchAssignmentSubmitted(assignment.AssignmentId);
-                        }}
-                      >
-                        <div className="flex gap-3 items-center ml-10">
-                          <AssessmentOutlinedIcon />
-                          <ListItemText primary={assignment.AssignmentTitle} />
-                        </div>
-                      </ListItemText>
-                    ))}
-                  </Collapse>
-
-                  <ListItemButton
-                    component="div"
-                    id="nested-list-subheader"
-                    onClick={handleToggle}
-                  >
-                    <Box
-                      sx={{
-                        fontWeight: "700",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                      onClick={handleToggle}
-                    >
-                      <AssignmentLateOutlinedIcon className="text-red-800" />
-                      <span>Past due</span>
-                    </Box>
-                    {open ? (
-                      <ExpandLessIcon onClick={handleToggle} />
-                    ) : (
-                      <ExpandMoreIcon onClick={handleToggle} />
-                    )}
-                  </ListItemButton>
-                  <Collapse in={open} timeout="auto" unmountOnExit>
-                    {assignmentList.map((assignment, index) => (
-                      <ListItemText
-                        key={index}
-                        onClick={() => {
-                          handleNextAssignment(assignment.AssignmentId);
-                          fetchAssignmentSubmitted(assignment.AssignmentId);
-                        }}
-                      >
-                        <div className="flex gap-3 items-center ml-10">
-                          <AssessmentOutlinedIcon />
-                          <ListItemText primary={assignment.AssignmentTitle} />
-                        </div>
-                      </ListItemText>
-                    ))}
-                  </Collapse>
-                  <ListItemButton
-                    component="div"
-                    id="nested-list-subheader"
-                    onClick={handleToggle}
-                  >
-                    <Box
-                      sx={{
-                        fontWeight: "700",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                      onClick={handleToggle}
-                    >
-                      <AssignmentTurnedInOutlinedIcon className="text-green-600" />
-                      <span>Completed</span>
-                    </Box>
-                    {open ? (
-                      <ExpandLessIcon onClick={handleToggle} />
-                    ) : (
-                      <ExpandMoreIcon onClick={handleToggle} />
-                    )}
-                  </ListItemButton>
-                </List>
-              </div>
-              <div className="file-container outline-none mt-5  " tabIndex="0">
-                <div className="px-4 sm:px-0 flex justify-between">
-                  <h3 className="text-2xl font-semibold leading-7 text-gray-900">
-                    Assignment
-                  </h3>
-                  <div className="flex gap-5 text-red-700 italic text-sm	font-semibold items-center">
-                    {submissionStatus === 1 && (
-                      <p>
-                        Submited in{" "}
-                        {formatDateString(assignmentSubmitted.SubmissionDate)}
-                      </p>
-                    )}
-                    <button
-                      className="flex-none rounded-md  hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                      onClick={() => {
-                        if (submissionStatus === 1) {
-                          handleChangeStatus();
-                        } else {
-                          handleChangeStatus();
-                          handleSubmit();
-                        }
-                      }}
-                    >
-                      {submissionStatus === 1 ? "Undo Submit" : " Submit"}
-                    </button>
+                      <NoResultFound />
+                    )} */}
                   </div>
                 </div>
-                <div className="mt-6 border-t border-gray-100">
-                  <dl className="divide-y divide-gray-100">
-                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt className="text-base	 font-medium leading-6 text-gray-900">
-                        Title
+                <div className="course-file-viewer gap-5 w-[30%]  mr-5">
+                  <div
+                    className="file-container outline-none mt-5  "
+                    tabIndex="0"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="italic text-red-700 font-semibold">
+                        Mon, Mar 11, 2024, 8:04 AM
+                      </span>
+                      <button
+                        className="flex-none rounded-md  hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        onClick={() => {
+                          if (submissionStatus === 1) {
+                            handleChangeStatus();
+                          } else {
+                            handleChangeStatus();
+                          }
+                        }}
+                      >
+                        {submissionStatus === 1 ? "Undo Submit" : " Submit"}
+                      </button>
+                    </div>
+                    <AssignmentList />
+                    <div className=" py-2 ">
+                      <dt className="text-base 	font-medium leading-6 text-gray-900">
+                        Due in{" "}
+                        <span>{formatDateString(assignment?.EndDate)}</span>
                       </dt>
-                      <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        {assignment?.AssignmentTitle}
+                    </div>
+                    <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
+                      <dt className="text-base 	font-medium leading-6 text-gray-900">
+                        <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
+                          Instructions
+                        </span>
+                      </dt>
+                      <dd className="mt-2 ml-4 text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <p className="py-2 px-3">
+                          {getText(assignment?.AssignmentDesc)}
+                        </p>
                       </dd>
                     </div>
-                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt className="text-base	 font-medium leading-6 text-gray-900">
-                        Date
+                    <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
+                      <dt className="text-base 	font-medium leading-6 text-gray-900">
+                        <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
+                          Attachments
+                        </span>
                       </dt>
-                      <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        {assignment?.StartDate ? (
-                          <span>
-                            {formatDateString(assignment?.StartDate)} -{" "}
-                          </span>
-                        ) : (
-                          <span>
-                            <em>None - </em>
-                          </span>
-                        )}
-                        {assignment?.EndDate ? (
-                          <span>{formatDateString(assignment?.EndDate)}</span>
-                        ) : (
-                          <span>
-                            <em>None</em>
-                          </span>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt className="text-base	 font-medium leading-6 text-gray-900">
-                        About
-                      </dt>
-                      <dd className="mt-1 text-base	 leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        {assignment?.AssignmentDesc ? (
-                          <span>{getText(assignment?.AssignmentDesc)}</span>
-                        ) : (
-                          <span>
-                            <em>None</em>
-                          </span>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt className="text-base	 font-medium leading-6 text-gray-900">
-                        Attachments
-                      </dt>
-                      <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                        {attachFile?.length > 0 ? (
-                          <ul
-                            role="list"
-                            className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                          >
-                            <>
-                              {attachFile?.map((file, index) => (
-                                <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
+                      <dd className="mt-2 ml-4 text-base  bg-zinc-100 rounded-xl	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <ul role="list">
+                          <dd className=" text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
+                            <ul role="list">
+                              <li className="flex items-center justify-between first:pt-3 last:pb-3 py-2 px-3 text-sm leading-4">
+                                <input
+                                  type="radio"
+                                  id={`hosting-small`}
+                                  name="hosting"
+                                  value="hosting-small"
+                                  className="hidden peer"
+                                  required
+                                />
+                                <label
+                                  htmlFor={`hosting-small`}
+                                  class="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 		peer-checked:outline-1 peer-checked:outline	     peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100 "
+                                >
                                   <div className="flex w-0 flex-1 items-center">
                                     <PaperClipIcon
                                       className="h-5 w-5 flex-shrink-0 text-gray-400"
@@ -449,184 +400,189 @@ export default function CourseAssignment() {
                                     />
                                     <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                       <span className="truncate font-medium">
-                                        {file?.FileTitle}
+                                        Hello
                                       </span>
                                     </div>
                                   </div>
                                   <div className="ml-4 flex-shrink-0 flex items-center gap-4">
                                     <a
-                                      href={file?.FileUrl}
                                       download
                                       className="font-medium  text-indigo-600 hover:text-indigo-500"
                                     >
                                       Download
                                     </a>
-                                    <VisibilityIcon className="hover:text-indigo-500 cursor-pointer" />
                                   </div>
-                                </li>
-                              ))}
-                            </>
-                          </ul>
-                        ) : (
-                          <span>
-                            <em>None</em>
-                          </span>
-                        )}
-                      </dd>
-                    </div>
-
-                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt className="text-base	font-medium leading-6 text-gray-900">
-                        My work
-                      </dt>
-                      <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                        <ul
-                          role="list"
-                          className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                        >
-                          <div className="  flex-col  divide-y divide-gray-100">
-                            <div className="flex-col">
-                              <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center ">
-                                <div className="flex items-center justify-center gap-1">
-                                  <AttachmentIcon />
-                                  <span>Attach</span>
-                                </div>
+                                </label>
+                              </li>
+                              <li className="flex items-center justify-between first:pt-3 last:pb-3 py-2 px-3 text-sm leading-4">
                                 <input
-                                  ref={fileInputRef}
-                                  type="file"
-                                  style={{ display: "none" }}
-                                  onChange={handleFileSelect}
-                                  multiple
-                                  disabled={submissionStatus === 1}
+                                  type="radio"
+                                  id={`hosting-small`}
+                                  name="hosting"
+                                  value="hosting-small"
+                                  className="hidden peer"
+                                  required
                                 />
-
-                                <button
-                                  onClick={handleChangeClick}
-                                  type="button"
-                                  className={`rounded-md ${
-                                    submissionStatus === 1 &&
-                                    "	 cursor-not-allowed	"
-                                  } bg-white  px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50`}
+                                <label
+                                  htmlFor={`hosting-small`}
+                                  class="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 		peer-checked:outline-1 peer-checked:outline	     peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100 "
                                 >
-                                  Select files
-                                </button>
-                              </p>
-                              <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
-                                {submissionFiles && (
-                                  <>
-                                    {submissionFiles.map(
-                                      (submissionFile, index) => (
-                                        <li
-                                          key={index}
-                                          className="flex   border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
-                                        >
-                                          <div className="flex w-0 flex-1 items-center">
-                                            <PaperClipIcon
-                                              className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                              aria-hidden="true"
-                                            />
-                                            <div className="ml-4 flex min-w-0 flex-1 gap-2 justify-between">
-                                              <span className="truncate font-medium text-blue-500">
-                                                {submissionFile.fileTitle}
-                                              </span>
-                                              <div className="flex gap-3 justify-center items-center">
-                                                <a
-                                                  href={submissionFile?.fileUrl}
-                                                  download
-                                                  className="font-medium  text-indigo-600 hover:text-indigo-500"
-                                                >
-                                                  Download
-                                                </a>
-
-                                                {submissionStatus === 0 ? (
-                                                  <CloseIcon
-                                                    onClick={() =>
-                                                      handleDeleteFile(
-                                                        submissionFile.assignmentFileId
-                                                      )
-                                                    }
-                                                    fontSize="small"
-                                                  />
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </li>
-                                      )
-                                    )}
-                                  </>
-                                )}
-                              </dd>
-                              <div>
-                                {selectedFiles && (
-                                  <>
-                                    {selectedFiles.map((file, index) => (
-                                      <li
-                                        key={index}
-                                        className="flex mx-8 border-b border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
-                                      >
-                                        <div className="flex w-0 flex-1 items-center">
-                                          <PaperClipIcon
-                                            className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                            aria-hidden="true"
-                                          />
-                                          <div className="ml-4 flex min-w-0 flex-1 gap-2 justify-between">
-                                            <span className="truncate font-medium text-blue-500">
-                                              {file.name}
-                                            </span>
-                                            <CloseIcon fontSize="small" />
-                                          </div>
-                                        </div>
-                                      </li>
-                                    ))}
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                                  <div className="flex w-0 flex-1 items-center">
+                                    <PaperClipIcon
+                                      className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
+                                      <span className="truncate font-medium">
+                                        Hello
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="ml-4 flex-shrink-0 flex items-center gap-4">
+                                    <a
+                                      download
+                                      className="font-medium  text-indigo-600 hover:text-indigo-500"
+                                    >
+                                      Download
+                                    </a>
+                                  </div>
+                                </label>
+                              </li>
+                            </ul>
+                          </dd>
                         </ul>
                       </dd>
                     </div>
-                    {assignmentSubmitted?.Status === 1 && (
-                      <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-base	 font-medium leading-6 text-gray-900">
-                          Teacher's evaluation
-                        </dt>
-                        <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
-                          <ul
-                            role="list"
-                            className="divide-y divide-gray-100 rounded-md border border-gray-200"
-                          >
-                            <div className="  flex-col  divide-y divide-gray-100">
-                              <div className="flex-col">
-                                <p className="font-semibold gap-4 py-4 pl-4 pr-5   flex items-center justify-between ">
-                                  <div className="flex w-full gap-4">
-                                    <span>Points</span>
-                                    <span>{assignmentSubmitted.Score}</span>
-                                  </div>
-                                </p>
-                              </div>
-                              <p className="flex-col">
-                                <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  justify-between ">
-                                  <div className="flex flex-col gap-4">
-                                    <span>Review</span>
-                                    <span className="font-normal">
-                                      {getText(assignmentSubmitted.Review)}
+                    <div className="flex-col">
+                      <p className="font-semibold gap-4 py-4    flex justify-between ">
+                        <div className="bg-zinc-100 px-3 py-1 flex items-center rounded-xl justify-center gap-1">
+                          <AttachmentIcon />
+                          <span>Attach</span>
+                        </div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          style={{ display: "none" }}
+                          onChange={handleFileSelect}
+                          multiple
+                          disabled={submissionStatus === 1}
+                        />
+
+                        <button
+                          onClick={handleChangeClick}
+                          type="button"
+                          className={`rounded-md ${
+                            submissionStatus === 1 && "	 cursor-not-allowed	"
+                          } bg-white  px-2.5 py-1.5 text-sm font-semibold text-black hover:outline-blue-600 hover:outline shadow-sm ring-1 ring-inset ring-gray-300 hover:opacity-80`}
+                        >
+                          Select files
+                        </button>
+                      </p>
+                      <dd className="mt-2  text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
+                        {submissionFiles && (
+                          <>
+                            {submissionFiles.map((submissionFile, index) => (
+                              <li
+                                key={index}
+                                className="flex   border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                              >
+                                <div className="flex w-0 flex-1 items-center">
+                                  <PaperClipIcon
+                                    className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                    aria-hidden="true"
+                                  />
+                                  <div className="ml-4 flex min-w-0 flex-1 gap-2 justify-between">
+                                    <span className="truncate font-medium text-blue-500">
+                                      {submissionFile.fileTitle}
                                     </span>
+                                    <div className="flex gap-3 justify-center items-center">
+                                      <a
+                                        href={submissionFile?.fileUrl}
+                                        download
+                                        className="font-medium  text-indigo-600 hover:text-indigo-500"
+                                      >
+                                        Download
+                                      </a>
+
+                                      {submissionStatus === 0 ? (
+                                        <CloseIcon
+                                          onClick={() =>
+                                            handleDeleteFile(
+                                              submissionFile.assignmentFileId
+                                            )
+                                          }
+                                          fontSize="small"
+                                        />
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </p>
-                            </div>
-                          </ul>
-                        </dd>
+                              </li>
+                            ))}
+                          </>
+                        )}
+                      </dd>
+                      <div>
+                        {selectedFiles && (
+                          <div className="ml-4 bg-zinc-100 rounded-md">
+                            {selectedFiles.map((file, index) => (
+                              <li
+                                key={index}
+                                className="flex  last:border-none	 items-center justify-between py-2 pl-4 pr-5 text-sm leading-6"
+                              >
+                                <div className="flex w-0 flex-1 items-center">
+                                  <PaperClipIcon
+                                    className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                    aria-hidden="true"
+                                  />
+                                  <div className="ml-4 flex min-w-0 flex-1 gap-2 justify-between">
+                                    <span className="truncate font-medium text-blue-500">
+                                      {file.name}
+                                    </span>
+                                    <CloseIcon fontSize="small" />
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </dl>
+                    </div>
+                    <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
+                      <dt className="text-base 	font-medium leading-6 text-gray-900">
+                        <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
+                          Review & evaluation
+                        </span>
+                      </dt>
+                      <dd className="mt-2 ml-4 text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <p className="py-2 px-3 flex flex-col gap-3">
+                          <div className="flex justify-between items-center">
+                            <div className="flex justify-center gap-3">
+                              <CreditScoreIcon />
+                              <span className=" font-semibold">Points</span>
+                            </div>
+                            <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-base font-semibold text-red-700 ring-1 ring-inset ring-red-600/10">
+                              10
+                            </span>
+                          </div>
+                          <div className="flex flex-col items-start">
+                            <div className="flex justify-center gap-3">
+                              <ReviewsIcon />
+                              <span className=" font-semibold">Review </span>
+                            </div>
+                            <p className="mt-1">
+                              Hello Hello Hello Hello Hello Hello Hello Hello
+                            </p>
+                          </div>
+                        </p>
+                      </dd>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
             <div className="h-[100vh - 60px]">
               <NoResultFound />

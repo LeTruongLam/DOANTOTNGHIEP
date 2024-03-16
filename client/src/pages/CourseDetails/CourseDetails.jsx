@@ -26,7 +26,7 @@ import ChapterList from "./CourseChapter/ChapterList";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 const CourseDetails = () => {
-  const { fetchLesson, fetchCourseById } = useContext(AuthContext);
+  const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
   const [courseId, setCourseId] = useState(location.state?.courseId);
   const navigate = useNavigate();

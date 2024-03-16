@@ -1,6 +1,6 @@
 import { db } from "../../db.js";
 import jwt from "jsonwebtoken";
-
+import { v4 as uuidv4 } from "uuid";
 export const authorize = (req, res, next) => {
   const token = req.cookies.access_token;
 
@@ -16,6 +16,7 @@ export const authorize = (req, res, next) => {
     return res.status(403).json("Token is not valid!");
   }
 };
+// Lấy thông tin 1 bài assignment
 export const getAssignment = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
@@ -38,6 +39,28 @@ export const getAssignment = (req, res) => {
     });
   });
 };
+// Lấy thông tin 1 bài assignment theo assignmentId
+export const getAssignmentById = (req, res) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+    const assignmentId = req.params.assignmentId;
+    const q = `
+      SELECT assignments.*, courses.title as CourseTitle
+      FROM assignments
+      JOIN chapters ON assignments.ChapterId = chapters.ChapterId
+      JOIN courses ON courses.CourseId = chapters.CourseId
+      WHERE assignments.AssignmentId = ?`;
+    db.query(q, [assignmentId], (err, result) => {
+      if (err) return res.status(500).json(err);
+      const data = result[0];
+      return res.status(200).json(data);
+    });
+  });
+};
+// Lấy thông tin nhiều bài assignment
 
 export const getAssignments = (req, res) => {
   const token = req.cookies.access_token;
@@ -59,6 +82,8 @@ export const getAssignments = (req, res) => {
   });
 };
 
+// Xóa 1 bài assignment
+
 export const deleteAssignment = (req, res) => {
   const chapterId = req.params.chapterId;
   const assignmentId = req.params.assignmentId;
@@ -72,6 +97,7 @@ export const deleteAssignment = (req, res) => {
     return res.status(200).json({ message: "Assignment deleted successfully" });
   });
 };
+// Thêm title assignment
 
 export const addAssignmentTitle = (req, res) => {
   const assignmentTitle = req.body.assignmentTitle;
@@ -445,15 +471,14 @@ export const updatePointAssignment = (req, res) => {
   });
 };
 
-// Sinh viên lấy thông tin bài đã nộp
+// lấy thông tin bài đã nộp
 export const getAssignmentSubmitted = (req, res) => {
-  const assignmentId = req.params.assignmentId;
-  const userId = req.params.userId;
+  const submissionId = req.params.submissionId;
   const q = `SELECT sb.*, s.StudentName, s.StudentCode FROM submissions sb
           JOIN students s ON s.UserId = sb.UserId
-          WHERE sb.AssignmentId = ? AND sb.UserId = ?`;
+          WHERE sb.SubmissionId = ? `;
 
-  db.query(q, [assignmentId, userId], (err, data) => {
+  db.query(q, [submissionId], (err, data) => {
     if (err) {
       return res.status(500).json({ error: "Database error!" });
     }
@@ -461,7 +486,6 @@ export const getAssignmentSubmitted = (req, res) => {
     if (data.length === 0) {
       return res.json({ message: "No assignment submission found." });
     }
-
     return res.json(data);
   });
 };
@@ -485,15 +509,16 @@ export const updateSubmissionStatus = (req, res) => {
 };
 
 export const insertAssignmentSubmission = (req, res) => {
+  const submissionId = uuidv4();
   const assignmentId = req.body.assignmentId;
   const chapterId = req.body.chapterId;
   const userId = req.body.userId;
   const courseId = req.body.courseId;
-  const query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate) VALUES (?, ?, ?, ?, NOW());`;
+  const query = `INSERT INTO submissions (SubmissionId,AssignmentId, UserId, ChapterId, CourseId, SubmissionDate) VALUES (?,?, ?, ?, ?, NOW());`;
 
   db.query(
     query,
-    [assignmentId, userId, chapterId, courseId],
+    [submissionId, assignmentId, userId, chapterId, courseId],
     (err, result) => {
       if (err) {
         console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
@@ -554,16 +579,17 @@ export const getAllAssignmentsOfCourse = (req, res) => {
     });
   });
 };
+// Lấy tất cả sinh viên của 1 lớp có nộp bài hoặc chưa
+
 export const getAllStudentAndAssignmentStatus = (req, res) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json("Not authenticated!");
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
-
     const classId = req.params.classId;
     const assignmentId = req.params.assignmentId;
     const q = `
-    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, sb.UserId
+    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, s.UserId
     FROM students s
     JOIN class_student sc ON s.StudentId = sc.StudentId
     JOIN classes c ON sc.ClassId = c.ClassId
@@ -580,4 +606,34 @@ export const getAllStudentAndAssignmentStatus = (req, res) => {
       return res.status(200).json(data);
     });
   });
+};
+// Giao vien tao bai submission neu sinh vien khong nop bai
+
+export const insertAssignmentSubmissionTeacher = (req, res) => {
+  const submissionId = uuidv4();
+  const assignmentId = req.body.assignmentId;
+  const chapterId = req.body.chapterId;
+  const userId = req.body.userId;
+  const courseId = req.body.courseId;
+  let status = 0;
+  const query = `INSERT INTO submissions (SubmissionId,AssignmentId, UserId, ChapterId, CourseId, Status) VALUES (?,?, ?, ?, ?,?);`;
+
+  db.query(
+    query,
+    [submissionId, assignmentId, userId, chapterId, courseId, status],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({
+          success: false,
+          message: "Lỗi",
+        });
+      } else {
+        const id = submissionId
+        res.status(201).json({
+          data: id,
+        });
+      }
+    }
+  );
 };

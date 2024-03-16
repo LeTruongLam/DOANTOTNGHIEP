@@ -19,7 +19,7 @@ cloudinary.config({
   api_secret: "hjuus8X3RczPHUlpy0RW46RtRFc",
   secure: true,
 });
-
+// Đăng video bài học
 router.post("/uploadVideo", upload.single("video"), (req, res) => {
   const { chapterTitle, chapterDesc, courseId } = req.body;
   let videoUrl = "";
@@ -43,6 +43,7 @@ router.post("/uploadVideo", upload.single("video"), (req, res) => {
   }
 });
 
+// Sửa video bài học
 router.put(
   "/:chapterId/uploadLessonVideo/:lessonId",
   upload.single("video"),
@@ -134,6 +135,7 @@ router.put("/updateChapter/:chapterId", upload.single("video"), (req, res) => {
   );
 });
 
+
 router.post("/uploadImage", upload.single("image"), (req, res) => {
   if (req.file) {
     cloudinary.uploader
@@ -214,6 +216,7 @@ router.post(
     }
   }
 );
+// Giáo viên đăng tài liệu assignmetns
 function insertAssignmentFile(
   assignmentFileId,
   fileTitle,
@@ -246,13 +249,12 @@ function insertAssignmentFile(
     }
   );
 }
-
+// Giáo viên đăng tài liệu assignmetns
 router.post(
   "/chapters/uploadAssignmentFile/:assignmentId",
   upload.single("document"),
   (req, res) => {
     const { assignmentId } = req.params;
-    console.log(req.file);
     if (req.file) {
       cloudinary.uploader
         .upload(req.file.path, {
@@ -288,6 +290,7 @@ router.post(
     }
   }
 );
+// Sinh viên nộp bài submission
 
 function submitAssignment(
   assignmentId,

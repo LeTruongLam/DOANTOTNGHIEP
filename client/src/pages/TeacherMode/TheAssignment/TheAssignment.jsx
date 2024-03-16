@@ -7,7 +7,7 @@ const TheAssignment = () => {
   const { courses, fetchCourses } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleEdit = async (courseTitle, courseId) => {
-    navigate(`/assignments/${courseTitle}`, {
+    navigate(`/course/${courseId}/assignments`, {
       state: { courseId: courseId, courseTitle: courseTitle },
     });
   };

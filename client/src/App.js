@@ -67,6 +67,7 @@ function App() {
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course/:courseTitle"
+                exact
                 element={
                   <Layout>
                     <CourseDetails />
@@ -77,6 +78,7 @@ function App() {
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course"
+                exact
                 element={
                   <Layout>
                     <Course />
@@ -87,6 +89,7 @@ function App() {
             <Route element={<TeacherRouter />}>
               <Route
                 path="/course/create"
+                exact
                 element={
                   <LayoutTeacher>
                     <CourseStepper />
@@ -96,7 +99,8 @@ function App() {
             </Route>
             <Route element={<TeacherRouter />}>
               <Route
-                path="/assignments/:courseTitle"
+                path="/course/:courseId/assignments"
+                exact
                 element={
                   <LayoutTeacher>
                     <AssignmentView />
@@ -124,6 +128,7 @@ function App() {
             <Route element={<TeacherRouter />}>
               <Route
                 path="/dashboard"
+                exact
                 element={
                   <LayoutTeacher>
                     <TheDashboard />
@@ -134,6 +139,7 @@ function App() {
             <Route element={<TeacherRouter />}>
               <Route
                 path="/assignments"
+                exact
                 element={
                   <LayoutTeacher>
                     <TheAssignment />
@@ -141,11 +147,13 @@ function App() {
                 }
               />
               <Route
-                path="/Assignment-Detail/:submissionId"
+                path="/course/:courseId/assignment/:assignmentId/assignment-detail/:submissionId"
+                exact
                 element={<AssignmentDetail />}
               />
               <Route
-                path="/assignments/:courseTitle/classroom"
+                path="/course/:courseId/assignment/:assignmentId/classrooms"
+                exact
                 element={
                   <LayoutTeacher>
                     <AssignmentListStudent />
@@ -190,6 +198,7 @@ function App() {
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course/:courseTitle/document/:chapterId"
+                exact
                 element={
                   <LayoutViewer>
                     <CourseFileViewer />
@@ -200,6 +209,7 @@ function App() {
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course/:courseTitle/assignment/:chapterId"
+                exact
                 element={
                   <LayoutViewer>
                     <CourseAssignment />
@@ -210,6 +220,7 @@ function App() {
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course/:courseTitle/lecture/:lessonId"
+                exact
                 element={
                   <LayoutViewer>
                     <CourseVideo />

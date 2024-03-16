@@ -50,41 +50,41 @@ const Sidebar = () => {
     <div className=" min-w-[250px] border-r border-slate-300 flex flex-col justify-between ">
       <Container>
         <SlickBar>
-          <Item exact className="mt-10 " activeClassName="active" to="/">
+          <Item exact className="mt-10 hover:bg-slate-200 " activeClassName="active" to="/">
             <HomeIcon />
             <Text className="inline ">Home</Text>
           </Item>
           <Item
             activeClassName="active"
             to="/dashboard"
-            className={
+            className={`${
               location.pathname.startsWith("/write") ||
               location.pathname.startsWith("/course/create")
                 ? "active"
                 : ""
-            }
+            } hover:bg-slate-200`}
           >
             <ListAltIcon />
             <Text>Courses</Text>
           </Item>
-          <Item activeClassName="active" to="/calender">
+          <Item className="hover:bg-slate-200" activeClassName="active" to="/calender">
             <CalendarMonthIcon />
             <Text>Calender</Text>
           </Item>
           <Item
             activeClassName="active"
             to="/assignments"
-            className={
+            className={`${
               location.pathname === "/assignment/view" ||
               location.pathname.startsWith("/assignmentDetail/")
                 ? "active"
                 : ""
-            }
+              } hover:bg-slate-200`   }
           >
             <AssignmentIndIcon />
             <Text>Assignments</Text>
           </Item>
-          <Item activeClassName="active" to="/bankquestion">
+          <Item className="hover:bg-slate-200" activeClassName="active" to="/bankquestion">
             <QuizIcon />
             <Text className="inline">Bank Questions</Text>
           </Item>

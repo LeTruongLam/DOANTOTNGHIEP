@@ -1,5 +1,6 @@
 import { db } from "../../db.js";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 export const authorize = (req, res, next) => {
   const token = req.cookies.access_token;
@@ -23,12 +24,12 @@ export const getClassCourse = (req, res) => {
 
   jwt.verify(token, "jwtkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
-
     const courseId = req.params.courseId;
     const q = `
-      SELECT *
+      SELECT classes.* , courses.title
       FROM classes
-      WHERE CourseId = ?
+      JOIN courses ON classes.CourseId = courses.CourseId
+      WHERE classes.CourseId = ?
     `;
 
     db.query(q, [courseId], (err, data) => {
@@ -45,7 +46,7 @@ export const addClassCourse = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const { classCode, teacherId } = req.body;
-
+    const classId = uuidv4();
     const checkDuplicateQ = `
       SELECT COUNT(*) AS count
       FROM classes
@@ -53,8 +54,8 @@ export const addClassCourse = (req, res) => {
     `;
 
     const insertClassQ = `
-      INSERT INTO classes (ClassCode, CourseId, TeacherId)
-      VALUES (?, ?, ?)
+      INSERT INTO classes (ClassId, ClassCode, CourseId, TeacherId)
+      VALUES (?, ?, ?, ?)
     `;
 
     db.query(checkDuplicateQ, [classCode], (err, result) => {
@@ -67,7 +68,7 @@ export const addClassCourse = (req, res) => {
 
       db.query(
         insertClassQ,
-        [classCode, req.params.courseId, teacherId],
+        [classId, classCode, req.params.courseId, teacherId],
         (err, result) => {
           if (err) return res.status(500).json(err);
           return res.status(201).json({ message: "Class added successfully" });
@@ -193,16 +194,16 @@ export const getClassStudent = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     const courseId = req.params.courseId;
-    const classCode = req.params.classCode;
+    const classId = req.params.classId;
     const q = `
       SELECT students.StudentName, students.StudentCode,students.UserId, classes.*
       FROM class_student
       JOIN students ON class_student.StudentId =  students.StudentId
       JOIN classes ON class_student.ClassId = classes.ClassId
-      WHERE classes.CourseId = ? AND classes.ClassCode = ?
+      WHERE classes.CourseId = ? AND classes.ClassId = ?
     `;
 
-    db.query(q, [courseId, classCode], (err, data) => {
+    db.query(q, [courseId, classId], (err, data) => {
       if (err) return res.status(500).json(err);
       return res.status(200).json(data);
     });

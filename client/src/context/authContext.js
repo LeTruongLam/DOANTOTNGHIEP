@@ -9,6 +9,7 @@ export const AuthContexProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
   const [courses, setCourses] = useState([]);
+  const [chapters, setChapters] = useState([]);
 
   const [expiredToken, setExpiredToken] = useState(false);
   const login = async (inputs) => {
@@ -22,7 +23,7 @@ export const AuthContexProvider = ({ children }) => {
   const fetchChapter = async (CourseId) => {
     try {
       const reschapter = await axios.get(`/courses/${CourseId}/chapters`);
-
+      setChapters(reschapter.data);
       return reschapter.data;
     } catch (err) {
       console.log(err);
@@ -101,6 +102,7 @@ export const AuthContexProvider = ({ children }) => {
       value={{
         currentUser,
         courses,
+        chapters,
         fetchCourses,
         login,
         logout,

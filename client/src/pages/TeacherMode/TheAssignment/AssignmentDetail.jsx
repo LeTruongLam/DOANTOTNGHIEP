@@ -2,7 +2,7 @@
 import React, { useEffect, Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "../../course/course.scss";
 import axios from "axios";
 import ReactQuill from "react-quill";
@@ -14,20 +14,7 @@ import Button from "@mui/material/Button";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import BlockIcon from "@mui/icons-material/Block";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-// const docs = [
-//   {
-//     uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
-//   },
-//   {
-//     uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001833/CourseDocument/a5l3oeffz42tcaqb2qum.pptx",
-//   },
-//   {
-//     uri: "https://res.cloudinary.com/ddwapzxdc/image/upload/v1701011815/CourseDocument/och5g3ajzkracjjiuebo.pdf",
-//   },
-//   {
-//     uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701012003/CourseDocument/jrxk54u3qs8ncidv6twr.xlsx",
-//   },
-// ];
+import NoResultFound from "../../NotFounds/NoResultFound";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -35,6 +22,8 @@ function classNames(...classes) {
 export default function AssignmentDetail() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { submissionId, courseId, assignmentId } = useParams();
+
   const [selected, setSelected] = useState();
 
   const [assignment, setAssignment] = useState();
@@ -51,7 +40,7 @@ export default function AssignmentDetail() {
   const fetchAssignmentSubmitted = async () => {
     try {
       const res = await axios.get(
-        `/courses/assignments/${location.state?.assignmentId}/submitted/${location.state?.userId}`
+        `/courses/assignments/submitted/${submissionId}`
       );
       setSelected(res.data[0]);
       setAssignment(res.data[0]);
@@ -60,12 +49,14 @@ export default function AssignmentDetail() {
       setSelectedFile(res.data[0]?.SubmissionFiles[0]);
       setAssignmentReview(res.data[0]?.Review);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
   const docs = [
     {
-      uri: selectedFile.fileUrl || "",
+      uri:
+        selectedFile?.fileUrl ||
+        "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
     },
   ];
   useEffect(() => {
@@ -119,13 +110,18 @@ export default function AssignmentDetail() {
     } else {
       setSelectedFile([]);
     }
-    navigate(`/Assignment-Detail/${student?.SubmissionId}`, {
-      state: {
-        assignmentId: location.state?.assignmentId,
-        userId: student.UserId,
-        classStudent: classStudent,
-      },
-    });
+
+    navigate(
+      `/course/${courseId}/assignment/${assignmentId}/assignment-detail/${student?.SubmissionId}`,
+      {
+        state: {
+          classStudent: classStudent,
+        },
+      }
+    );
+  };
+  const handleExit = () => {
+    navigate(`/course/${courseId}/assignment/${assignmentId}/classrooms`);
   };
   return (
     <div className="flex flex-col">
@@ -139,7 +135,7 @@ export default function AssignmentDetail() {
               {assignment?.StudentName} {assignment?.StudentCode}
             </span>
           </div>
-          <div className="links">
+          <div className="links" onClick={handleExit}>
             <ExitToAppIcon />
             <span>Exit</span>
           </div>
@@ -147,8 +143,15 @@ export default function AssignmentDetail() {
       </div>
       <div className="body-height flex flex-row gap-5">
         <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
-          <div style={{ width: "100%", height: "100%" }}>
-            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+          <div className="w-full h-full">
+            {assignmentFiles ? (
+              <DocViewer
+                documents={docs}
+                pluginRenderers={DocViewerRenderers}
+              />
+            ) : (
+              <NoResultFound />
+            )}
           </div>
         </div>
         <div className="course-file-viewer gap-5 w-[30%]  mr-5">
@@ -292,7 +295,7 @@ export default function AssignmentDetail() {
                                             />
                                             <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                               <span className="truncate font-medium">
-                                                {assignmentFile.fileTitle}
+                                                {assignmentFile?.fileTitle}
                                               </span>
                                             </div>
                                           </div>

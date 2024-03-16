@@ -1,6 +1,5 @@
-import React, { useEffect, useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, Fragment, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -8,10 +7,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { formatDateString } from "../../../js/TAROHelper";
 import axios from "axios";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -22,6 +17,13 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import CheckIcon from "@mui/icons-material/Check";
 import BlockIcon from "@mui/icons-material/Block";
+import { Listbox, Transition } from "@headlessui/react";
+import { ChevronUpDownIcon } from "@heroicons/react/20/solid";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 const columns = [
   { id: "title", label: "Name", minWidth: 250 },
   {
@@ -84,51 +86,88 @@ function a11yProps(index) {
 }
 
 const AssignmentListStudent = () => {
+  const [selected, setSelected] = useState();
+  const { assignmentId, courseId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [classes, setClasses] = useState([]);
+  const [assignment, setAssignment] = useState();
   const [classId, setClassId] = useState();
   const [classCode, setClassCode] = useState("");
   const [classStudent, setClassStudent] = useState([]);
   useEffect(() => {
     fetchClassesOfCourse();
+    fetchAssignment();
   }, []);
   // Lấy danh sách lớp của môn học
   const fetchClassesOfCourse = async () => {
     try {
-      const res = await axios.get(`/classes/${location.state?.courseId}`);
+      const res = await axios.get(`/classes/${courseId}`);
       setClasses(res.data);
       setClassCode(res.data[0]?.ClassCode);
+      setSelected(res.data[0]?.ClassCode);
       fetchStudentAndAssignmentStatus(res.data[0]?.ClassId);
     } catch (error) {
       console.error(error);
     }
   };
-
+  // Lấy thông tin của assignment
+  const fetchAssignment = async () => {
+    try {
+      const res = await axios.get(`/courses/assignments/${assignmentId}`);
+      setAssignment(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const fetchStudentAndAssignmentStatus = async (classId) => {
     try {
       const res = await axios.get(
-        `/courses/assignments/${location.state?.assignmentId}/classroom/${classId}`
+        `/courses/assignments/${assignmentId}/classroom/${classId}`
       );
       setClassStudent(res.data);
     } catch (error) {
       console.error(error);
     }
   };
-  const handleToAssignmentDetail = (student) => {
-    navigate(`/Assignment-Detail/${student?.SubmissionId}`, {
-      state: {
-        assignmentId: location.state?.assignmentId,
-        userId: student.UserId,
-        classStudent: classStudent,
-      },
-    });
+  const handleToAssignmentDetail = async (student) => {
+    console.log(student);
+    if (student.SubmissionId) {
+      navigate(
+        `/course/${courseId}/assignment/${assignmentId}/assignment-detail/${student?.SubmissionId}`,
+        {
+          state: {
+            classStudent: classStudent,
+          },
+        }
+      );
+    } else {
+      try {
+        const res = await axios.post(
+          `/courses/chapters/${assignment.ChapterId}/submission/teacherAdd`,
+          {
+            assignmentId: assignmentId,
+            chapterId: assignment.ChapterId,
+            userId: student.UserId,
+            courseId: courseId,
+          }
+        );
+        let newSubmissionId = res.data.data;
+        navigate(
+          `/course/${courseId}/assignment/${assignmentId}/assignment-detail/${newSubmissionId}`,
+          {
+            state: {
+              classStudent: classStudent,
+            },
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
-  const handleChangeClass = (event) => {
-    setClassCode(event.target.value);
-  };
+
   const rows = classStudent?.map((student, index) => {
     return createData(
       `${student?.StudentName}  ${student?.StudentCode}`,
@@ -156,7 +195,7 @@ const AssignmentListStudent = () => {
       </button>
     );
   });
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -173,22 +212,24 @@ const AssignmentListStudent = () => {
     <div>
       <div className="py-4 border-b flex justify-between border-slate-300">
         <div>
-          <h1 className="font-semibold text-2xl	 ">
-            {location.state.assignment?.AssignmentTitle}
+          <h1 className="font-semibold text-3xl	mb-1 ">
+            {assignment?.AssignmentTitle}
           </h1>
-          <span className="opacity-70">
-            {"Due in "}
-            {formatDateString(location.state.assignment?.EndDate)}
+          <span className="text-lg">
+            <span className=" text-red-700 font-bold"> Due in </span>
+            <span className=" opacity-70">
+              {formatDateString(assignment?.EndDate)}
+            </span>
           </span>
         </div>
-        <input
+        {/* <input
           type="text"
           name="search-course"
           id="search-course"
           autoComplete="given-name"
           placeholder="Search students"
-          className=" outline-none block w-80 rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
-        />
+          className=" outline-none block w-80 rounded-md border-0 px-3.5 py-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
+        /> */}
       </div>
       <div className="mb-5">
         <Box sx={{ width: "100%" }}>
@@ -210,47 +251,99 @@ const AssignmentListStudent = () => {
                   />
                   <Tab
                     label={
-                      <span style={{ fontWeight: "bold" }}>
-                        Duplicate 
-                      </span>
+                      <span style={{ fontWeight: "bold" }}>Duplicate</span>
                     }
                     {...a11yProps(2)}
                     sx={{ textTransform: "none" }}
                   />
                 </Tabs>
               </div>
-              <FormControl
-                sx={{ m: 1, backgroundColor: "#fff", minWidth: 300 }}
-                size="medium"
-              >
-                <InputLabel id="demo-select-small-label">Class Code</InputLabel>
-                <Select
-                  labelId="demo-select-small-label"
-                  id="demo-select-small"
-                  value={classCode || ""}
-                  label="Class Code"
-                  onChange={handleChangeClass}
-                >
-                  {classes.map((classItem, classIndex) => (
-                    <MenuItem
-                      key={classIndex}
-                      value={classItem.ClassCode}
-                      onClick={() => {
-                        setClassCode(classItem.ClassCode);
+              <Listbox value={selected} onChange={setSelected}>
+                {({ open }) => (
+                  <div className="relative mt-2">
+                    <Listbox.Button className="relative w-full min-w-80 cursor-default rounded-md bg-white py-2 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                      <span className="flex items-center">
+                        <span className="ml-3 block truncate">
+                          {selected} - {assignment?.CourseTitle}
+                        </span>
+                      </span>
+                      <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+                        <ChevronUpDownIcon
+                          className="h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Listbox.Button>
 
-                        setClassId(classItem.ClassId);
-                        fetchStudentAndAssignmentStatus(classItem.ClassId);
-                      }}
+                    <Transition
+                      show={open}
+                      as={Fragment}
+                      leave="transition ease-in duration-100"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
                     >
-                      {classItem.ClassCode}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                      <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                        {classes.map((classItem, index) => (
+                          <Listbox.Option
+                            key={index}
+                            className={({ active }) =>
+                              classNames(
+                                active
+                                  ? "bg-indigo-600 text-white"
+                                  : "text-gray-900",
+                                "relative cursor-default select-none py-2 pl-3 pr-9"
+                              )
+                            }
+                            value={classItem.ClassCode}
+                            onClick={() => {
+                              setSelected(classItem?.ClassCode);
+                              setClassId(classItem.ClassId);
+                              fetchStudentAndAssignmentStatus(
+                                classItem.ClassId
+                              );
+                            }}
+                          >
+                            {({ selected, active }) => (
+                              <>
+                                <div className="flex items-center">
+                                  <span
+                                    className={classNames(
+                                      selected
+                                        ? "font-semibold"
+                                        : "font-normal",
+                                      "ml-3 block truncate"
+                                    )}
+                                  >
+                                    {classItem?.ClassCode} - {classItem?.title}
+                                  </span>
+                                </div>
+
+                                {selected ? (
+                                  <span
+                                    className={classNames(
+                                      active ? "text-white" : "text-indigo-600",
+                                      "absolute inset-y-0 right-0 flex items-center pr-4"
+                                    )}
+                                  >
+                                    <CheckIcon
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
+                                  </span>
+                                ) : null}
+                              </>
+                            )}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </Transition>
+                  </div>
+                )}
+              </Listbox>
             </div>
           </Box>
           <CustomTabPanel value={value} index={0}>
-            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+            <Paper sx={{ width: "100%", overflow: "hidden", marginTop: 1 }}>
               <TableContainer sx={{ height: "100%", minHeight: 450 }}>
                 <Table stickyHeader aria-label="sticky table">
                   <TableHead>
@@ -311,10 +404,8 @@ const AssignmentListStudent = () => {
               />
             </Paper>
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={2}>
-          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}></CustomTabPanel>
+          <CustomTabPanel value={value} index={2}></CustomTabPanel>
         </Box>
       </div>
     </div>

@@ -40,6 +40,7 @@ import {
 import {
   getAssignment,
   getAssignments,
+  getAssignmentById,
   deleteAssignment,
   addAssignmentTitle,
   getAssignmentTitle,
@@ -49,7 +50,7 @@ import {
   getAssignmentDate,
   updateAssignmentDate,
   getAssignmentFile,
-  // assignmentSubmission,
+  insertAssignmentSubmissionTeacher,
   getAssignmentSubmission,
   updateReviewAssignment,
   updatePointAssignment,
@@ -110,6 +111,7 @@ router.put("/chapters/:chapterId/lessons/desc/:lessonId", updateLessonDesc);
 // assignments
 router.get("/chapters/:chapterId/assignments", getAssignments);
 router.get("/chapters/:chapterId/assignments/:assignmentId", getAssignment);
+router.get("/assignments/:assignmentId", getAssignmentById);
 router.delete(
   "/chapters/:chapterId/assignments/:assignmentId",
   deleteAssignment
@@ -130,6 +132,7 @@ router.put(
 );
 router.post("/chapters/assignments", addAssignmentTitle);
 router.post("/chapters/:chapterId/submission", insertAssignmentSubmission);
+router.post("/chapters/:chapterId/submission/teacherAdd", insertAssignmentSubmissionTeacher);
 router.get(
   "/chapters/:chapterId/assignments/desc/:assignmentId",
   getAssignmentDesc
@@ -151,7 +154,7 @@ router.put("/assignments/score/:submissionId", updatePointAssignment);
 
 // Lấy thông tin của bài submitted
 router.get(
-  "/assignments/:assignmentId/submitted/:userId",
+  "/assignments/submitted/:submissionId",
   getAssignmentSubmitted
 );
 // sửa Status của bài tập submitted
@@ -167,5 +170,4 @@ router.get(
   "/assignments/:assignmentId/classroom/:classId",
   getAllStudentAndAssignmentStatus
 );
-
 export default router;
