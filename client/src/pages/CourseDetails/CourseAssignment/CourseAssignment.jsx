@@ -77,7 +77,20 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-
+const docs = [
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
+  },
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001833/CourseDocument/a5l3oeffz42tcaqb2qum.pptx",
+  },
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/image/upload/v1701011815/CourseDocument/och5g3ajzkracjjiuebo.pdf",
+  },
+  {
+    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701012003/CourseDocument/jrxk54u3qs8ncidv6twr.xlsx",
+  },
+];
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
@@ -88,7 +101,7 @@ export default function CourseAssignment() {
   const [assignment, setAssignment] = useState();
   const [assignmentList, setAssignmentList] = useState([]);
   const [attachFile, setAttachFile] = useState([]);
-  const [assignmentSubmitted, setAssignmentSubmitted] = useState(null);
+  const [assignmentSubmitted, setAssignmentSubmitted] = useState();
   const [submissionFiles, setSubmissionFiles] = useState([]);
   const [submissionStatus, setSubmissionStatus] = useState();
   const [assignmentId, setAssignmentId] = useState();
@@ -134,31 +147,25 @@ export default function CourseAssignment() {
         `/courses/chapters/${location.state?.chapterId}/assignmentfile/${assignmentId}`
       );
       setAttachFile(response.data);
+      // console.log(response.data)
     } catch (error) {
       console.error("Error fetching assignment files:", error);
     }
   };
   const fetchAssignmentSubmitted = async (assignmentId) => {
-    const token = localStorage.getItem("token");
     try {
       const response = await axios.get(
-        `/courses/assignments/${assignmentId}/submitted/${currentUser.UserId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-          },
-        }
+        `/courses/assignments/${assignmentId}/submitted/${currentUser.UserId}`
       );
-
       if (response.data.length > 0) {
         setSubmissionStatus(response.data[0].Status);
         setSubmissionFiles(response.data[0].SubmissionFiles);
         setAssignmentSubmitted(response.data[0]);
         setAssignmentId(response.data[0].AssignmentId);
       } else {
-        setAssignmentSubmitted(null);
-        setSubmissionFiles(null);
-        setSubmissionStatus(null);
+        setAssignmentSubmitted();
+        setSubmissionFiles([]);
+        setSubmissionStatus();
       }
     } catch (error) {
       console.error("Error fetching assignment Submitted:", error);
@@ -293,7 +300,7 @@ export default function CourseAssignment() {
           {assignment ? (
             <>
               <div className="body-height flex flex-row gap-5">
-                <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
+                <div className="w-[70%]  px-5 border-r border-slate-300 ">
                   <Box>
                     <Box>
                       <div className="flex justify-between items-center">
@@ -319,14 +326,10 @@ export default function CourseAssignment() {
                     <CustomTabPanel value={value} index={0}></CustomTabPanel>
                   </Box>
                   <div className="w-full h-full">
-                    {/* {assignmentFiles ? (
-                      <DocViewer
-                        documents={docs}
-                        pluginRenderers={DocViewerRenderers}
-                      />
-                    ) : (
-                      <NoResultFound />
-                    )} */}
+                    <DocViewer
+                      documents={docs}
+                      pluginRenderers={DocViewerRenderers}
+                    />
                   </div>
                 </div>
                 <div className="course-file-viewer gap-5 w-[30%]  mr-5">
@@ -335,11 +338,19 @@ export default function CourseAssignment() {
                     tabIndex="0"
                   >
                     <div className="flex justify-between items-center">
-                      <span className="italic text-red-700 font-semibold">
-                        Mon, Mar 11, 2024, 8:04 AM
-                      </span>
+                      {assignmentSubmitted &&
+                      assignmentSubmitted?.Status === 1 ? (
+                        <span className="italic text-red-700 font-semibold">
+                          {formatDateString(
+                            assignmentSubmitted?.SubmissionDate
+                          )}
+                        </span>
+                      ) : (
+                        <div></div>
+                      )}
+
                       <button
-                        className="flex-none rounded-md  hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                        className="flex-none rounded-md text-base hover:bg-blue-500 bg-black px-3 py-1.5  font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={() => {
                           if (submissionStatus === 1) {
                             handleChangeStatus();
@@ -351,47 +362,54 @@ export default function CourseAssignment() {
                         {submissionStatus === 1 ? "Undo Submit" : " Submit"}
                       </button>
                     </div>
-                    <AssignmentList />
-                    <div className=" py-2 ">
+                    <AssignmentList
+                      assignmentList={assignmentList}
+                      setAssignment={setAssignment}
+                      fetchAssignmentFiles={fetchAssignmentFiles}
+                      fetchAssignmentSubmitted={fetchAssignmentSubmitted}
+                    />
+                    <div className="px-2 py-2 ">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
                         Due in{" "}
                         <span>{formatDateString(assignment?.EndDate)}</span>
                       </dt>
                     </div>
-                    <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
+                    <div className="px-2 py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
                         <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
                           Instructions
                         </span>
                       </dt>
-                      <dd className="mt-2 ml-4 text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
-                        <p className="py-2 px-3">
-                          {getText(assignment?.AssignmentDesc)}
+                      <dd className="mt-2  text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <p className="py-2 px-3 italic opacity-90">
+                          {assignment?.AssignmentDesc
+                            ? getText(assignment?.AssignmentDesc)
+                            : "No value"}
                         </p>
                       </dd>
                     </div>
-                    <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
+                    <div className=" py-2 ">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
-                        <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
+                        <span className="bg-zinc-100 flex max-w-max items-center	mb-2 px-3 py-1 rounded-xl">
                           Attachments
                         </span>
                       </dt>
-                      <dd className="mt-2 ml-4 text-base  bg-zinc-100 rounded-xl	 text-gray-900 sm:col-span-2 sm:mt-0">
-                        <ul role="list">
-                          <dd className=" text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
-                            <ul role="list">
+                      <dd className="mt-2 text-base  bg-zinc-100 rounded-xl	 text-gray-900 sm:col-span-2 sm:mt-0">
+                        <dd className=" text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
+                          {attachFile.length > 0 ? (
+                            attachFile.map((file, index) => (
                               <li className="flex items-center justify-between first:pt-3 last:pb-3 py-2 px-3 text-sm leading-4">
                                 <input
                                   type="radio"
-                                  id={`hosting-small`}
+                                  id={`hosting-small-${index}`}
                                   name="hosting"
                                   value="hosting-small"
                                   className="hidden peer"
                                   required
                                 />
                                 <label
-                                  htmlFor={`hosting-small`}
-                                  class="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 		peer-checked:outline-1 peer-checked:outline	     peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100 "
+                                  htmlFor={`hosting-small-${index}`}
+                                  className="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 peer-checked:outline-1 peer-checked:outline peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100"
                                 >
                                   <div className="flex w-0 flex-1 items-center">
                                     <PaperClipIcon
@@ -400,61 +418,32 @@ export default function CourseAssignment() {
                                     />
                                     <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                       <span className="truncate font-medium">
-                                        Hello
+                                        {file?.FileTitle}
                                       </span>
                                     </div>
                                   </div>
                                   <div className="ml-4 flex-shrink-0 flex items-center gap-4">
                                     <a
+                                      href={file?.FileUrl}
                                       download
-                                      className="font-medium  text-indigo-600 hover:text-indigo-500"
+                                      className="font-medium text-indigo-600 hover:text-indigo-500"
                                     >
                                       Download
                                     </a>
                                   </div>
                                 </label>
                               </li>
-                              <li className="flex items-center justify-between first:pt-3 last:pb-3 py-2 px-3 text-sm leading-4">
-                                <input
-                                  type="radio"
-                                  id={`hosting-small`}
-                                  name="hosting"
-                                  value="hosting-small"
-                                  className="hidden peer"
-                                  required
-                                />
-                                <label
-                                  htmlFor={`hosting-small`}
-                                  class="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 		peer-checked:outline-1 peer-checked:outline	     peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100 "
-                                >
-                                  <div className="flex w-0 flex-1 items-center">
-                                    <PaperClipIcon
-                                      className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                      aria-hidden="true"
-                                    />
-                                    <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                                      <span className="truncate font-medium">
-                                        Hello
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="ml-4 flex-shrink-0 flex items-center gap-4">
-                                    <a
-                                      download
-                                      className="font-medium  text-indigo-600 hover:text-indigo-500"
-                                    >
-                                      Download
-                                    </a>
-                                  </div>
-                                </label>
-                              </li>
-                            </ul>
-                          </dd>
-                        </ul>
+                            ))
+                          ) : (
+                            <p className="py-2 px-3 italic opacity-90">
+                              No value
+                            </p>
+                          )}
+                        </dd>
                       </dd>
                     </div>
-                    <div className="flex-col">
-                      <p className="font-semibold gap-4 py-4    flex justify-between ">
+                    <div>
+                      <p className="font-semibold gap-4 py-2    flex justify-between ">
                         <div className="bg-zinc-100 px-3 py-1 flex items-center rounded-xl justify-center gap-1">
                           <AttachmentIcon />
                           <span>Attach</span>
@@ -478,13 +467,13 @@ export default function CourseAssignment() {
                           Select files
                         </button>
                       </p>
-                      <dd className="mt-2  text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
+                      <dd className="mt-2 bg-zinc-100  rounded-xl text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
                         {submissionFiles && (
                           <>
                             {submissionFiles.map((submissionFile, index) => (
                               <li
                                 key={index}
-                                className="flex   border-gray-100 last:border-none	 items-center justify-between py-4 pl-4 pr-5 text-sm leading-6"
+                                className="flex   border-gray-100 last:border-none	 items-center justify-between py-3 pl-4 pr-5 text-sm leading-6"
                               >
                                 <div className="flex w-0 flex-1 items-center">
                                   <PaperClipIcon
@@ -526,7 +515,7 @@ export default function CourseAssignment() {
                       </dd>
                       <div>
                         {selectedFiles && (
-                          <div className="ml-4 bg-zinc-100 rounded-md">
+                          <div className=" bg-zinc-100 rounded-md">
                             {selectedFiles.map((file, index) => (
                               <li
                                 key={index}
@@ -550,34 +539,36 @@ export default function CourseAssignment() {
                         )}
                       </div>
                     </div>
-                    <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
+                    <div className="px-2 py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
                         <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
                           Review & evaluation
                         </span>
                       </dt>
-                      <dd className="mt-2 ml-4 text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
-                        <p className="py-2 px-3 flex flex-col gap-3">
-                          <div className="flex justify-between items-center">
-                            <div className="flex justify-center gap-3">
-                              <CreditScoreIcon />
-                              <span className=" font-semibold">Points</span>
+                      {assignmentSubmitted && (
+                        <dd className="mt-2 text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
+                          <p className="py-2 px-3 flex flex-col gap-3">
+                            <div className="flex justify-between items-center">
+                              <div className="flex justify-center gap-3">
+                                <CreditScoreIcon />
+                                <span className=" font-semibold">Points</span>
+                              </div>
+                              <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-base font-bold text-red-700 ring-1 ring-inset ring-red-600/10">
+                                {assignmentSubmitted?.Score}
+                              </span>
                             </div>
-                            <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-base font-semibold text-red-700 ring-1 ring-inset ring-red-600/10">
-                              10
-                            </span>
-                          </div>
-                          <div className="flex flex-col items-start">
-                            <div className="flex justify-center gap-3">
-                              <ReviewsIcon />
-                              <span className=" font-semibold">Review </span>
+                            <div className="flex flex-col items-start">
+                              <div className="flex justify-center gap-3">
+                                <ReviewsIcon />
+                                <span className=" font-semibold">Review </span>
+                              </div>
+                              <p className="mt-1">
+                                {assignmentSubmitted?.Review}
+                              </p>
                             </div>
-                            <p className="mt-1">
-                              Hello Hello Hello Hello Hello Hello Hello Hello
-                            </p>
-                          </div>
-                        </p>
-                      </dd>
+                          </p>
+                        </dd>
+                      )}
                     </div>
                   </div>
                 </div>

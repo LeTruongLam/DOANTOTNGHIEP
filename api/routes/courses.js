@@ -55,6 +55,7 @@ import {
   updateReviewAssignment,
   updatePointAssignment,
   getAssignmentSubmitted,
+  getAssignmentSubmittedStudentView,
   updateSubmissionStatus,
   insertAssignmentSubmission,
   getAllAssignmentsOfCourse,
@@ -132,7 +133,10 @@ router.put(
 );
 router.post("/chapters/assignments", addAssignmentTitle);
 router.post("/chapters/:chapterId/submission", insertAssignmentSubmission);
-router.post("/chapters/:chapterId/submission/teacherAdd", insertAssignmentSubmissionTeacher);
+router.post(
+  "/chapters/:chapterId/submission/teacherAdd",
+  insertAssignmentSubmissionTeacher
+);
 router.get(
   "/chapters/:chapterId/assignments/desc/:assignmentId",
   getAssignmentDesc
@@ -152,10 +156,13 @@ router.put(
 router.put("/assignments/review/:submissionId", updateReviewAssignment);
 router.put("/assignments/score/:submissionId", updatePointAssignment);
 
-// Lấy thông tin của bài submitted
+// Lấy thông tin của bài submitted với vai trò giáo viên
+router.get("/assignments/submitted/:submissionId", getAssignmentSubmitted);
+
+// Lấy thông tin của bài submitted với vai trò sinh viên
 router.get(
-  "/assignments/submitted/:submissionId",
-  getAssignmentSubmitted
+  "/assignments/:assignmentId/submitted/:userId",
+  getAssignmentSubmittedStudentView
 );
 // sửa Status của bài tập submitted
 router.put(

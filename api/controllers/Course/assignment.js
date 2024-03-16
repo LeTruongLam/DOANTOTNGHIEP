@@ -489,6 +489,21 @@ export const getAssignmentSubmitted = (req, res) => {
     return res.json(data);
   });
 };
+
+// lấy thông tin bài đã nộp view student
+export const getAssignmentSubmittedStudentView = (req, res) => {
+  const assignmentId = req.params.assignmentId;
+  const userId = req.params.userId;
+  const q = `SELECT * FROM submissions 
+          WHERE AssignmentId = ? AND UserId`;
+
+  db.query(q, [assignmentId, userId], (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: "Database error!" });
+    }
+    return res.json(data);
+  });
+};
 export const updateSubmissionStatus = (req, res) => {
   const assignmentId = req.params.assignmentId;
   const submissionStatus = req.body.submissionStatus;
@@ -629,7 +644,7 @@ export const insertAssignmentSubmissionTeacher = (req, res) => {
           message: "Lỗi",
         });
       } else {
-        const id = submissionId
+        const id = submissionId;
         res.status(201).json({
           data: id,
         });
