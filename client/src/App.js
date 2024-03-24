@@ -26,6 +26,8 @@ import TeacherRouter from "./utils/TeacherRouter.jsx";
 import AssignmentView from "./pages/TeacherMode/TheAssignment/AssignmentView.jsx";
 import AssignmentListStudent from "./pages/TeacherMode/TheAssignment/AssignmentListStudent.jsx";
 import TheCalender from "./pages/TeacherMode/TheCalender.jsx";
+import BankQuestions from "./pages/TeacherMode/BankQuestions/BankQuestions.jsx";
+import BankQuestionView from "./pages/TeacherMode/BankQuestions/BankQuestionView.jsx";
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -160,14 +162,33 @@ function App() {
                   </LayoutTeacher>
                 }
               />
-                <Route
-                path="/calender"
-                element={<TheCalender />}
-              />
+              <Route path="/calender" element={<TheCalender />} />
             </Route>
             <Route element={<TeacherRouter />}>
               <Route
-                path="/write"
+                path="/bankquestion"
+                exact
+                element={
+                  <LayoutTeacher>
+                    <BankQuestions />
+                  </LayoutTeacher>
+                }
+              />
+              <Route element={<TeacherRouter />}>
+                <Route
+                  path="/bankquestion/course/:courseId"
+                  exact
+                  element={
+                    <LayoutTeacher>
+                      <BankQuestionView />
+                    </LayoutTeacher>
+                  }
+                />
+              </Route>
+            </Route>
+            <Route element={<TeacherRouter />}>
+              <Route
+                path="/course/write"
                 element={
                   <LayoutTeacher>
                     <CustomerCourse />

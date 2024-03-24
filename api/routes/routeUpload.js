@@ -2,6 +2,8 @@ import express from "express";
 const router = express.Router();
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+
 import { db } from "../db.js";
 import { updateLessonVideo } from "../controllers/Course/lesson.js";
 import { updateAssignmentFile } from "../controllers/Course/assignment.js";
@@ -134,7 +136,6 @@ router.put("/updateChapter/:chapterId", upload.single("video"), (req, res) => {
     }
   );
 });
-
 
 router.post("/uploadImage", upload.single("image"), (req, res) => {
   if (req.file) {
@@ -302,40 +303,41 @@ function submitAssignment(
   req,
   res
 ) {
+  const submissionId = uuidv4();
+
   const combinedFiles = [
     ...submissionFiles,
     ...(submittedFiles ? JSON.parse(submittedFiles) : []),
   ];
   const submissionFilesJson = JSON.stringify(combinedFiles);
   let query;
-
-  if (submittedFiles) {
-    query = `UPDATE submissions SET  SubmissionFiles = ? WHERE AssignmentId = ? AND UserId = ?`;
+  if (submittedFiles !== []) {
+    query = `UPDATE submissions SET SubmissionFiles = ? WHERE AssignmentId = ? AND UserId = ?`;
   } else {
-    query = `INSERT INTO submissions (AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, NOW(), ?);`;
+    query = `INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, ?, NOW(), ?);`;
   }
 
   const queryParams = submittedFiles
     ? [submissionFilesJson, assignmentId, userId]
-    : [assignmentId, userId, chapterId, courseId, submissionFilesJson];
+    : [submissionId, assignmentId, userId, chapterId, courseId, submissionFilesJson];
 
   db.query(query, queryParams, (err, result) => {
     if (err) {
       console.error(
-        "Lỗi khi chèn hoặc cập nhật dữ liệu tài liệu vào cơ sở dữ liệu: ",
+        "Error inserting or updating submission data into the database:",
         err
       );
       res.status(500).json({
         success: false,
-        message: "Lỗi",
+        message: "An error occurred",
       });
     } else {
       console.log(
-        "Dữ liệu tài liệu đã được chèn hoặc cập nhật vào cơ sở dữ liệu"
+        "Submission data has been inserted or updated into the database"
       );
       res.status(201).json({
         success: true,
-        message: "fileUrl đã được tải lên!",
+        message: "fileUrl has been uploaded!",
         data: result,
       });
     }
@@ -345,6 +347,7 @@ router.post(
   "/chapters/uploadAssignmentFile/:assignmentId/submission",
   upload.array("documentSubmit", 10),
   (req, res, next) => {
+    console.log("Up file");
     const assignmentId = req.body.assignmentId;
     const chapterId = req.body.chapterId;
     const userId = req.body.userId;

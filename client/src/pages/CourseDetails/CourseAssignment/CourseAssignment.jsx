@@ -7,46 +7,27 @@ import React, {
   useRef,
   useContext,
 } from "react";
+import Confetti from "react-confetti";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../course/course.scss";
-import Confetti from "react-confetti";
 import { AuthContext } from "../../../context/authContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 import CloseIcon from "@mui/icons-material/Close";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDateString, getText } from "../../../js/TAROHelper";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import List from "@mui/material/List";
-import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
-import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import AttachmentIcon from "@mui/icons-material/Attachment";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Collapse from "@mui/material/Collapse";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import NoResultFound from "../../NotFounds/NoResultFound";
-import AssignmentLateOutlinedIcon from "@mui/icons-material/AssignmentLateOutlined";
-import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import BlockIcon from "@mui/icons-material/Block";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Listbox, Transition } from "@headlessui/react";
 import AssignmentList from "./AssignmentList";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -77,25 +58,11 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const docs = [
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001607/CourseDocument/vroivwlk4k3bmev534cf.docx",
-  },
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701001833/CourseDocument/a5l3oeffz42tcaqb2qum.pptx",
-  },
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/image/upload/v1701011815/CourseDocument/och5g3ajzkracjjiuebo.pdf",
-  },
-  {
-    uri: "https://res.cloudinary.com/ddwapzxdc/raw/upload/v1701012003/CourseDocument/jrxk54u3qs8ncidv6twr.xlsx",
-  },
-];
+
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
   const listRef = useRef(null);
-  const [open, setOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [assignment, setAssignment] = useState();
@@ -106,7 +73,8 @@ export default function CourseAssignment() {
   const [submissionStatus, setSubmissionStatus] = useState();
   const [assignmentId, setAssignmentId] = useState();
   const [congratulation, setCongratulation] = useState(false);
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
+  const [selectedDoc, setSelectedDoc] = useState({});
 
   const [loading, setLoading] = useState(true);
 
@@ -124,6 +92,9 @@ export default function CourseAssignment() {
   const handleChangeClick = () => {
     fileInputRef.current.click();
   };
+  useEffect(() => {
+    fetchAssignmentData();
+  }, []);
   const fetchAssignmentData = async () => {
     setLoading(true);
     try {
@@ -147,7 +118,7 @@ export default function CourseAssignment() {
         `/courses/chapters/${location.state?.chapterId}/assignmentfile/${assignmentId}`
       );
       setAttachFile(response.data);
-      // console.log(response.data)
+      setSelectedDoc(response.data[0]);
     } catch (error) {
       console.error("Error fetching assignment files:", error);
     }
@@ -163,15 +134,19 @@ export default function CourseAssignment() {
         setAssignmentSubmitted(response.data[0]);
         setAssignmentId(response.data[0].AssignmentId);
       } else {
-        setAssignmentSubmitted();
+        setAssignmentSubmitted({});
         setSubmissionFiles([]);
-        setSubmissionStatus();
+        setSubmissionStatus(0);
       }
     } catch (error) {
       console.error("Error fetching assignment Submitted:", error);
     }
   };
-
+  const docs = [
+    {
+      uri: selectedDoc?.FileUrl,
+    },
+  ];
   const handleChangeStatus = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -191,79 +166,59 @@ export default function CourseAssignment() {
       console.error("Error updating assignment status:", error);
     }
   };
-  useEffect(() => {
-    fetchAssignmentData();
-  }, [location.state?.chapterId]);
 
-  // const handleNextAssignment = async (assignmentId) => {
-  //   setLoading(true);
-  //   try {
-  //     const chapterId = location.state?.chapterId;
-  //     const response = await axios.get(
-  //       `/courses/chapters/${chapterId}/assignments/${assignmentId}`
-  //     );
-  //     setAssignment(response.data);
-  //     fetchAssignmentFiles(assignmentId);
-  //     setLoading(false);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
+  const handleSubmit = async () => {
+    if (submissionStatus === 0) {
+      if (selectedFiles.length > 0) {
+        try {
+          const fileData = new FormData();
+          const length = selectedFiles.length;
+          for (let i = 0; i < length; i++) {
+            fileData.append("documentSubmit", selectedFiles[i]);
+          }
+          fileData.append("assignmentId", assignment.AssignmentId);
+          fileData.append("chapterId", location.state?.chapterId);
+          fileData.append("userId", currentUser.UserId);
+          fileData.append("courseId", location.state?.courseId);
+          fileData.append("submissionFiles", JSON.stringify(submissionFiles));
 
-  // const handleSubmit = async () => {
-  //   if (selectedFiles.length > 0) {
-  //     try {
-  //       const fileData = new FormData();
-  //       const length = selectedFiles.length;
-  //       for (let i = 0; i < length; i++) {
-  //         fileData.append("documentSubmit", selectedFiles[i]);
-  //       }
-  //       fileData.append("assignmentId", assignment.AssignmentId);
-  //       fileData.append("chapterId", location.state?.chapterId);
-  //       fileData.append("userId", currentUser.UserId);
-  //       fileData.append("courseId", location.state?.courseId);
-  //       fileData.append("submissionFiles", JSON.stringify(submissionFiles));
-
-  //       await axios.post(
-  //         `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
-  //         fileData
-  //       );
-  //       if (submissionStatus === 0) {
-  //         setCongratulation(true);
-  //         setTimeout(function () {
-  //           setCongratulation(false);
-  //         }, 3000);
-  //       }
-  //       setSelectedFiles([]);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   } else {
-  //     try {
-  //       const submissionData = {
-  //         assignmentId: assignment.AssignmentId,
-  //         chapterId: location.state?.chapterId,
-  //         userId: currentUser.UserId,
-  //         courseId: location.state?.courseId,
-  //       };
-
-  //       if (!assignmentSubmitted) {
-  //         await axios.post(
-  //           `/courses/chapters/${assignment.ChapterId}/submission`,
-  //           submissionData
-  //         );
-  //       }
-  //       if (submissionStatus === 0) {
-  //         setCongratulation(true);
-  //         setTimeout(function () {
-  //           setCongratulation(false);
-  //         }, 3000);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // };
+          await axios.post(
+            `/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
+            fileData
+          );
+          setCongratulation(true);
+          setTimeout(function () {
+            setCongratulation(false);
+          }, 3000);
+          setSelectedFiles([]);
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          const submissionData = {
+            assignmentId: assignment.AssignmentId,
+            chapterId: location.state?.chapterId,
+            userId: currentUser.UserId,
+            courseId: location.state?.courseId,
+          };
+          await axios.post(
+            `/courses/chapters/${assignment.ChapterId}/submission`,
+            submissionData
+          );
+          setCongratulation(true);
+          setTimeout(function () {
+            setCongratulation(false);
+          }, 3000);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      handleChangeStatus();
+    } else if (submissionStatus === 1) {
+      handleChangeStatus();
+    }
+  };
   const handleDeleteFile = async (assignmentFileId) => {
     alert(assignmentFileId);
     try {
@@ -299,8 +254,9 @@ export default function CourseAssignment() {
         <>
           {assignment ? (
             <>
+              {congratulation && <Confetti />}
               <div className="body-height flex flex-row gap-5">
-                <div className="w-[70%]  px-5 border-r border-slate-300 ">
+                <div className="w-[70%] h-full px-5 border-r border-slate-300 ">
                   <Box>
                     <Box>
                       <div className="flex justify-between items-center">
@@ -351,13 +307,7 @@ export default function CourseAssignment() {
 
                       <button
                         className="flex-none rounded-md text-base hover:bg-blue-500 bg-black px-3 py-1.5  font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                        onClick={() => {
-                          if (submissionStatus === 1) {
-                            handleChangeStatus();
-                          } else {
-                            handleChangeStatus();
-                          }
-                        }}
+                        onClick={handleSubmit}
                       >
                         {submissionStatus === 1 ? "Undo Submit" : " Submit"}
                       </button>
@@ -410,6 +360,9 @@ export default function CourseAssignment() {
                                 <label
                                   htmlFor={`hosting-small-${index}`}
                                   className="inline-flex items-center justify-between w-full p-3 text-gray-500 bg-white border border-slate-300 rounded-lg cursor-pointer peer-checked:outline-blue-500 peer-checked:outline-1 peer-checked:outline peer-checked:border-blue-500 peer-checked:text-blue-500 hover:text-gray-600 hover:bg-slate-100"
+                                  onClick={() => {
+                                    setSelectedDoc(file);
+                                  }}
                                 >
                                   <div className="flex w-0 flex-1 items-center">
                                     <PaperClipIcon

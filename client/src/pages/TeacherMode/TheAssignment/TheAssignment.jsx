@@ -18,16 +18,20 @@ const TheAssignment = () => {
 
   return (
     <>
-      <div className="py-5 flex justify-between">
-        <input
-          type="text"
-          name="search-course"
-          id="search-course"
-          autoComplete="given-name"
-          placeholder="Search course"
-          className=" outline-none block w-80 rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
-        />
+      <div className="flex justify-between items-center">
+        <span className="text-3xl font-bold">Assignments</span>
+        <div className="my-4 flex gap-3 ">
+          <input
+            type="text"
+            name="search-course"
+            id="search-course"
+            autoComplete="given-name"
+            placeholder="Search course"
+            className=" outline-none block w-80 rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
+          />
+        </div>
       </div>
+
       <div className="grid grid-cols-4 gap-6">
         {courses.map((course, index) => (
           <div

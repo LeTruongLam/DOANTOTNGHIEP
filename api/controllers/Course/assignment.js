@@ -495,8 +495,7 @@ export const getAssignmentSubmittedStudentView = (req, res) => {
   const assignmentId = req.params.assignmentId;
   const userId = req.params.userId;
   const q = `SELECT * FROM submissions 
-          WHERE AssignmentId = ? AND UserId`;
-
+          WHERE AssignmentId = ? AND UserId = ?`;
   db.query(q, [assignmentId, userId], (err, data) => {
     if (err) {
       return res.status(500).json({ error: "Database error!" });
@@ -506,10 +505,9 @@ export const getAssignmentSubmittedStudentView = (req, res) => {
 };
 export const updateSubmissionStatus = (req, res) => {
   const assignmentId = req.params.assignmentId;
-  const submissionStatus = req.body.submissionStatus;
+  const submissionStatus = req.body.submissionStatus ? 1 : 0;
   const userId = req.userInfo.id;
   const q = `UPDATE submissions SET Status = ?, SubmissionDate = NOW() WHERE AssignmentId = ? AND UserId = ?;`;
-
   db.query(q, [submissionStatus, assignmentId, userId], (err, data) => {
     if (err) {
       console.error(
@@ -518,39 +516,34 @@ export const updateSubmissionStatus = (req, res) => {
       );
       return res.status(500).json({ error: "Lỗi cơ sở dữ liệu!" });
     }
-    console.log("Trạng thái nộp bài đã được cập nhật trong cơ sở dữ liệu");
     return res.json(data);
   });
 };
-
 export const insertAssignmentSubmission = (req, res) => {
   const submissionId = uuidv4();
-  const assignmentId = req.body.assignmentId;
-  const chapterId = req.body.chapterId;
-  const userId = req.body.userId;
-  const courseId = req.body.courseId;
-  const query = `INSERT INTO submissions (SubmissionId,AssignmentId, UserId, ChapterId, CourseId, SubmissionDate) VALUES (?,?, ?, ?, ?, NOW());`;
-
-  db.query(
-    query,
-    [submissionId, assignmentId, userId, chapterId, courseId],
-    (err, result) => {
-      if (err) {
-        console.error("Lỗi khi chèn dữ liệu tài liệu vào cơ sở dữ liệu: ", err);
-        res.status(500).json({
-          success: false,
-          message: "Lỗi",
-        });
-      } else {
-        console.log("Dữ liệu tài liệu đã được chèn vào cơ sở dữ liệu");
-        res.status(201).json({
-          success: true,
-          message: "fileUrl đã được tải lên!",
-          data: result,
-        });
-      }
+  const { assignmentId, chapterId, userId, courseId } = req.body;
+  const query = `
+    INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate)
+    VALUES (?, ?, ?, ?, ?, NOW());
+  `;
+  const values = [submissionId, assignmentId, userId, chapterId, courseId];
+  console.log(values);
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting submission data into the database:", err);
+      res.status(500).json({
+        success: false,
+        message: "An error occurred",
+      });
+    } else {
+      console.log("Submission data has been inserted into the database");
+      res.status(201).json({
+        success: true,
+        message: "fileUrl has been uploaded!",
+        data: result,
+      });
     }
-  );
+  });
 };
 export const deleteAssignmentFile = (req, res) => {
   const userInfo = req.userInfo;

@@ -3,7 +3,6 @@ import { AuthContext } from "../../../context/authContext";
 import { useParams } from "react-router-dom";
 import { formatDateString } from "../../../js/TAROHelper";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import PropTypes from "prop-types";
@@ -108,7 +107,7 @@ const AssignmentView = () => {
               className="flex-none rounded-md mt-2 hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             >
               <AddCircleOutlineIcon className="mr-1" />
-              New Assignment
+             Assignment
             </button>
           </div>
         </Box>

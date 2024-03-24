@@ -55,7 +55,7 @@ function AssignmentList({
                     }
                     value={assignment}
                     onClick={() => {
-                      // console.log(assignment);
+                   
                       setAssignment(assignment);
                       fetchAssignmentFiles(assignment?.AssignmentId);
                       fetchAssignmentSubmitted(assignment?.AssignmentId);

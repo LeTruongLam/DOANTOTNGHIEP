@@ -42,12 +42,13 @@ export default function AssignmentDetail() {
       const res = await axios.get(
         `/courses/assignments/submitted/${submissionId}`
       );
-      setSelected(res.data[0]);
-      setAssignment(res.data[0]);
-      setAssignmentPoint(res.data[0]?.Score);
-      setAssignmentFiles(res.data[0]?.SubmissionFiles);
-      setSelectedFile(res.data[0]?.SubmissionFiles[0]);
-      setAssignmentReview(res.data[0]?.Review);
+      const data = res.data;
+      setSelected(data[0]);
+      setAssignment(data[0]);
+      setAssignmentPoint(data[0]?.Score);
+      setAssignmentFiles(data[0]?.SubmissionFiles);
+      setSelectedFile(data[0]?.SubmissionFiles[0]);
+      setAssignmentReview(data[0]?.Review);
     } catch (error) {
       console.log(error);
     }
@@ -267,7 +268,7 @@ export default function AssignmentDetail() {
                             <ul role="list">
                               {assignment?.Status === 1 ? (
                                 <>
-                                  {assignment.SubmissionFiles?.map(
+                                  {assignment?.SubmissionFiles?.map(
                                     (assignmentFile, index) => (
                                       <li
                                         key={index}
