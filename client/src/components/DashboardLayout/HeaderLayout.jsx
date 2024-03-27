@@ -56,7 +56,7 @@ const HeaderLayout = () => {
     navigate("/course");
   };
   return (
-    <div className="navbar flex justify-end">
+    <div className="pr-6 navbar flex justify-end">
       <div className="navbar-container ">
         <div className="links " onClick={handleExit}>
           <ExitToAppIcon />

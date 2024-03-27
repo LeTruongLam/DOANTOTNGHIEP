@@ -91,7 +91,7 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
           <CourseCode title="Course Code" subTitle="Edit Code" />
           <CourseDate title="Course Date" subTitle="Edit Date" />
           <div className="course-img ">
-            <DropFileInput onFileChange={onFileChange} />
+            <DropFileInput title="Course img" onFileChange={onFileChange} />
           </div>
           <div className="editorContainer">
             <CourseDesc

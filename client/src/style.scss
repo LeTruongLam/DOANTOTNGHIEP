@@ -147,3 +147,14 @@ body::-webkit-scrollbar-thumb:hover {
 .body-height {
     height: calc(100vh - 64px);
 }
+
+  
+  .image-zoom {
+    transition: transform 0.4s ease-in;
+  }
+  
+  .image-zoom:hover {
+    transform: scale(8) translateX(30px) translateY(-10px);
+    z-index: 1000;
+    position: relative;
+  }

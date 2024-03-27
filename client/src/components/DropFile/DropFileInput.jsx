@@ -36,7 +36,7 @@ const DropFileInput = (props) => {
     <div className="course-image">
       <div className="course-image-wrapper">
         <div className="course-image-header  mt-3 mb-3">
-          <p>Course Image</p>
+          <p>{props.title}</p>
           <p>
             <EditIcon fontSize="small" onClick={() => setSelectedFile(null)} />
           </p>

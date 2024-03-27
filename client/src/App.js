@@ -37,15 +37,15 @@ const Layout = ({ children }) => (
 
 const LayoutViewer = ({ children }) => (
   <>
-    <HeaderVideo />
+    <HeaderVideo  />
     <div className="mr-4">{children}</div>
   </>
 );
 
 const LayoutTeacher = ({ children }) => (
-  <div className="flex gap-6">
+  <div className="flex ">
     <Sidebar />
-    <div className="w-full mr-5">
+    <div className="w-full ">
       <HeaderLayout />
       {children}
     </div>
