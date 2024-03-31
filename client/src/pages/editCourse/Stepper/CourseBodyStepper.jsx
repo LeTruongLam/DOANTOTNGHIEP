@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import "../EditWrite.scss";
 import { message } from "antd";
 import DropFileInput from "../../../components/DropFile/DropFileInput";
@@ -17,18 +17,24 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
 import Dialog from "../../../components/Dialogs/Dialog";
+
 const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
+  const [open, setOpen] = useState(false);
+  const urlParams = new URLSearchParams(window.location.search);
+  const courseId = urlParams.get("edit");
 
   const onFileChange = (files) => {
     const formData = new FormData();
-    formData.append("image", files[0]);
+    formData.append("image", files);
     axios
-      .post("/users/uploadImage", formData)
+      .post(`/users/${courseId}/uploadImage`, formData)
       .then((response) => {
         const { imageUrl } = response.data;
+        message.success("Subject image changed successfully");
+
         setImageUrl(imageUrl);
       })
       .catch((error) => {
@@ -56,10 +62,20 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
       console.log(err);
     }
   };
+  const onShowDialog = async () => {
+    setOpen(true);
+  };
   return (
     <div className="grow-[3]">
       <div className="flex justify-between py-3 m-3 items-center	">
-        <Dialog title="Bạn có muốn xóa môn học" content="Xóa đi !" type="1" />
+        <Dialog
+          open={open}
+          setOpen={setOpen}
+          title="Are you sure you want to delete course ?"
+          content="This action cannot be undone. All associated data will be permanently deleted from the system."
+          type="1"
+          handleOke={handleDelete}
+        />
         <p className="text-2xl	font-semibold	">Course Setup</p>
         <p>
           <button
@@ -72,7 +88,7 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
             Back
           </button>
           <button
-            onClick={handleDelete}
+            onClick={onShowDialog}
             className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 	"
           >
             <DeleteOutlineIcon />

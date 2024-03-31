@@ -8,15 +8,12 @@ import SchoolIcon from "@mui/icons-material/School";
 
 const Course = () => {
   const { courses, fetchCourses } = useContext(AuthContext);
-
   const navigate = useNavigate();
-
   const handleCourseClick = (course) => {
     navigate(`/course/${course.title}`, {
       state: { courseTitle: course.title, courseId: course.CourseId },
     });
   };
-
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -41,7 +38,7 @@ const Course = () => {
               onClick={() => handleCourseClick(course)}
             >
               <div className="course-image">
-                <img src={`../upload/${course.img}`} alt="" />
+                <img src={`../upload/${course.img}`} alt="Course Image" />
               </div>
               <div className="course-content">
                 <div className="course-glimpse-wrapper">

@@ -14,7 +14,6 @@ const CourseFile = (props) => {
     try {
       const formData = new FormData();
       formData.append("document", selectedFile);
-      console.log(selectedFile);
       const response = await axios.post("/users/uploadDocument/29", formData);
       setSelectedFile(response.data);
       return response.data;
@@ -28,7 +27,6 @@ const CourseFile = (props) => {
       setSelectedFile(newFile);
       const updatedList = [...fileList, newFile];
       setFileList(updatedList);
-      console.log("file: " + newFile);
     }
   };
 
@@ -105,9 +103,4 @@ const CourseFile = (props) => {
     </div>
   );
 };
-
-// CourseFile.propTypes = {
-//   onFileChange: PropTypes.func,
-// };
-
 export default CourseFile;

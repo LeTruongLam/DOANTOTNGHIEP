@@ -12,9 +12,7 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-
 const upload = multer({ storage });
-
 cloudinary.config({
   cloud_name: "ddwapzxdc",
   api_key: "622526376528128",
@@ -101,7 +99,6 @@ function insertChapterData(chapterTitle, chapterDesc, videoUrl, courseId, res) {
     }
   );
 }
-
 router.put("/updateChapter/:chapterId", upload.single("video"), (req, res) => {
   const chapterId = req.params.chapterId;
   const { chapterTitle, chapterDesc } = req.body;
@@ -137,24 +134,28 @@ router.put("/updateChapter/:chapterId", upload.single("video"), (req, res) => {
   );
 });
 
-router.post("/uploadImage", upload.single("image"), (req, res) => {
+function updateCourseImage(courseId, imageUrl, res) {
+  const query = "UPDATE courses SET `img` = ? WHERE `CourseId` = ?";
+  db.query(query, [imageUrl, courseId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    return res.status(201).json({
+      success: true,
+      message: "Image uploaded!",
+      imageUrl: imageUrl,
+    });
+  });
+}
+router.post("/:courseId/uploadImage", upload.single("image"), (req, res) => {
+  const courseId = req.params.courseId;
   if (req.file) {
     cloudinary.uploader
       .upload(req.file.path, { folder: "CourseImage" })
       .then((result) => {
         const imageUrl = result.url;
-        res.status(201).json({
-          success: true,
-          message: "Image uploaded!",
-          imageUrl: imageUrl,
-        });
+        updateCourseImage(courseId, imageUrl, res); // Di chuyển gọi hàm updateCourseImage vào đây
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "Error",
-        });
+        res.status(500).json(err);
       });
   } else {
     res.status(400).json({
@@ -163,20 +164,17 @@ router.post("/uploadImage", upload.single("image"), (req, res) => {
     });
   }
 });
-
 function insertChapterDocument(chapterDocument, chapterId, documentName, res) {
   const query = `    INSERT INTO documents (ChapterId, DocumentName , DocumentUrl)
   VALUES (?, ?, ?);`;
 
   db.query(query, [chapterId, documentName, chapterDocument], (err, result) => {
     if (err) {
-      console.error("Error inserting document data into database: ", err);
       res.status(500).json({
         success: false,
         message: "Error",
       });
     } else {
-      console.log("Document data inserted into database");
       res.status(201).json({
         success: true,
         message: "Document uploaded!",
@@ -203,7 +201,6 @@ router.post(
           insertChapterDocument(chapterDocument, chapterId, documentName, res); // Gọi hàm insertChapterDocument để chèn dữ liệu
         })
         .catch((err) => {
-          console.log(err);
           res.status(500).json({
             success: false,
             message: "Error",
@@ -319,7 +316,14 @@ function submitAssignment(
 
   const queryParams = submittedFiles
     ? [submissionFilesJson, assignmentId, userId]
-    : [submissionId, assignmentId, userId, chapterId, courseId, submissionFilesJson];
+    : [
+        submissionId,
+        assignmentId,
+        userId,
+        chapterId,
+        courseId,
+        submissionFilesJson,
+      ];
 
   db.query(query, queryParams, (err, result) => {
     if (err) {
@@ -403,4 +407,38 @@ router.post(
     }
   }
 );
+
+// upload img liên qua đến bank quizz
+router.post("/questions/uploadImg", upload.single("image"), (req, res) => {
+  if (req.file) {
+    cloudinary.uploader
+      .upload(req.file.path, {
+        folder: "BankQuestion",
+        resource_type: "image",
+      })
+      .then((result) => {
+        // console.log("Image uploaded successfully:", result);
+        // console.log(result.secure_url);
+        res.status(200).json({
+          success: true,
+          message: "Image uploaded successfully",
+          imageUrl: result.secure_url,
+        });
+      })
+      .catch((err) => {
+        console.log("Error uploading image:", err);
+        res.status(500).json({
+          success: false,
+          message: "Error uploading image",
+          error: err,
+        });
+      });
+  } else {
+    console.log("No image file provided.");
+    res.status(400).json({
+      success: false,
+      message: "No image file provided",
+    });
+  }
+});
 export default router;

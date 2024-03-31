@@ -10,13 +10,16 @@ import List from "@mui/material/List";
 import NoResultFound from "../NotFounds/NoResultFound";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
+
 export default function CourseFileViewer() {
   const location = useLocation();
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [selectedDocIndex, setSelectedDocIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const listRef = useRef(null);
+
   useEffect(() => {
     const fetchCourseFiles = async () => {
       try {
@@ -49,8 +52,9 @@ export default function CourseFileViewer() {
     }
   }, [docs]);
 
-  const handleDocClick = (doc) => {
+  const handleDocClick = (doc, index) => {
     setSelectedDoc(doc);
+    setSelectedDocIndex(index);
   };
 
   return (
@@ -74,12 +78,12 @@ export default function CourseFileViewer() {
             <NoResultFound />
           ) : (
             <div className="course-file-viewer">
-              <div className="list-file">
+              <div className="container-left ">
                 <List
                   ref={listRef}
                   sx={{
                     width: "100%",
-                    maxWidth: 250,
+                    maxWidth: 350,
                     bgcolor: "background.paper",
                   }}
                   component="nav"
@@ -94,8 +98,16 @@ export default function CourseFileViewer() {
                         justifyContent: "center",
                         gap: "16px",
                         marginTop: index === 0 ? 0 : 2,
+                        borderRight:
+                          selectedDocIndex === index
+                            ? "2px solid rgb(147 51 234)"
+                            : "none",
+                        color:
+                          selectedDocIndex === index
+                            ? "rgb(147 51 234)"
+                            : "black",
                       }}
-                      onClick={() => handleDocClick(data)}
+                      onClick={() => handleDocClick(data, index)}
                     >
                       <InsertDriveFileIcon />
                       <ListItemText

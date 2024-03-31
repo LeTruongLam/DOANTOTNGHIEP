@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Background from "../../img/landingpage/main.png";
-import "./home.scss"
-
+import "./home.scss";
 
 const HomePage = () => {
   return (
@@ -56,7 +55,6 @@ const HomePage = () => {
               <h2>75%</h2>
               <h4>Total success</h4>
             </div>
-            
           </div>
         </div>
       </div>

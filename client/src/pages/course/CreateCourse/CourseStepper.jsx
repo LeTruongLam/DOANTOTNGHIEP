@@ -83,76 +83,77 @@ export default function CourseStepper() {
     }
   };
   const handleEdit = async () => {
-    navigate(`/write?edit=${course.CourseId}`, { state: course });
+    navigate(`/course/write?edit=${course.CourseId}`, { state: course });
   };
   return (
-    <Box sx={{ width: "100%", marginTop: "20px" }}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-          if (isStepOptional(index)) {
-            labelProps.optional = (
-              <Typography variant="caption">Optional</Typography>
+    <div className="px-5">
+      <Box sx={{ width: "100%", marginTop: "20px" }}>
+        <Stepper activeStep={activeStep}>
+          {steps.map((label, index) => {
+            const stepProps = {};
+            const labelProps = {};
+            if (isStepSkipped(index)) {
+              stepProps.completed = false;
+            }
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
             );
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      {activeStep === steps.length ? (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            Create a course and go to the edit course details page
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button
-              onClick={handleEdit}
-              sx={{ color: "white", backgroundColor: "black" }}
-            >
-              Finish
-            </Button>
-          </Box>
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            {activeStep === 0 && (
-              <CourseTitle
-                courseTitle={courseTitle}
-                setCourseTitle={setCourseTitle}
-              />
-            )}
-            {activeStep === 1 && (
-              <CourseCode
-                courseCode={courseCode}
-                setCourseCode={setCourseCode}
-              />
-            )}
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Back
-            </Button>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? "Create" : "Next"}
-            </Button>
-          </Box>
-        </React.Fragment>
-      )}
-    </Box>
+          })}
+        </Stepper>
+        {activeStep === steps.length ? (
+          <React.Fragment>
+            <Typography sx={{ mt: 2, mb: 1 }}>
+              Create a course and go to the edit course details page
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              <Box sx={{ flex: "1 1 auto" }} />
+              <button
+                onClick={handleEdit}
+                className={` bg-blue-700 hover:bg-blue-600  px-3 py-1 rounded-md font-semibold text-white`}
+              >
+                Finish
+              </button>
+            </Box>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Typography sx={{ mt: 2, mb: 1 }}>
+              {activeStep === 0 && (
+                <CourseTitle
+                  courseTitle={courseTitle}
+                  setCourseTitle={setCourseTitle}
+                />
+              )}
+              {activeStep === 1 && (
+                <CourseCode
+                  courseCode={courseCode}
+                  setCourseCode={setCourseCode}
+                />
+              )}
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              <button
+                className={`border hover:bg-slate-100  border-blue-500 px-3 py-1 rounded-md font-semibold ${
+                  activeStep === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={activeStep === 0}
+                onClick={handleBack}
+              >
+                Back
+              </button>
+              <Box sx={{ flex: "1 1 auto" }} />
+              <button
+                onClick={handleNext}
+                className={` bg-blue-700 hover:bg-blue-600  px-3 py-1 rounded-md font-semibold text-white`}
+              >
+                {activeStep === steps.length - 1 ? "Create" : "Next"}
+              </button>
+            </Box>
+          </React.Fragment>
+        )}
+      </Box>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ const TheAssignment = () => {
   }, []);
 
   return (
-    <>
+    <div className="px-5 h-screen" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="flex justify-between items-center">
         <span className="text-3xl font-bold">Assignments</span>
         <div className="my-4 flex gap-3 ">
@@ -62,7 +62,7 @@ const TheAssignment = () => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 export default TheAssignment;

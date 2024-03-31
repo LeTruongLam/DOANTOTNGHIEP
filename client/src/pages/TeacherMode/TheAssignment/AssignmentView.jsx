@@ -86,7 +86,7 @@ const AssignmentView = () => {
     setValue(newValue);
   };
   return (
-    <>
+    <div className="px-5">
       <Box sx={{ width: "100%" }}>
         <Box>
           <div className="flex justify-between items-center">
@@ -180,7 +180,7 @@ const AssignmentView = () => {
           </ul>
         </CustomTabPanel>
       </Box>
-    </>
+    </div>
   );
 };
 

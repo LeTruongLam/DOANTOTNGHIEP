@@ -41,7 +41,7 @@ const CourseDetails = () => {
           },
         });
         setCourse(res.data);
-        // console.table(res.data);
+  
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
         setLoading(true);

@@ -209,7 +209,7 @@ const AssignmentListStudent = () => {
     setPage(0);
   };
   return (
-    <div>
+    <div className="px-5">
       <div className="py-4 border-b flex justify-between border-slate-300">
         <div>
           <h1 className="font-semibold text-3xl	mb-1 ">

@@ -78,7 +78,7 @@ export default function BankQuestions() {
     setPage(0);
   };
   return (
-    <div>
+    <div className="px-5 h-screen" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="flex justify-between items-center">
         <span className="text-3xl font-bold">Bank Questions</span>
         <div className="my-4 flex gap-3 ">

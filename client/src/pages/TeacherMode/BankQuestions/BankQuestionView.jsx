@@ -1,10 +1,11 @@
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import axios from "axios";
 import Dialog from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import React, { Fragment, useContext, useState, useEffect } from "react";
-import StepperFirst from "./StepperAdd/ListQuestions";
+import ListQuestions from "./StepperAdd/ListQuestions";
 import QuestionsInfo from "./StepperAdd/QuestionsInfo";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
@@ -19,6 +20,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { message } from "antd";
 
 const steps = ["Add Question", "Questions Info"];
 
@@ -29,10 +31,9 @@ function BankQuestionView() {
   const { courseId } = useParams();
   const { fetchChapter, chapters, fetchCourseById } = useContext(AuthContext);
   const [openIndex, setOpenIndex] = useState(null);
-
   const [questions, setQuestions] = useState([]);
   const [questionTitle, setQuestionTitle] = useState("");
-  const [questionType, setQuestionType] = useState("single");
+  const [questionType, setQuestionType] = useState("Single Choice");
   const [questionImg, setQuestionImg] = useState();
   const [optionsAnswer, setOptionsAnswer] = useState([]);
   useEffect(() => {
@@ -48,33 +49,64 @@ function BankQuestionView() {
   const handleClickOpen = () => {
     setOpen(true);
   };
+  const uploadImgFileToCloudinary = async (imgFile) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", imgFile);
+
+      const response = await axios.post("/users/questions/uploadImg", formData);
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  const handleSubmitQuestions = async () => {
+    try {
+      const data = await uploadImgFileToCloudinary(questionImg);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
+      handleSubmitQuestions();
       setQuestions([]);
       handleClose();
       setActiveStep(0);
     } else {
+      if (!questionTitle) {
+        message.error("Question title cannot be empty");
+        return;
+      }
       const newQuestion = {
+        id: questions.length + 1,
         questionTitle: questionTitle,
         questionType: questionType,
         questionImg: questionImg,
+        answerText: "",
         optionsAnswer: optionsAnswer,
       };
-      setQuestions([...questions, newQuestion]);
+      console.log([...questions, newQuestion]);
+      setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
+
     setQuestionTitle("");
     setOptionsAnswer([]);
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setQuestionType("Single Choice");
   };
 
   const handleClose = () => {
     setOpen(false);
     setActiveStep(0);
-    setQuestions([])
+    setQuestions([]);
   };
   return (
     <>
@@ -163,15 +195,10 @@ function BankQuestionView() {
               <React.Fragment>
                 <Typography sx={{ mt: 2, mb: 1 }}>
                   {activeStep === 1 && (
-                    <StepperFirst
+                    <ListQuestions
                       setQuestions={setQuestions}
                       questions={questions}
-                      setOptionsAnswer={setOptionsAnswer}
-                      optionsAnswer={optionsAnswer}
-                      setQuestionType={setQuestionType}
-                      questionType={questionType}
-                      setQuestionTitle={setQuestionTitle}
-                      questionTitle={questionTitle}
+                      handleBack={handleBack}
                     />
                   )}
                   {activeStep === 0 && (
@@ -184,6 +211,9 @@ function BankQuestionView() {
                       questionType={questionType}
                       setQuestionTitle={setQuestionTitle}
                       questionTitle={questionTitle}
+                      setQuestionImg={setQuestionImg}
+                      questionImg={questionImg}
+                      onFileChange={uploadImgFileToCloudinary}
                     />
                   )}
                 </Typography>
@@ -200,14 +230,6 @@ function BankQuestionView() {
               Cancel
             </button>
             <div className="flex gap-2">
-              <button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                type="button"
-                class="cursor-pointer text-black bg-white border border-blue-500 focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-5 py-1.5 me-2 mb-2  "
-              >
-                Back
-              </button>
               <button
                 onClick={handleNext}
                 type="button"

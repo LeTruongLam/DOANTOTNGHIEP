@@ -1,8 +1,33 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
-import React, { useState, useRef } from "react";
+import React, { useState, Fragment, useRef } from "react";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // import { message } from "antd";
+import SignleChoice from "../../../../img/icons/04-single-choice.svg";
+import MultipleChoice from "../../../../img/icons/multiple-choice-9.svg";
+import TextInput from "../../../../img/icons/text-38.svg";
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+const people = [
+  {
+    id: 1,
+    value: "Single Choice",
+    avatar: SignleChoice,
+  },
+  {
+    id: 2,
+    value: "Multiple Choice",
+    avatar: MultipleChoice,
+  },
+  {
+    id: 3,
+    value: "Text Input",
+    avatar: TextInput,
+  },
+];
 function QuestionsInfo({
   questions,
   setQuestions,
@@ -12,50 +37,46 @@ function QuestionsInfo({
   setQuestionType,
   optionsAnswer,
   setOptionsAnswer,
+  questionImg,
+  setQuestionImg,
+  onFileChange,
 }) {
-  const [options, setOptions] = useState([]);
+  const [selectedType, setSelectedType] = useState(people[0]);
   const [newOptionValue, setNewOptionValue] = useState("");
   const [optionImg, setOptionImg] = useState("");
-  const [selectedFile, setSelectedFile] = useState("");
+
   const [isAnswer, setIsAnswer] = useState(false);
   const wrapperRef = useRef(null);
-  const handleChangeOptionImg = (e) => {
+  const handleChangeOptionImg = async (e) => {
     const newFile = e.target.files[0];
-    setOptionImg(newFile);
-    // console.log(newFile);
+    const data = await onFileChange(newFile);
+
+    setOptionImg(data.imageUrl);
   };
 
   const onDragEnter = () => wrapperRef.current.classList.add("dragover");
   const onDragLeave = () => wrapperRef.current.classList.remove("dragover");
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
-  const onFileDrop = (e) => {
+  const onFileDrop = async (e) => {
     const newFile = e.target.files[0];
-    setSelectedFile(newFile);
+    const data = await onFileChange(newFile);
+    setQuestionImg(data.imageUrl);
   };
   const handleQuestionTitleChange = (event) => {
     setQuestionTitle(event.target.value);
-
   };
   const handleAddOption = () => {
-    // const addOption = {
-    //   id: options.length + 1,
-    //   value: newOptionValue,
-    //   isAnswer: isAnswer,
-
-    // };
     const newOption = {
       id: optionsAnswer.length + 1,
       optionTitle: newOptionValue,
       optionImg: optionImg,
       isAnswer: isAnswer,
     };
-    // setOptions([...options, addOption]);
     setOptionsAnswer([...optionsAnswer, newOption]);
     setNewOptionValue("");
-    // console.log([...optionsAnswer, newOption]);
   };
-  const handleQuestionTypeChange = (event) => {
-    setQuestionType(event.target.value);
+  const handleQuestionTypeChange = (value) => {
+    setQuestionType(value);
   };
 
   const handleNewOptionValueChange = (event) => {
@@ -72,10 +93,10 @@ function QuestionsInfo({
   const renderOptions = () => {
     return optionsAnswer.map((option) => {
       const inputId =
-        questionType === "single"
+        questionType === "Single Choice"
           ? `bordered-radio-${option.id}`
           : `bordered-checkbox-${option.id}`;
-      const inputType = questionType === "single" ? "radio" : "checkbox";
+      const inputType = questionType === "Single Choice" ? "radio" : "checkbox";
       return (
         <div
           key={option.id}
@@ -143,7 +164,7 @@ function QuestionsInfo({
           Upload img
         </label>
         <div className="bg-white rounded-md flex items-center  	 ">
-          <div className=" bg-slate-200 opacity-50 flex-6 m-4 py-10 rounded-md cursor-pointer hover:opacity-100">
+          <div className=" bg-slate-200 opacity-50 flex-6 m-4  rounded-md cursor-pointer hover:opacity-100">
             <div
               ref={wrapperRef}
               className="flex justify-center items-center relative overflow-hidden"
@@ -151,17 +172,12 @@ function QuestionsInfo({
               onDragLeave={onDragLeave}
               onDrop={onDrop}
             >
-              {selectedFile ? (
-                <div className="selected-file">
-                  <div className="selected-file">
-                    <img
-                      src={URL.createObjectURL(selectedFile)}
-                      alt="Question Image"
-                    />
-                  </div>
+              {questionImg ? (
+                <div className="max-h-40 max-w-60 py-0">
+                  <img className="" src={questionImg} alt="Question Image" />
                 </div>
               ) : (
-                <div className="flex flex-col justify-center items-center mx-6">
+                <div className="flex flex-col justify-center py-10 items-center mx-6">
                   <CloudUploadIcon fontSize="medium" />
                   <p className="text-sm mt-1	">
                     <span className="text-purple-600	">Upload a img</span>
@@ -190,15 +206,90 @@ function QuestionsInfo({
         >
           Select your question type
         </label>
-        <select
-          id="questionType"
-          className="border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          value={questionType}
-          onChange={handleQuestionTypeChange}
-        >
-          <option value="single">Single Choice</option>
-          <option value="multiple">Multiple Choice</option>
-        </select>
+        <Listbox value={selectedType} onChange={setSelectedType}>
+          {({ open }) => (
+            <div className="relative mt-2">
+              <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                <span className="flex items-center">
+                  <img
+                    src={selectedType.avatar}
+                    alt=""
+                    className="h-5 w-5 flex-shrink-0 rounded-full"
+                  />
+                  <span className="ml-3 block truncate">
+                    {selectedType.value}
+                  </span>
+                </span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </span>
+              </Listbox.Button>
+
+              <Transition
+                show={open}
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  {people.map((person) => (
+                    <Listbox.Option
+                      key={person.id}
+                      className={({ active }) =>
+                        classNames(
+                          active ? "bg-indigo-600 text-white" : "text-gray-900",
+                          "relative cursor-default select-none py-2 pl-3 pr-9"
+                        )
+                      }
+                      value={person}
+                      onClick={() => {
+                        handleQuestionTypeChange(person.value);
+                      }}
+                    >
+                      {({ selected, active }) => (
+                        <>
+                          <div className="flex items-center">
+                            <img
+                              src={person.avatar}
+                              alt=""
+                              className="h-5 w-5 flex-shrink-0 rounded-full"
+                            />
+                            <span
+                              className={classNames(
+                                selected ? "font-semibold" : "font-normal",
+                                "ml-3 block truncate"
+                              )}
+                            >
+                              {person.value}
+                            </span>
+                          </div>
+
+                          {selected ? (
+                            <span
+                              className={classNames(
+                                active ? "text-white" : "text-indigo-600",
+                                "absolute inset-y-0 right-0 flex items-center pr-4"
+                              )}
+                            >
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          )}
+        </Listbox>
       </div>
       <div className="my-3">
         <label
@@ -220,38 +311,43 @@ function QuestionsInfo({
                 className="min-h-10 border flex-grow  border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                 placeholder="Enter option content"
               />
-              <input
-                id="isAnswer"
-                type="checkbox"
-                value={isAnswer}
-                name={"bordered-radio"}
-                className="w-5 h-5 text-blue-600"
-                onChange={() => {
-                  setIsAnswer(!isAnswer);
-                }}
-              />
-              <div className="relative">
-                <input
-                  type="file"
-                  value=""
-                  className="absolute top-0 left-0 opacity-0 w-full h-full"
-                  onChange={handleChangeOptionImg}
-                />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="#fff"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+
+              {questionType !== "Text Input" && (
+                <>
+                  <input
+                    id="isAnswer"
+                    type="checkbox"
+                    value={isAnswer}
+                    name={"bordered-radio"}
+                    className="w-5 h-5 text-blue-600 "
+                    onChange={() => {
+                      setIsAnswer(!isAnswer);
+                    }}
                   />
-                </svg>
-              </div>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      value=""
+                      className="absolute top-0 left-0 opacity-0 w-full h-full"
+                      onChange={handleChangeOptionImg}
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="#fff"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                      />
+                    </svg>
+                  </div>
+                </>
+              )}
             </div>
 
             <button

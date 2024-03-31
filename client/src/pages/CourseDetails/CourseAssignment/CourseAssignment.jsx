@@ -62,7 +62,6 @@ function a11yProps(index) {
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
-  const listRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [assignment, setAssignment] = useState();

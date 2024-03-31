@@ -3,6 +3,7 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import studentRoutes from "./routes/students.js"
 import courseRoutes from "./routes/courses.js";
+import questionRoutes from "./routes/question.js"
 import classRoutes from "./routes/class.js"
 import cookieParser from "cookie-parser";
 import multer from "multer";
@@ -96,6 +97,7 @@ app.use("/api/infor", userRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/users", routeUpload);
+app.use("/api/questions", questionRoutes);
 
 app.listen(8800, () => {
   console.log("Connected!");
