@@ -2,39 +2,67 @@ import { db } from "../../db.js";
 import jwt from "jsonwebtoken";
 
 import { v4 as uuidv4 } from "uuid";
-export const authorize = (req, res, next) => {
-  const token = req.cookies.access_token;
-  if (!token) {
-    return res.status(401).json("Not authenticated!");
-  }
-  try {
-    const decodedToken = jwt.verify(token, "jwtkey");
-    req.userRole = decodedToken.role;
-    next();
-  } catch (err) {
-    return res.status(403).json("Token is not valid!");
-  }
-};
 
 export const addListQuestion = (req, res, next) => {
-  const questionId = uuidv4();
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-    const courseId = req.body.courseId;
-    console.log(courseId);
-    console.log(req.body.questions);
-    console.log(req.body.questionImg);
-    console.log(req.body.optionsAnswer);
+  const courseId = req.params.courseId;
+  const chapterId = req.body.chapterId;
+  const questions = req.body.questions;
 
-    const q = `
-    
-    `;
-
-    db.query(q, [], (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.status(200).json(data);
+  const promises = questions.map((question) => {
+    return new Promise((resolve, reject) => {
+      let questionId = uuidv4();
+      let q = `INSERT INTO questions(QuestionId, ChapterId, CourseId, QuestionContent, QuestionImg, QuestionType, QuestionAnswer, QuestionOptions, IsDeleted)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, false)`;
+      const questionContent = question.questionTitle || "";
+      const questionImg = question.questionImg;
+      const questionType = question.questionType || "";
+      const questionAnswer = question.questionAnswer || "";
+      const questionOptions = JSON.stringify(question.optionsAnswer) || "";
+      db.query(
+        q,
+        [
+          questionId,
+          chapterId,
+          courseId,
+          questionContent,
+          questionImg,
+          questionType,
+          questionAnswer,
+          questionOptions,
+        ],
+        (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        }
+      );
     });
+  });
+
+  Promise.all(promises)
+    .then(() => {
+      console.log("Thêm câu hỏi thành công");
+      res.status(200).json({ message: "Questions added successfully." });
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+};
+export const getListQuestionByChapterId = (req, res) => {
+  const chapterId = req.params.chapterId;
+  const query = `
+    SELECT *
+    FROM questions
+    WHERE ChapterId = ?
+  `;
+  db.query(query, [chapterId], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "An unexpected error occurred." });
+    }
+    const questions = data.length === 0 ? [] : data;
+    return res.status(200).json(questions);
   });
 };

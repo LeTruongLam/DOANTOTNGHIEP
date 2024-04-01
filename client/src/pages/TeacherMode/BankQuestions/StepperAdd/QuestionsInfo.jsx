@@ -5,13 +5,14 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // import { message } from "antd";
+import Spinner from "../../../../components/Spinners/Spinner";
 import SignleChoice from "../../../../img/icons/04-single-choice.svg";
 import MultipleChoice from "../../../../img/icons/multiple-choice-9.svg";
 import TextInput from "../../../../img/icons/text-38.svg";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-const people = [
+const choice = [
   {
     id: 1,
     value: "Single Choice",
@@ -40,17 +41,19 @@ function QuestionsInfo({
   questionImg,
   setQuestionImg,
   onFileChange,
+  setIsLoading,
+  isLoading,
 }) {
-  const [selectedType, setSelectedType] = useState(people[0]);
+  const [selectedType, setSelectedType] = useState(choice[0]);
   const [newOptionValue, setNewOptionValue] = useState("");
   const [optionImg, setOptionImg] = useState("");
 
   const [isAnswer, setIsAnswer] = useState(false);
   const wrapperRef = useRef(null);
+
   const handleChangeOptionImg = async (e) => {
     const newFile = e.target.files[0];
     const data = await onFileChange(newFile);
-
     setOptionImg(data.imageUrl);
   };
 
@@ -59,6 +62,7 @@ function QuestionsInfo({
   const onDrop = () => wrapperRef.current.classList.remove("dragover");
   const onFileDrop = async (e) => {
     const newFile = e.target.files[0];
+    setIsLoading(true);
     const data = await onFileChange(newFile);
     setQuestionImg(data.imageUrl);
   };
@@ -74,6 +78,7 @@ function QuestionsInfo({
     };
     setOptionsAnswer([...optionsAnswer, newOption]);
     setNewOptionValue("");
+    setOptionImg();
   };
   const handleQuestionTypeChange = (value) => {
     setQuestionType(value);
@@ -94,19 +99,22 @@ function QuestionsInfo({
     return optionsAnswer.map((option) => {
       const inputId =
         questionType === "Single Choice"
-          ? `bordered-radio-${option.id}`
-          : `bordered-checkbox-${option.id}`;
+          ? `bordered-radio-${option?.id}`
+          : `bordered-checkbox-${option?.id}`;
       const inputType = questionType === "Single Choice" ? "radio" : "checkbox";
       return (
         <div
-          key={option.id}
+          key={option?.id}
           className=" flex my-3 border border-blue-300 items-center px-3 rounded-md bg-white"
         >
-          <img
-            className="h-10 rounded-[50%] border border-slate-200 m-1 image-zoom hover:rounded-sm hover:shadow-lg hover:border-none hover:shadow-gray-100	"
-            src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp"
-            alt=""
-          />
+          {option?.optionImg && (
+            <img
+              className="h-10 w-12 border object-fill border-slate-200 m-1 image-zoom hover:rounded-sm hover:shadow-lg hover:border-none hover:shadow-gray-100	"
+              src={option?.optionImg}
+              alt="Image option"
+            />
+          )}
+
           <label
             htmlFor={inputId}
             className="w-full py-3 ms-2 text-sm font-medium opacity-80 text-gray-900 truncate"
@@ -172,6 +180,7 @@ function QuestionsInfo({
               onDragLeave={onDragLeave}
               onDrop={onDrop}
             >
+              {isLoading && <Spinner />}
               {questionImg ? (
                 <div className="max-h-40 max-w-60 py-0">
                   <img className="" src={questionImg} alt="Question Image" />
@@ -213,7 +222,7 @@ function QuestionsInfo({
                 <span className="flex items-center">
                   <img
                     src={selectedType.avatar}
-                    alt=""
+                    alt="Type Image"
                     className="h-5 w-5 flex-shrink-0 rounded-full"
                   />
                   <span className="ml-3 block truncate">
@@ -236,7 +245,7 @@ function QuestionsInfo({
                 leaveTo="opacity-0"
               >
                 <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  {people.map((person) => (
+                  {choice.map((person) => (
                     <Listbox.Option
                       key={person.id}
                       className={({ active }) =>
@@ -255,7 +264,7 @@ function QuestionsInfo({
                           <div className="flex items-center">
                             <img
                               src={person.avatar}
-                              alt=""
+                              alt="Image type"
                               className="h-5 w-5 flex-shrink-0 rounded-full"
                             />
                             <span

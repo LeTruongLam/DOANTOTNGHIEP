@@ -20,8 +20,11 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import Collapse from "@mui/material/Collapse";
 import { message } from "antd";
-
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ComponentTest from "../../../components/SelectMenus/ComponentTest";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {
@@ -35,7 +38,11 @@ function BankQuestionView() {
   const [questionTitle, setQuestionTitle] = useState("");
   const [questionType, setQuestionType] = useState("Single Choice");
   const [questionImg, setQuestionImg] = useState();
+  const [chapterId, setChapterId] = useState();
   const [optionsAnswer, setOptionsAnswer] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [questionData, setQuestionData] = useState([]);
+
   useEffect(() => {
     fetchChapter(courseId);
     const fetchData = async () => {
@@ -46,27 +53,40 @@ function BankQuestionView() {
     };
     fetchData();
   }, []);
-  const handleClickOpen = () => {
+  const handleClickOpen = (classId) => {
+    setChapterId(classId);
     setOpen(true);
   };
   const uploadImgFileToCloudinary = async (imgFile) => {
     try {
       const formData = new FormData();
       formData.append("image", imgFile);
-
       const response = await axios.post("/users/questions/uploadImg", formData);
-      console.log(response.data);
+      setIsLoading(false); // Đặt setIsLoading(false) ở đây, sau khi nhận được response thành công
       return response.data;
     } catch (error) {
       console.log(error);
+      setIsLoading(false); // Đặt setIsLoading(false) ở đây, sau khi xảy ra lỗi
       throw error;
     }
   };
-
   const handleSubmitQuestions = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const data = await uploadImgFileToCloudinary(questionImg);
+      await axios.post(
+        `/questions/course/${courseId}`,
+        { questions, chapterId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
+      message.success("Questions added successfully.");
+      fetchQuestionListByChapterId(chapterId);
     } catch (error) {
+      message.error("Question added error");
+
       console.log(error);
     }
   };
@@ -74,6 +94,7 @@ function BankQuestionView() {
     if (activeStep === steps.length - 1) {
       handleSubmitQuestions();
       setQuestions([]);
+      setQuestionImg();
       handleClose();
       setActiveStep(0);
     } else {
@@ -89,8 +110,7 @@ function BankQuestionView() {
         answerText: "",
         optionsAnswer: optionsAnswer,
       };
-      console.log([...questions, newQuestion]);
-      setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
+      setQuestions([...questions, newQuestion]);
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
 
@@ -101,19 +121,39 @@ function BankQuestionView() {
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
     setQuestionType("Single Choice");
+    setQuestionImg();
   };
 
   const handleClose = () => {
     setOpen(false);
     setActiveStep(0);
     setQuestions([]);
+    setChapterId();
+  };
+
+  const fetchQuestionListByChapterId = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`/questions/chapters/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      });
+      setQuestionData(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleClickQuestionList = async (index, id) => {
+    fetchQuestionListByChapterId(id);
+    setOpenIndex((prevOpenIndex) => (prevOpenIndex === index ? null : index));
   };
   return (
     <>
       <div className="flex justify-between items-center px-6 mt-3 border-b border-slate-300 pb-3">
         <span className="text-xl font-bold">{course?.title}</span>
         <button
-          onClick={handleClickOpen}
+          // onClick={handleClickOpen}
           type="submit"
           className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >
@@ -122,6 +162,30 @@ function BankQuestionView() {
         </button>
       </div>
       <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
+        <div className="p-5 pb-0 flex justify-between items-center ">
+          <div className=" flex justify-center items-center">
+            <div className="hover:bg-slate-200 hover:rounded-md px-1 hover:cursor-pointer">
+              <RefreshIcon />
+            </div>
+            <span className="mx-2 text-slate-500">|</span>
+            <span className=" ">2 questions selected</span>
+            <span className="ml-4 px-3 py-2 hover:bg-slate-200  hover:cursor-pointer hover:rounded-md text-blue-700 text-sm">
+              Clean
+            </span>
+          </div>
+          <div className="flex justify-between items-center gap-3">
+            <div>
+              <ComponentTest />
+            </div>
+            <div className="flex justify-center items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:rounded-md hover:cursor-pointer">
+              <DeleteIcon
+                style={{ color: "rgb(220 38 38)", fontSize: "20px" }}
+              />
+              <span className="text-red-600">Delete</span>
+            </div>
+          </div>
+        </div>
+
         <div className="p-5">
           {chapters.map((item, index) => (
             <List
@@ -135,7 +199,9 @@ function BankQuestionView() {
               component="nav"
               aria-labelledby="nested-list-subheader"
             >
-              <ListItemButton>
+              <ListItemButton
+                onClick={() => handleClickQuestionList(index, item?.ChapterId)}
+              >
                 <div className="flex justify-between w-full items-center">
                   <div className="flex items-center">
                     {openIndex === index ? <ExpandLess /> : <ExpandMore />}
@@ -145,7 +211,7 @@ function BankQuestionView() {
                     />
                   </div>
                   <div
-                    onClick={handleClickOpen}
+                    onClick={() => handleClickOpen(item?.ChapterId)}
                     className=" border rounded-md px-2 py-1 flex items-center gap-1		"
                   >
                     <AddIcon />
@@ -153,6 +219,19 @@ function BankQuestionView() {
                   </div>
                 </div>
               </ListItemButton>
+              <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {questionData.map((item, id) => (
+                    <ListItemButton key={id} sx={{ pl: 4 }}>
+                      <ListItemText
+                        primary={` Question ${id + 1}:  ${
+                          item.QuestionContent
+                        }`}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Collapse>
             </List>
           ))}
         </div>
@@ -214,6 +293,8 @@ function BankQuestionView() {
                       setQuestionImg={setQuestionImg}
                       questionImg={questionImg}
                       onFileChange={uploadImgFileToCloudinary}
+                      isLoading={isLoading}
+                      setIsLoading={setIsLoading}
                     />
                   )}
                 </Typography>
