@@ -11,8 +11,8 @@ export const addListQuestion = (req, res, next) => {
   const promises = questions.map((question) => {
     return new Promise((resolve, reject) => {
       let questionId = uuidv4();
-      let q = `INSERT INTO questions(QuestionId, ChapterId, CourseId, QuestionContent, QuestionImg, QuestionType, QuestionAnswer, QuestionOptions, IsDeleted)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, false)`;
+      let q = `INSERT INTO questions(QuestionId, ChapterId, CourseId, QuestionContent, QuestionImg, QuestionType, QuestionAnswer, QuestionOptions, IsDeleted, LastModificationTime)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, false, NOW())`;
       const questionContent = question.questionTitle || "";
       const questionImg = question.questionImg;
       const questionType = question.questionType || "";
@@ -65,4 +65,78 @@ export const getListQuestionByChapterId = (req, res) => {
     const questions = data.length === 0 ? [] : data;
     return res.status(200).json(questions);
   });
+};
+export const deleteListQuestion = (req, res) => {
+  const questionIds = req.body.selectedIds;
+  const query = `
+    DELETE FROM questions
+    WHERE QuestionId IN (?)
+  `;
+  db.query(query, [questionIds], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "An unexpected error occurred." });
+    }
+    return res.status(200).json({ message: "Questions deleted successfully." });
+  });
+};
+export const getQuestionById = (req, res) => {
+  const questionId = req.params.questionId;
+  const query = `
+    SELECT *
+    FROM questions
+    WHERE QuestionId = ?
+  `;
+  db.query(query, [questionId], (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "An unexpected error occurred." });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Question not found." });
+    }
+    const question = data[0];
+    return res.status(200).json(question);
+  });
+};
+
+export const updateQuestion = (req, res) => {
+  const questionId = req.params.questionId;
+  const questionContent = req.body.questionContent;
+  const questionImg = req.body.questionImg;
+  const questionType = req.body.questionType;
+  const questionAnswer = req.body.questionAnswer;
+  const questionOptions = JSON.stringify(req.body.optionsAnswer);
+
+  const query = `
+    UPDATE questions
+    SET QuestionContent = ?,
+        QuestionImg = ?,
+        QuestionType = ?,
+        QuestionAnswer = ?,
+        QuestionOptions = ?,
+        LastModificationTime = NOW()
+    WHERE QuestionId = ?
+  `;
+  db.query(
+    query,
+    [
+      questionContent,
+      questionImg,
+      questionType,
+      questionAnswer,
+      questionOptions,
+      questionId
+    ],
+    (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "An unexpected error occurred." });
+      }
+      if (data.affectedRows === 0) {
+        return res.status(404).json({ error: "Question not found." });
+      }
+      return res.status(200).json({ message: "Question updated successfully." });
+    }
+  );
 };

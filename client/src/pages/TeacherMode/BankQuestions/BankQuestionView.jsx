@@ -5,8 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import React, { Fragment, useContext, useState, useEffect } from "react";
-import ListQuestions from "./StepperAdd/ListQuestions";
-import QuestionsInfo from "./StepperAdd/QuestionsInfo";
+import ListQuestions from "./QuestionForm/ListQuestions";
+import QuestionsInfo from "./QuestionForm/QuestionsInfo";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -14,27 +14,23 @@ import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
-import AddIcon from "@mui/icons-material/Add";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import Collapse from "@mui/material/Collapse";
+import { formatDateString } from "../../../js/TAROHelper";
 import { message } from "antd";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ComponentTest from "../../../components/SelectMenus/ComponentTest";
+import ClassMenu from "../../../components/SelectMenus/ClassMenu";
+import QuestionFormEdit from "./QuestionForm/QuestionFormEdit";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {
   const [course, setCourse] = useState();
   const [activeStep, setActiveStep] = useState(0);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const { courseId } = useParams();
-  const { fetchChapter, chapters, fetchCourseById } = useContext(AuthContext);
-  const [openIndex, setOpenIndex] = useState(null);
+  const { fetchChapter, fetchCourseById } = useContext(AuthContext);
   const [questions, setQuestions] = useState([]);
+  const [chapters, setChapters] = useState([]);
   const [questionTitle, setQuestionTitle] = useState("");
   const [questionType, setQuestionType] = useState("Single Choice");
   const [questionImg, setQuestionImg] = useState();
@@ -42,19 +38,30 @@ function BankQuestionView() {
   const [optionsAnswer, setOptionsAnswer] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [questionData, setQuestionData] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selected, setSelected] = useState();
 
+  const fetchCourseData = async () => {
+    try {
+      let res = await fetchCourseById(courseId);
+      setCourse(res);
+    } catch (error) {}
+  };
+  const fetchChapterData = async () => {
+    try {
+      const chapterData = await fetchChapter(courseId);
+      setChapters(chapterData);
+      setSelected(chapterData[0]);
+      setChapterId(chapterData[0].ChapterId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
-    fetchChapter(courseId);
-    const fetchData = async () => {
-      try {
-        let res = await fetchCourseById(courseId);
-        setCourse(res);
-      } catch (error) {}
-    };
-    fetchData();
+    fetchCourseData();
+    fetchChapterData();
   }, []);
-  const handleClickOpen = (classId) => {
-    setChapterId(classId);
+  const handleClickOpen = () => {
     setOpen(true);
   };
   const uploadImgFileToCloudinary = async (imgFile) => {
@@ -83,7 +90,7 @@ function BankQuestionView() {
         }
       );
       message.success("Questions added successfully.");
-      fetchQuestionListByChapterId(chapterId);
+      fetchQuestionListByChapterId();
     } catch (error) {
       message.error("Question added error");
 
@@ -128,13 +135,12 @@ function BankQuestionView() {
     setOpen(false);
     setActiveStep(0);
     setQuestions([]);
-    setChapterId();
   };
 
-  const fetchQuestionListByChapterId = async (id) => {
+  const fetchQuestionListByChapterId = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(`/questions/chapters/${id}`, {
+      const res = await axios.get(`/questions/chapters/${chapterId}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
         },
@@ -144,16 +150,61 @@ function BankQuestionView() {
       console.log(err);
     }
   };
-  const handleClickQuestionList = async (index, id) => {
-    fetchQuestionListByChapterId(id);
-    setOpenIndex((prevOpenIndex) => (prevOpenIndex === index ? null : index));
+  useEffect(() => {
+    fetchQuestionListByChapterId();
+  }, [chapterId]);
+
+  const handleCheckboxChange = (event) => {
+    const id = event.target.value;
+    const isChecked = event.target.checked;
+
+    if (isChecked) {
+      // Thêm id vào mảng selectedIds
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      // Xóa id khỏi mảng selectedIds
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    }
+  };
+  const handleDeleteQuestion = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`/questions/chapters/${chapterId}`, {
+        data: { selectedIds }, // Pass selectedIds as the request body
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+      });
+      message.success("Questions deleted successfully.");
+      setSelectedIds([]);
+      fetchQuestionListByChapterId();
+    } catch (error) {
+      message.error("Error deleting questions.");
+      console.log(error);
+    }
   };
   return (
     <>
-      <div className="flex justify-between items-center px-6 mt-3 border-b border-slate-300 pb-3">
+      <QuestionFormEdit
+        open={openEdit}
+        setOpen={setOpenEdit}
+        setQuestions={setQuestions}
+        questions={questions}
+        setOptionsAnswer={setOptionsAnswer}
+        optionsAnswer={optionsAnswer}
+        setQuestionType={setQuestionType}
+        questionType={questionType}
+        setQuestionTitle={setQuestionTitle}
+        questionTitle={questionTitle}
+        setQuestionImg={setQuestionImg}
+        questionImg={questionImg}
+        onFileChange={uploadImgFileToCloudinary}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+      />
+      <div className="flex justify-between items-center px-3 mt-3 border-b border-slate-300 pb-3">
         <span className="text-xl font-bold">{course?.title}</span>
         <button
-          // onClick={handleClickOpen}
           type="submit"
           className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >
@@ -161,79 +212,121 @@ function BankQuestionView() {
           Bank Question
         </button>
       </div>
-      <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
-        <div className="p-5 pb-0 flex justify-between items-center ">
+      <div
+        className="rounded-b-lg min-h-[600px]"
+        style={{ backgroundColor: "#F5F5F5" }}
+      >
+        <div className="p-3 pb-0 flex justify-between items-center ">
           <div className=" flex justify-center items-center">
             <div className="hover:bg-slate-200 hover:rounded-md px-1 hover:cursor-pointer">
               <RefreshIcon />
             </div>
             <span className="mx-2 text-slate-500">|</span>
-            <span className=" ">2 questions selected</span>
-            <span className="ml-4 px-3 py-2 hover:bg-slate-200  hover:cursor-pointer hover:rounded-md text-blue-700 text-sm">
-              Clean
-            </span>
+            <span className=" ">{selectedIds.length} questions selected</span>
+            {selectedIds.length === 0 && (
+              <span className="ml-4 px-3 py-2 hover:bg-slate-200  hover:cursor-pointer hover:rounded-md text-blue-700 text-sm">
+                Clean
+              </span>
+            )}
           </div>
           <div className="flex justify-between items-center gap-3">
             <div>
-              <ComponentTest />
-            </div>
-            <div className="flex justify-center items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:rounded-md hover:cursor-pointer">
-              <DeleteIcon
-                style={{ color: "rgb(220 38 38)", fontSize: "20px" }}
+              <ClassMenu
+                setSelected={setSelected}
+                selected={selected}
+                chapters={chapters}
+                setChapterId={setChapterId}
               />
-              <span className="text-red-600">Delete</span>
             </div>
+            {selectedIds.length === 0 ? (
+              <button
+                onClick={() => handleClickOpen()}
+                className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3"
+              >
+                Add Question
+              </button>
+            ) : (
+              <div
+                onClick={handleDeleteQuestion}
+                className="flex justify-center items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:rounded-md hover:cursor-pointer"
+              >
+                <DeleteIcon
+                  style={{ color: "rgb(220 38 38)", fontSize: "20px" }}
+                />
+                <span className="text-red-600 text-sm font-semibold">
+                  Delete
+                </span>
+              </div>
+            )}
           </div>
         </div>
-
-        <div className="p-5">
-          {chapters.map((item, index) => (
-            <List
-              key={index}
-              sx={{
-                borderRadius: "12px",
-                marginBottom: "16px",
-                width: "100%",
-                bgcolor: "#fff",
-              }}
-              component="nav"
-              aria-labelledby="nested-list-subheader"
-            >
-              <ListItemButton
-                onClick={() => handleClickQuestionList(index, item?.ChapterId)}
-              >
-                <div className="flex justify-between w-full items-center">
-                  <div className="flex items-center">
-                    {openIndex === index ? <ExpandLess /> : <ExpandMore />}
-                    <ListItemText
-                      className="ml-3"
-                      primary={`Chương ${index + 1}: ${item.ChapterTitle}`}
-                    />
-                  </div>
-                  <div
-                    onClick={() => handleClickOpen(item?.ChapterId)}
-                    className=" border rounded-md px-2 py-1 flex items-center gap-1		"
-                  >
-                    <AddIcon />
-                    <span>Quiz</span>
-                  </div>
-                </div>
-              </ListItemButton>
-              <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {questionData.map((item, id) => (
-                    <ListItemButton key={id} sx={{ pl: 4 }}>
-                      <ListItemText
-                        primary={` Question ${id + 1}:  ${
-                          item.QuestionContent
-                        }`}
-                      />
-                    </ListItemButton>
+        <div className="p-3">
+          <div class="  shadow-sm sm:rounded-lg p-4 bg-white ">
+            <div className="min-h-[480px] max-h-[500px] overflow-y-auto">
+              <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
+                <thead class="text-sm text-black font-normal">
+                  <tr>
+                    <th scope="col" class="p-4"></th>
+                    <th scope="col" class="px-6 py-2" style={{ width: "30%" }}>
+                      Question Content
+                    </th>
+                    <th scope="col" class="px-6 py-2" style={{ width: "20%" }}>
+                      Question ID
+                    </th>
+                    <th scope="col" class="px-6 py-2" style={{ width: "20%" }}>
+                      Question Type
+                    </th>
+                    <th scope="col" class="px-6 py-2" style={{ width: "20%" }}>
+                      Created At
+                    </th>
+                    <th scope="col" class="px-6 py-2" style={{ width: "10%" }}>
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questionData.map((question) => (
+                    <tr
+                      key={question.QuestionId}
+                      class="bg-white border-t border-slate-300 hover:bg-zinc-100"
+                    >
+                      <td class="w-4 p-3">
+                        <div class="flex items-center">
+                          <input
+                            id={question.QuestionId}
+                            onChange={handleCheckboxChange}
+                            type="checkbox"
+                            className={` w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600`}
+                            value={question.QuestionId}
+                          />
+                        </div>
+                      </td>
+                      <td class="px-6 py-3 max-w-96 truncate ">
+                        <span title={question.QuestionContent}>
+                          {question.QuestionContent}
+                        </span>
+                      </td>
+                      <td class="px-6 py-3 truncate ...">
+                        {question.QuestionId}
+                      </td>
+                      <td class="px-6 py-3">{question.QuestionType}</td>
+                      <td className="px-6 py-2 truncate ">
+                        {formatDateString(question.LastModificationTime)}
+                      </td>
+                      <td class="px-6 py-3">
+                        <button
+                          onClick={() => setOpenEdit(true)}
+                          class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
                   ))}
-                </List>
-              </Collapse>
-            </List>
-          ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
       <Dialog

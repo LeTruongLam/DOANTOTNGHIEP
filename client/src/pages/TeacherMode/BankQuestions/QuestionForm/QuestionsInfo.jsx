@@ -6,9 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // import { message } from "antd";
 import Spinner from "../../../../components/Spinners/Spinner";
-import SignleChoice from "../../../../img/icons/04-single-choice.svg";
-import MultipleChoice from "../../../../img/icons/multiple-choice-9.svg";
-import TextInput from "../../../../img/icons/text-38.svg";
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -16,22 +14,18 @@ const choice = [
   {
     id: 1,
     value: "Single Choice",
-    avatar: SignleChoice,
   },
   {
     id: 2,
     value: "Multiple Choice",
-    avatar: MultipleChoice,
   },
   {
     id: 3,
     value: "Text Input",
-    avatar: TextInput,
   },
 ];
 function QuestionsInfo({
-  questions,
-  setQuestions,
+
   questionTitle,
   setQuestionTitle,
   questionType,
@@ -220,11 +214,6 @@ function QuestionsInfo({
             <div className="relative mt-2">
               <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
                 <span className="flex items-center">
-                  <img
-                    src={selectedType.avatar}
-                    alt="Type Image"
-                    className="h-5 w-5 flex-shrink-0 rounded-full"
-                  />
                   <span className="ml-3 block truncate">
                     {selectedType.value}
                   </span>
@@ -262,11 +251,6 @@ function QuestionsInfo({
                       {({ selected, active }) => (
                         <>
                           <div className="flex items-center">
-                            <img
-                              src={person.avatar}
-                              alt="Image type"
-                              className="h-5 w-5 flex-shrink-0 rounded-full"
-                            />
                             <span
                               className={classNames(
                                 selected ? "font-semibold" : "font-normal",
