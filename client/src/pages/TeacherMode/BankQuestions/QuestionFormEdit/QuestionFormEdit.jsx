@@ -1,54 +1,66 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
 import Dialog from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
-import React, { useState, Fragment, useRef } from "react";
+import React, { useState, Fragment, useEffect, useRef } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import axios from "axios";
 // import { message } from "antd";
 import Spinner from "../../../../components/Spinners/Spinner";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-const choice = [
-  {
-    id: 1,
-    value: "Single Choice",
-  },
-  {
-    id: 2,
-    value: "Multiple Choice",
-  },
-  {
-    id: 3,
-    value: "Text Input",
-  },
-];
+const choice = ["Single Choice", "Multiple Choice", "Text Input"];
 function QuestionFormEdit({
   setOpen,
   open,
-  questionTitle,
-  setQuestionTitle,
   questionType,
   setQuestionType,
   optionsAnswer,
   setOptionsAnswer,
-  questionImg,
-  setQuestionImg,
   onFileChange,
   setIsLoading,
   isLoading,
+  questionId,
 }) {
-  const [selectedType, setSelectedType] = useState(choice[0]);
+  const [selectedType, setSelectedType] = useState();
+  const [questionContent, setQuestionContent] = useState("");
+  const [questionImg, setQuestionImg] = useState("");
+  const [questionOptions, setQuestionOptions] = useState([]);
   const [newOptionValue, setNewOptionValue] = useState("");
   const [optionImg, setOptionImg] = useState("");
-
   const [isAnswer, setIsAnswer] = useState(false);
   const wrapperRef = useRef(null);
+  const [question, setQuestion] = useState();
 
+  const fetchQuestionById = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      if (questionId) {
+        const res = await axios.get(`/questions/${questionId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        });
+        const data = res.data;
+        setQuestion(data);
+        setSelectedType(data.QuestionType);
+        setQuestionContent(data.QuestionContent);
+        setQuestionImg(data.QuestionImg);
+        setQuestionOptions(data.QuestionOptions);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchQuestionById();
+  }, [questionId]);
   const handleChangeOptionImg = async (e) => {
     const newFile = e.target.files[0];
     const data = await onFileChange(newFile);
@@ -64,19 +76,19 @@ function QuestionFormEdit({
     const data = await onFileChange(newFile);
     setQuestionImg(data.imageUrl);
   };
-  const handleQuestionTitleChange = (event) => {
-    setQuestionTitle(event.target.value);
+  const handleQuestionContentChange = (event) => {
+    setQuestionContent(event.target.value);
   };
   const handleAddOption = () => {
     const newOption = {
-      id: optionsAnswer.length + 1,
-      optionTitle: newOptionValue,
-      optionImg: optionImg,
+      id: questionOptions.length + 1,
       isAnswer: isAnswer,
+      optionImg: optionImg,
+      optionTitle: newOptionValue,
     };
-    setOptionsAnswer([...optionsAnswer, newOption]);
+    setQuestionOptions([...questionOptions, newOption]);
     setNewOptionValue("");
-    setOptionImg();
+    setOptionImg("");
   };
   const handleQuestionTypeChange = (value) => {
     setQuestionType(value);
@@ -91,6 +103,12 @@ function QuestionFormEdit({
       (option) => option.id !== optionId
     );
     setOptionsAnswer(updatedOptionsAnswer);
+  };
+  const handleDeleteQuestionOptions = (optionId) => {
+    const updatedOptionsAnswer = questionOptions.filter(
+      (option) => option.id !== optionId
+    );
+    setQuestionOptions(updatedOptionsAnswer);
   };
 
   const renderOptions = () => {
@@ -130,6 +148,12 @@ function QuestionFormEdit({
             checked={option.isAnswer}
           />
           <button
+            // onClick={() => handleDeleteOption(option.id)}
+            className="ml-2 text-sm font-medium text-blue-600"
+          >
+            Edit
+          </button>
+          <button
             onClick={() => handleDeleteOption(option.id)}
             className="ml-2 text-sm font-medium text-red-600"
           >
@@ -139,7 +163,16 @@ function QuestionFormEdit({
       );
     });
   };
+  const [editingOptionId, setEditingOptionId] = useState(null);
 
+  const handleEditClick = (optionId) => {
+    setEditingOptionId(optionId);
+  };
+
+  const handleSaveClick = (optionId) => {
+    setEditingOptionId(null);
+    // Thực hiện các xử lý để lưu dữ liệu đã chỉnh sửa
+  };
   return (
     <Dialog className="scroll " fullWidth sx={{ m: 1 }} open={open}>
       <div className="form-wrapper mx-0 my-3 scroll">
@@ -168,15 +201,15 @@ function QuestionFormEdit({
                 htmlFor="about"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Write your question here{" "}
+                Write your question here
                 <span className="text-red-800 text-xl	">*</span>
               </label>
               <div className="mt-2">
                 <textarea
                   id="about"
                   name="about"
-                  value={questionTitle}
-                  onChange={handleQuestionTitleChange}
+                  value={questionContent}
+                  onChange={handleQuestionContentChange}
                   rows={1}
                   className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                   placeholder="Enter  question "
@@ -202,11 +235,7 @@ function QuestionFormEdit({
                     {isLoading && <Spinner />}
                     {questionImg ? (
                       <div className="max-h-40 max-w-60 py-0">
-                        <img
-                          className=""
-                          src={questionImg}
-                          alt="Question Image"
-                        />
+                        <img src={questionImg} alt="Question Image" />
                       </div>
                     ) : (
                       <div className="flex flex-col justify-center py-10 items-center mx-6">
@@ -244,7 +273,7 @@ function QuestionFormEdit({
                     <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
                       <span className="flex items-center">
                         <span className="ml-3 block truncate">
-                          {selectedType.value}
+                          {selectedType}
                         </span>
                       </span>
                       <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
@@ -263,9 +292,9 @@ function QuestionFormEdit({
                       leaveTo="opacity-0"
                     >
                       <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                        {choice.map((person) => (
+                        {choice.map((option, index) => (
                           <Listbox.Option
-                            key={person.id}
+                            key={index}
                             className={({ active }) =>
                               classNames(
                                 active
@@ -274,9 +303,9 @@ function QuestionFormEdit({
                                 "relative cursor-default select-none py-2 pl-3 pr-9"
                               )
                             }
-                            value={person}
+                            value={option}
                             onClick={() => {
-                              handleQuestionTypeChange(person.value);
+                              handleQuestionTypeChange(option);
                             }}
                           >
                             {({ selected, active }) => (
@@ -290,7 +319,7 @@ function QuestionFormEdit({
                                       "ml-3 block truncate"
                                     )}
                                   >
-                                    {person.value}
+                                    {option}
                                   </span>
                                 </div>
 
@@ -326,6 +355,154 @@ function QuestionFormEdit({
                 <span className="text-red-800 text-xl	">*</span>
               </label>
               <div>
+                {questionOptions &&
+                  questionOptions.map((option) => {
+                    const inputType =
+                      questionType === "Single Choice" ? "radio" : "checkbox";
+                    const isEditing = option.id === editingOptionId;
+                    let optionContent = option.optionTitle;
+                    return (
+                      <div
+                        key={option?.id}
+                        className="flex relative my-3 border border-blue-300 items-center px-3 rounded-md bg-white"
+                      >
+                        {isEditing ? (
+                          // Giao diện chỉnh sửa
+                          <div className="flex-grow w-full">
+                            <div className="py-3">
+                              <textarea
+                                rows={1}
+                                className="min-h-10 w-full border flex-grow  border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                                type="text"
+                                value={optionContent}
+                              />
+                              <div className="flex justify-start items-center gap-4 py-2 px-3">
+                                <div className="flex justify-center items-center gap-3 text-sm font-medium opacity-80 text-gray-900">
+                                  <input
+                                    type="radio"
+                                    name="isAnswer"
+                                    className="w-4 h-4"
+                                    checked={option.isAnswer}
+                                    value={true}
+                                  />
+                                  <div className="flex-shrink-0">
+                                    <span className="w-full">Is Answer</span>
+                                  </div>
+                                </div>
+                                <div className="flex justify-center items-center gap-3 text-sm font-medium opacity-80 text-gray-900">
+                                  <input
+                                    type="radio"
+                                    name="isAnswer"
+                                    className="w-4 h-4"
+                                    checked={!option.isAnswer}
+                                    value={false}
+                                  />
+                                  <div className="flex-shrink-0">
+                                    <span className="w-full">
+                                      Is Not Answer
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex justify-start items-center  py-2 px-3 gap-3">
+                                <div className="relative">
+                                  <input
+                                    type="file"
+                                    value=""
+                                    className="absolute top-0 left-0 opacity-0 w-full h-full"
+                                    onChange={handleChangeOptionImg}
+                                  />
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="#fff"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                                    />
+                                  </svg>
+                                </div>
+                                <a
+                                  href="https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp"
+                                  target="_blank"
+                                  title="
+                                  https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp
+                                  "
+                                  className="truncate w-full text-sm font-medium opacity-80 text-blue-700 hover:cursor-pointer underline"
+                                >
+                                  https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp
+                                </a>
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <button
+                                class="text-red-600 bg-white  focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-3 py-1.5 me-2 mb-2  "
+                                onClick={() => {
+                                  setEditingOptionId(null);
+                                }}
+                              >
+                                Cancle
+                              </button>
+                              <button
+                                class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                                onClick={handleSaveClick}
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          // Giao diện hiển thị thông tin
+                          <>
+                            {option?.optionImg && (
+                              <img
+                                className="h-10 w-12 border object-fill border-slate-200 m-1 image-zoom hover:rounded-sm hover:shadow-lg hover:border-none hover:shadow-gray-100"
+                                src={option?.optionImg}
+                                alt="Image option"
+                              />
+                            )}
+                            <label
+                              htmlFor={option?.id}
+                              className="w-full py-3 ms-2 text-sm font-medium opacity-80 text-gray-900 truncate"
+                            >
+                              {option.optionTitle}
+                            </label>
+                            <input
+                              id={option?.id}
+                              type={inputType}
+                              value={option.isAnswer}
+                              name={
+                                questionType === "Single Choice"
+                                  ? "bordered-radio"
+                                  : "bordered-checkbox"
+                              }
+                              className="w-5 h-5 text-blue-600"
+                              checked={option.isAnswer}
+                            />
+                            <button
+                              className="ml-2 text-sm font-medium text-blue-600"
+                              onClick={() => handleEditClick(option.id)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleDeleteQuestionOptions(option.id)
+                              }
+                              className="ml-2 text-sm font-medium text-red-600"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
                 {renderOptions()}
                 <div className="flex justify-between w-full items-center gap-3 ">
                   <div className="flex justify-center items-center gap-2 flex-grow">
@@ -398,6 +575,9 @@ function QuestionFormEdit({
           </button>
           <div className="flex gap-2">
             <button
+              onClick={() => {
+                console.log(questionOptions);
+              }}
               type="button"
               class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >

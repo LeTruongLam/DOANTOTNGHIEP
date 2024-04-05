@@ -3,6 +3,8 @@ import {
   addListQuestion,
   getListQuestionByChapterId,
   deleteListQuestion,
+  updateQuestion,
+  getQuestionById,
 } from "../controllers/Question/question.js";
 import { authorize } from "../middlewares/authorize.js";
 
@@ -11,5 +13,7 @@ const router = express.Router();
 router.post("/course/:courseId", authorize, addListQuestion);
 router.get("/chapters/:chapterId", authorize, getListQuestionByChapterId);
 router.delete("/chapters/:chapterId", authorize, deleteListQuestion);
+router.put("/:questionId", authorize, updateQuestion);
+router.get("/:questionId", authorize, getQuestionById);
 
 export default router;

@@ -5,8 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import React, { Fragment, useContext, useState, useEffect } from "react";
-import ListQuestions from "./QuestionForm/ListQuestions";
-import QuestionsInfo from "./QuestionForm/QuestionsInfo";
+import ListQuestions from "./QuestionFormAdd/ListQuestions";
+import QuestionsInfo from "./QuestionFormAdd/QuestionsInfo";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -19,7 +19,7 @@ import { message } from "antd";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClassMenu from "../../../components/SelectMenus/ClassMenu";
-import QuestionFormEdit from "./QuestionForm/QuestionFormEdit";
+import QuestionFormEdit from "./QuestionFormEdit/QuestionFormEdit";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {
@@ -40,7 +40,10 @@ function BankQuestionView() {
   const [questionData, setQuestionData] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selected, setSelected] = useState();
-
+  const [questionId, setQuestionId] = useState(null);
+  const handleReloadClick = () => {
+    window.location.reload();
+  };
   const fetchCourseData = async () => {
     try {
       let res = await fetchCourseById(courseId);
@@ -61,6 +64,9 @@ function BankQuestionView() {
     fetchCourseData();
     fetchChapterData();
   }, []);
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [chapterId]);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -185,23 +191,27 @@ function BankQuestionView() {
   };
   return (
     <>
-      <QuestionFormEdit
-        open={openEdit}
-        setOpen={setOpenEdit}
-        setQuestions={setQuestions}
-        questions={questions}
-        setOptionsAnswer={setOptionsAnswer}
-        optionsAnswer={optionsAnswer}
-        setQuestionType={setQuestionType}
-        questionType={questionType}
-        setQuestionTitle={setQuestionTitle}
-        questionTitle={questionTitle}
-        setQuestionImg={setQuestionImg}
-        questionImg={questionImg}
-        onFileChange={uploadImgFileToCloudinary}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-      />
+      {openEdit && (
+        <QuestionFormEdit
+          open={openEdit}
+          setOpen={setOpenEdit}
+          setQuestions={setQuestions}
+          questions={questions}
+          setOptionsAnswer={setOptionsAnswer}
+          optionsAnswer={optionsAnswer}
+          setQuestionType={setQuestionType}
+          questionType={questionType}
+          setQuestionTitle={setQuestionTitle}
+          questionTitle={questionTitle}
+          setQuestionImg={setQuestionImg}
+          questionImg={questionImg}
+          onFileChange={uploadImgFileToCloudinary}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          questionId={questionId}
+        />
+      )}
+
       <div className="flex justify-between items-center px-3 mt-3 border-b border-slate-300 pb-3">
         <span className="text-xl font-bold">{course?.title}</span>
         <button
@@ -218,12 +228,15 @@ function BankQuestionView() {
       >
         <div className="p-3 pb-0 flex justify-between items-center ">
           <div className=" flex justify-center items-center">
-            <div className="hover:bg-slate-200 hover:rounded-md px-1 hover:cursor-pointer">
+            <div
+              onClick={handleReloadClick}
+              className="hover:bg-slate-200 hover:rounded-md px-1 hover:cursor-pointer"
+            >
               <RefreshIcon />
             </div>
             <span className="mx-2 text-slate-500">|</span>
             <span className=" ">{selectedIds.length} questions selected</span>
-            {selectedIds.length === 0 && (
+            {selectedIds.length !== 0 && (
               <span className="ml-4 px-3 py-2 hover:bg-slate-200  hover:cursor-pointer hover:rounded-md text-blue-700 text-sm">
                 Clean
               </span>
@@ -315,7 +328,11 @@ function BankQuestionView() {
                       </td>
                       <td class="px-6 py-3">
                         <button
-                          onClick={() => setOpenEdit(true)}
+                          onClick={() => {
+                            setOpenEdit(true);
+                            // fetchQuestionById(question.QuestionId);
+                            setQuestionId(question.QuestionId);
+                          }}
                           class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                         >
                           Edit

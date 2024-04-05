@@ -72,7 +72,7 @@ function QuestionsInfo({
     };
     setOptionsAnswer([...optionsAnswer, newOption]);
     setNewOptionValue("");
-    setOptionImg();
+    setOptionImg("");
   };
   const handleQuestionTypeChange = (value) => {
     setQuestionType(value);
