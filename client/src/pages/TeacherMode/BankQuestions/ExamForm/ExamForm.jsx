@@ -5,11 +5,18 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import React, { useState, Fragment, useEffect, useRef } from "react";
 
-import ShowDialog from "../../../../components/Dialogs/ShowDialog";
+import QuestionsList from "./QuestionsList";
 
-function ExamForm({ open, setOpen }) {
+function ExamForm({ open, setOpen, chapters }) {
+  const [questionList, setQuestionList] = useState([]);
   return (
-    <Dialog className="scroll " fullWidth sx={{ m: 1 }} open={open}>
+    <Dialog
+      className="scroll "
+      fullWidth
+      sx={{ m: 1 }}
+      open={open}
+      style={{ maxWidth: "7xl !important" }}
+    >
       <div className="form-wrapper mx-0 my-3 scroll">
         <DialogTitle
           style={{
@@ -30,74 +37,102 @@ function ExamForm({ open, setOpen }) {
           </Button>
         </DialogTitle>
         <div>
-          <div className="px-5 py-3 bg-slate-100 ">
-            <div className="my-3">
-              <label
-                htmlFor="about"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Write exam title
-                <span className="text-red-800 text-xl	">*</span>
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="about"
-                  name="about"
-                  rows={1}
-                  className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                  placeholder="Enter  title "
-                />
+          <div className="px-5 py-3 flex flex-1 gap-5 bg-slate-100 ">
+            <div>
+              <div className="my-3">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Write exam title
+                  <span className="text-red-800 text-xl	">*</span>
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="about"
+                    name="about"
+                    rows={1}
+                    className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    placeholder="Enter  title "
+                  />
+                </div>
               </div>
-            </div>
-            <div className="my-3">
-              <label
-                htmlFor="about"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Exam description test
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="about"
-                  name="about"
-                  rows={1}
-                  className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                  placeholder="Enter  description "
-                />
+              <div className="my-3">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Exam description test
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="about"
+                    name="about"
+                    rows={1}
+                    className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    placeholder="Enter  description "
+                  />
+                </div>
               </div>
-            </div>
-            <div className="my-3">
-              <label
-                htmlFor="about"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Time limit
-              </label>
-              <div className="mt-2 flex items-center justify-start gap-3">
-                <input
-                  type="number"
-                  min="0"
-                  className="max-w-20 min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-center"
-                />
-                <span className="bg-white font-semibold text-gray-700 w-max min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                  Minutes
-                </span>
-                <div>
-                  <span className="text-gray-900 opacity-90 font-semibold text-sm">
-                    Time limit for this quiz. 0 means no time limit.
+              <div className="my-3">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Time limit
+                </label>
+                <div className="mt-2 flex items-center justify-start gap-3">
+                  <input
+                    type="number"
+                    min="0"
+                    className="max-w-20 min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-center"
+                  />
+                  <span className="bg-white font-semibold text-gray-700 w-max min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    Minutes
                   </span>
+                  <div>
+                    <span className="text-gray-900 opacity-90 font-semibold text-sm">
+                      Time limit for this quiz. 0 means no time limit.
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="my-3">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Exam quiz
+                </label>
+                <div className="mt-2 flex flex-col items-center justify-start gap-3">
+                  {questionList.length}
+                  {questionList.map((question, index) => (
+                    <div key={index}>
+                      <p>{question}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="my-3">
-              <label
-                htmlFor="about"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Questions
-              </label>
-              <div className="mt-2">
-                <div className="bg-white h-52 rounded-md"></div>
+            <div>
+              <div className="my-3 ">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Questions
+                </label>
+                <div className="mt-2">
+                  <div className="bg-white  rounded-md">
+                    <div className="px-3">
+                      <QuestionsList
+                        chapters={chapters}
+                        setQuestionList={setQuestionList}
+                        questionList={questionList}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

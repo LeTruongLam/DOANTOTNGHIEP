@@ -22,6 +22,7 @@ import ClassMenu from "../../../components/SelectMenus/ClassMenu";
 import QuestionFormEdit from "./QuestionFormEdit/QuestionFormEdit";
 import SpeedDialTooltipOpen from "./Components/SpeedDial";
 import ExamForm from "./ExamForm/ExamForm";
+import NoData from "../../../img/empty-box.png";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {
@@ -215,7 +216,9 @@ function BankQuestionView() {
         />
       )}
       <SpeedDialTooltipOpen />
-      {openExam && <ExamForm open={openExam} setOpen={setOpenExam} />}
+      {openExam && (
+        <ExamForm open={openExam} setOpen={setOpenExam} chapters={chapters} />
+      )}
       <div className="flex justify-between items-center px-3 mt-3 border-b border-slate-300 pb-3">
         <span className="text-xl font-bold">{course?.title}</span>
         <button
@@ -305,48 +308,60 @@ function BankQuestionView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {questionData.map((question) => (
-                    <tr
-                      key={question.QuestionId}
-                      class="bg-white border-t border-slate-300 hover:bg-zinc-100"
-                    >
-                      <td class="w-4 p-3">
-                        <div class="flex items-center">
-                          <input
-                            id={question.QuestionId}
-                            onChange={handleCheckboxChange}
-                            type="checkbox"
-                            className={` w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600`}
-                            value={question.QuestionId}
-                          />
-                        </div>
-                      </td>
-                      <td class="px-6 py-3 max-w-96 truncate ">
-                        <span title={question.QuestionContent}>
-                          {question.QuestionContent}
-                        </span>
-                      </td>
-                      <td class="px-6 py-3 truncate ...">
-                        {question.QuestionId}
-                      </td>
-                      <td class="px-6 py-3">{question.QuestionType}</td>
-                      <td className="px-6 py-2 truncate ">
-                        {formatDateString(question.LastModificationTime)}
-                      </td>
-                      <td class="px-6 py-3">
-                        <button
-                          onClick={() => {
-                            setOpenEdit(true);
-                            // fetchQuestionById(question.QuestionId);
-                            setQuestionId(question.QuestionId);
-                          }}
-                          class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {questionData.length > 0 ? (
+                    questionData.map((question) => (
+                      <tr
+                        key={question.QuestionId}
+                        className="bg-white border-t border-slate-300 hover:bg-zinc-100"
+                      >
+                        <td className="w-4 p-3">
+                          <div className="flex items-center">
+                            <input
+                              id={question.QuestionId}
+                              onChange={(event) =>
+                                handleCheckboxChange(event, question)
+                              }
+                              type="checkbox"
+                              className={`w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600`}
+                              value={question.QuestionId}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 max-w-96 truncate">
+                          <span title={question.QuestionContent}>
+                            {question.QuestionContent}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3 truncate ...">
+                          {question.QuestionId}
+                        </td>
+                        <td className="px-6 py-3">{question.QuestionType}</td>
+                        <td className="px-6 py-2 truncate">
+                          {formatDateString(question.LastModificationTime)}
+                        </td>
+                        <td className="px-6 py-3">
+                          <button
+                            onClick={() => {
+                              setOpenEdit(true);
+                              setQuestionId(question.QuestionId);
+                            }}
+                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <div className="flex flex-1 flex-col justify-center items-center w-full">
+                      <p>No result</p>
+                      <img
+                        className="w-60 h-60 max-w-max"
+                        src={NoData}
+                        alt=""
+                      />
+                    </div>
+                  )}
                 </tbody>
               </table>
             </div>

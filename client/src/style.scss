@@ -82,25 +82,7 @@
             }
         }
 
-        // FOOTER
-        footer {
-            width: 100%;
-            border-top: 1px solid #dfe3e6;
-            padding: 20px 0px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 20px;
-            position: relative;
-            bottom: 0;
-
-
-            img {
-                height: 50px;
-
-            }
-        }
+     
     }
 
 }
@@ -148,14 +130,18 @@ body::-webkit-scrollbar-thumb:hover {
     height: calc(100vh - 64px);
 }
 
-  
-  .image-zoom {
+
+.image-zoom {
     transition: transform 0.4s ease-in;
-  }
-  
-  .image-zoom:hover {
+}
+
+.image-zoom:hover {
     transform: scale(8) translateX(30px) translateY(-10px);
     z-index: 1000;
     position: relative;
-  }
-  
+}
+
+.css-tlc64q-MuiPaper-root-MuiDialog-paper {
+    max-width: max-content !important;
+    min-width: 600px;
+}

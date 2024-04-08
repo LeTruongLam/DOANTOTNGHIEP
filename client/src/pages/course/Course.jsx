@@ -37,7 +37,7 @@ const Course = () => {
               className="link gap-3"
               onClick={() => handleCourseClick(course)}
             >
-              <div className="course-image">
+              <div className="course-image max-h-48">
                 <img src={`${course.img}`} alt="Course Image" />
               </div>
               <div className="course-content">
