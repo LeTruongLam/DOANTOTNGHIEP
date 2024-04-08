@@ -54,7 +54,7 @@ function ExamForm({ open, setOpen }) {
                 htmlFor="about"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Exam description
+                Exam description test
               </label>
               <div className="mt-2">
                 <textarea
