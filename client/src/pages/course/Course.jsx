@@ -38,7 +38,7 @@ const Course = () => {
               onClick={() => handleCourseClick(course)}
             >
               <div className="course-image">
-                <img src={`../upload/${course.img}`} alt="Course Image" />
+                <img src={`${course.img}`} alt="Course Image" />
               </div>
               <div className="course-content">
                 <div className="course-glimpse-wrapper">

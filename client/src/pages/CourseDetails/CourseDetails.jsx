@@ -199,7 +199,7 @@ const CourseDetails = () => {
             </div>
             <div className="header-sub drop-shadow-2xl">
               <div className="header-sub-wrapper">
-                {course.img && <img src={`../upload/${course.img}`} alt="" />}
+                {course.img && <img src={`${course.img}`} alt="" />}
                 <div class="flex mt-5 overview_time_discount">
                   <div class="mr-5 w-1 flex justify-center items-center bg-gradient-to-b from-transparent via-pink-400 to-transparent">
                     <div class="w-7 h-7 rounded-full px-1 bg-white flex justify-center items-center shadow-md shadow-indigo-950	 	">

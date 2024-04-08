@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import ListAltIcon from "@mui/icons-material/ListAlt";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import styled from "styled-components";
 import { NavLink, useLocation } from "react-router-dom";
@@ -85,7 +86,7 @@ const Sidebar = () => {
             <Text>Assignments</Text>
           </Item>
           <Item className="hover:bg-slate-200" activeClassName="active" to="/bankquestion">
-            <QuizIcon />
+            <AccountBalanceIcon />
             <Text className="inline">Bank Questions</Text>
           </Item>
         </SlickBar>

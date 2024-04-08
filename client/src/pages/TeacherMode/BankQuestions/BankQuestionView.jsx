@@ -20,12 +20,15 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ClassMenu from "../../../components/SelectMenus/ClassMenu";
 import QuestionFormEdit from "./QuestionFormEdit/QuestionFormEdit";
+import SpeedDialTooltipOpen from "./Components/SpeedDial";
+import ExamForm from "./ExamForm/ExamForm";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {
   const [course, setCourse] = useState();
   const [activeStep, setActiveStep] = useState(0);
   const [open, setOpen] = useState(false);
+  const [openExam, setOpenExam] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const { courseId } = useParams();
   const { fetchChapter, fetchCourseById } = useContext(AuthContext);
@@ -211,15 +214,19 @@ function BankQuestionView() {
           questionId={questionId}
         />
       )}
-
+      <SpeedDialTooltipOpen />
+      {openExam && <ExamForm open={openExam} setOpen={setOpenExam} />}
       <div className="flex justify-between items-center px-3 mt-3 border-b border-slate-300 pb-3">
         <span className="text-xl font-bold">{course?.title}</span>
         <button
+          onClick={() => {
+            setOpenExam(true);
+          }}
           type="submit"
           className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >
           <AddCircleOutlineIcon className="mr-1" />
-          Bank Question
+          Exam
         </button>
       </div>
       <div

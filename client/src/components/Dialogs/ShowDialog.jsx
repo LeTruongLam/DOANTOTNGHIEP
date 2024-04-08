@@ -2,8 +2,13 @@ import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
-export default function Example({ title, content, handleOke , open, setOpen }) {
-
+export default function ShowDialog({
+  title,
+  content,
+  handleOke,
+  open,
+  setOpen,
+}) {
   const cancelButtonRef = useRef(null);
 
   return (

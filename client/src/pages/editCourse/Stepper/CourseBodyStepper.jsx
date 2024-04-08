@@ -16,7 +16,7 @@ import CourseClass from "../CourseComponent/CourseClass";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
-import Dialog from "../../../components/Dialogs/Dialog";
+import Dialog from "../../../components/Dialogs/ShowDialog";
 
 const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
   const location = useLocation();

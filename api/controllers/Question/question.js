@@ -101,12 +101,14 @@ export const getQuestionById = (req, res) => {
 };
 
 export const updateQuestion = (req, res) => {
+  const {
+    questionContent,
+    questionImg = "",
+    questionType,
+    questionAnswer = "",
+    questionOptions,
+  } = req.body;
   const questionId = req.params.questionId;
-  const questionContent = req.body.questionContent;
-  const questionImg = req.body.questionImg;
-  const questionType = req.body.questionType;
-  const questionAnswer = req.body.questionAnswer;
-  const questionOptions = JSON.stringify(req.body.optionsAnswer);
 
   const query = `
     UPDATE questions
@@ -118,6 +120,7 @@ export const updateQuestion = (req, res) => {
         LastModificationTime = NOW()
     WHERE QuestionId = ?
   `;
+
   db.query(
     query,
     [
@@ -125,8 +128,8 @@ export const updateQuestion = (req, res) => {
       questionImg,
       questionType,
       questionAnswer,
-      questionOptions,
-      questionId
+      JSON.stringify(questionOptions),
+      questionId,
     ],
     (err, data) => {
       if (err) {
@@ -136,7 +139,9 @@ export const updateQuestion = (req, res) => {
       if (data.affectedRows === 0) {
         return res.status(404).json({ error: "Question not found." });
       }
-      return res.status(200).json({ message: "Question updated successfully." });
+      return res
+        .status(200)
+        .json({ message: "Question updated successfully." });
     }
   );
 };

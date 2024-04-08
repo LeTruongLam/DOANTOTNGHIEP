@@ -9,7 +9,8 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import axios from "axios";
-// import { message } from "antd";
+import { message } from "antd";
+import ShowDialog from "../../../../components/Dialogs/ShowDialog";
 import Spinner from "../../../../components/Spinners/Spinner";
 
 function classNames(...classes) {
@@ -35,9 +36,15 @@ function QuestionFormEdit({
   const [newOptionValue, setNewOptionValue] = useState("");
   const [optionImg, setOptionImg] = useState("");
   const [isAnswer, setIsAnswer] = useState(false);
+  const [onShowDialog, setOnShowDialog] = useState(false);
   const wrapperRef = useRef(null);
   const [question, setQuestion] = useState();
-
+  const [changeOption, setChangeOption] = useState({
+    id: "",
+    optionTitle: "",
+    optionImg: "",
+    isAnswer: false,
+  });
   const fetchQuestionById = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -86,9 +93,20 @@ function QuestionFormEdit({
       optionImg: optionImg,
       optionTitle: newOptionValue,
     };
-    setQuestionOptions([...questionOptions, newOption]);
-    setNewOptionValue("");
-    setOptionImg("");
+    if (selectedType === "Single Choice") {
+      const check = validateSingleChoiceOptions(questionOptions);
+      if (check === 1 && isAnswer) {
+        message.warning("Single choice questions have only 1 answer!");
+      } else {
+        setQuestionOptions([...questionOptions, newOption]);
+        setNewOptionValue("");
+        setOptionImg("");
+      }
+    } else {
+      setQuestionOptions([...questionOptions, newOption]);
+      setNewOptionValue("");
+      setOptionImg("");
+    }
   };
   const handleQuestionTypeChange = (value) => {
     setQuestionType(value);
@@ -96,6 +114,16 @@ function QuestionFormEdit({
 
   const handleNewOptionValueChange = (event) => {
     setNewOptionValue(event.target.value);
+  };
+  const validateSingleChoiceOptions = (options) => {
+    let hasTrueIsAnswer = false;
+    options.forEach((option, index) => {
+      if (option?.isAnswer === true) {
+        hasTrueIsAnswer = true;
+      }
+    });
+
+    return hasTrueIsAnswer ? 1 : 0;
   };
 
   const handleDeleteOption = (optionId) => {
@@ -165,16 +193,63 @@ function QuestionFormEdit({
   };
   const [editingOptionId, setEditingOptionId] = useState(null);
 
-  const handleEditClick = (optionId) => {
+  const handleEditClick = (option, optionId) => {
+    setChangeOption(option);
     setEditingOptionId(optionId);
   };
 
-  const handleSaveClick = (optionId) => {
+  const handleSaveChangeOptionClick = (optionId) => {
+    const newOptions = questionOptions.map((option) => {
+      if (option.id === optionId) {
+        return {
+          ...option,
+          optionImg: changeOption.optionImg,
+          isAnswer: changeOption.isAnswer,
+          optionTitle: changeOption.optionTitle,
+        };
+      }
+      return option;
+    });
+    setQuestionOptions(newOptions);
     setEditingOptionId(null);
-    // Thực hiện các xử lý để lưu dữ liệu đã chỉnh sửa
+    setChangeOption({
+      id: "",
+      optionTitle: "",
+      optionImg: "",
+      isAnswer: false,
+    });
+  };
+  const handleSubmitChangeQuestion = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.put(
+        `/questions/${questionId}`,
+        {
+          questionContent,
+          questionType: selectedType,
+          questionImg,
+          questionOptions,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      message.success("Question updated successfully.");
+      setOpen(false);
+    } catch (error) {
+      message.error("Error updating question.");
+      console.log(error);
+    }
   };
   return (
     <Dialog className="scroll " fullWidth sx={{ m: 1 }} open={open}>
+      <div className="z-100000">
+        <ShowDialog open={onShowDialog} setOpen={setOnShowDialog} />
+      </div>
       <div className="form-wrapper mx-0 my-3 scroll">
         <DialogTitle
           style={{
@@ -360,7 +435,6 @@ function QuestionFormEdit({
                     const inputType =
                       questionType === "Single Choice" ? "radio" : "checkbox";
                     const isEditing = option.id === editingOptionId;
-                    let optionContent = option.optionTitle;
                     return (
                       <div
                         key={option?.id}
@@ -369,21 +443,32 @@ function QuestionFormEdit({
                         {isEditing ? (
                           // Giao diện chỉnh sửa
                           <div className="flex-grow w-full">
-                            <div className="py-3">
+                            <div className="pt-3">
                               <textarea
                                 rows={1}
                                 className="min-h-10 w-full border flex-grow  border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                                 type="text"
-                                value={optionContent}
+                                value={changeOption.optionTitle}
+                                onChange={(e) =>
+                                  setChangeOption((prevState) => ({
+                                    ...prevState,
+                                    optionTitle: e.target.value,
+                                  }))
+                                }
                               />
-                              <div className="flex justify-start items-center gap-4 py-2 px-3">
+                              <div className="flex justify-start items-center gap-4 py-2">
                                 <div className="flex justify-center items-center gap-3 text-sm font-medium opacity-80 text-gray-900">
                                   <input
                                     type="radio"
                                     name="isAnswer"
                                     className="w-4 h-4"
-                                    checked={option.isAnswer}
-                                    value={true}
+                                    checked={changeOption.isAnswer}
+                                    onChange={() => {
+                                      setChangeOption((prevState) => ({
+                                        ...prevState,
+                                        isAnswer: true,
+                                      }));
+                                    }}
                                   />
                                   <div className="flex-shrink-0">
                                     <span className="w-full">Is Answer</span>
@@ -394,8 +479,13 @@ function QuestionFormEdit({
                                     type="radio"
                                     name="isAnswer"
                                     className="w-4 h-4"
-                                    checked={!option.isAnswer}
-                                    value={false}
+                                    checked={!changeOption.isAnswer}
+                                    onChange={() => {
+                                      setChangeOption((prevState) => ({
+                                        ...prevState,
+                                        isAnswer: false,
+                                      }));
+                                    }}
                                   />
                                   <div className="flex-shrink-0">
                                     <span className="w-full">
@@ -404,13 +494,20 @@ function QuestionFormEdit({
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex justify-start items-center  py-2 px-3 gap-3">
+                              <div className="flex justify-start items-center  py-2  gap-3">
                                 <div className="relative">
                                   <input
                                     type="file"
                                     value=""
                                     className="absolute top-0 left-0 opacity-0 w-full h-full"
-                                    onChange={handleChangeOptionImg}
+                                    onChange={async (e) => {
+                                      const newFile = e.target.files[0];
+                                      const data = await onFileChange(newFile);
+                                      setChangeOption((prevState) => ({
+                                        ...prevState,
+                                        optionImg: data.imageUrl,
+                                      }));
+                                    }}
                                   />
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -428,20 +525,18 @@ function QuestionFormEdit({
                                   </svg>
                                 </div>
                                 <a
-                                  href="https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp"
+                                  href={changeOption?.optionImg}
+                                  title={changeOption?.optionImg}
                                   target="_blank"
-                                  title="
-                                  https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp
-                                  "
                                   className="truncate w-full text-sm font-medium opacity-80 text-blue-700 hover:cursor-pointer underline"
                                 >
-                                  https://res.cloudinary.com/ddwapzxdc/image/upload/v1699098430/CourseImage/xncnmw3j3abseh29hf3o.webp
+                                  {changeOption?.optionImg}
                                 </a>
                               </div>
                             </div>
                             <div className="flex justify-between items-center">
                               <button
-                                class="text-red-600 bg-white  focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-3 py-1.5 me-2 mb-2  "
+                                class="text-red-600 bg-white  focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-3 py-1.5  mb-2  "
                                 onClick={() => {
                                   setEditingOptionId(null);
                                 }}
@@ -450,7 +545,9 @@ function QuestionFormEdit({
                               </button>
                               <button
                                 class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                                onClick={handleSaveClick}
+                                onClick={() => {
+                                  handleSaveChangeOptionClick(option.id);
+                                }}
                               >
                                 Save
                               </button>
@@ -486,7 +583,9 @@ function QuestionFormEdit({
                             />
                             <button
                               className="ml-2 text-sm font-medium text-blue-600"
-                              onClick={() => handleEditClick(option.id)}
+                              onClick={() => {
+                                handleEditClick(option, option.id);
+                              }}
                             >
                               Edit
                             </button>
@@ -555,7 +654,7 @@ function QuestionFormEdit({
 
                   <button
                     onClick={handleAddOption}
-                    className="flex items-center justify-center gap-1 text-sm font-medium text-blue-600"
+                    className="flex items-center hover:bg-slate-200 px-2 py-1 rounded-md justify-center gap-1 text-sm font-medium text-blue-600"
                   >
                     <AddIcon style={{ color: "rgb(37 99 235)" }} />
                     <span>Add An Option</span>
@@ -576,7 +675,9 @@ function QuestionFormEdit({
           <div className="flex gap-2">
             <button
               onClick={() => {
+                handleSubmitChangeQuestion();
                 console.log(questionOptions);
+                setOnShowDialog(true);
               }}
               type="button"
               class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"

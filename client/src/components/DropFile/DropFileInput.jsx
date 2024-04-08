@@ -40,8 +40,7 @@ const DropFileInput = (props) => {
             </div>
           ) : location.state && location.state?.img ? (
             <div className="selected-file">
-              <img src={`../upload/${location.state?.img}`} alt="" />
-              {/* <img src={location.state?.img} alt="" /> */}
+              <img src={`${location.state?.img}`} alt="" />
             </div>
           ) : (
             <div className="drop-file-input__label">
@@ -53,7 +52,9 @@ const DropFileInput = (props) => {
         </div>
       </div>
       <div className="px-5 pb-3">
-        <span className="text-slate-400	 italic">Drag & Drop your file here</span>
+        <span className="text-slate-400	 italic">
+          Drag & Drop your file here
+        </span>
       </div>
     </div>
   );
