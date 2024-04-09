@@ -4,19 +4,17 @@ import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import React, { useState, Fragment, useEffect, useRef } from "react";
-
+import dayjs from "dayjs";
+import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
 import QuestionsList from "./QuestionsList";
 
 function ExamForm({ open, setOpen, chapters }) {
   const [questionList, setQuestionList] = useState([]);
   return (
-    <Dialog
-      className="scroll "
-      fullWidth
-      sx={{ m: 1 }}
-      open={open}
-      style={{ maxWidth: "7xl !important" }}
-    >
+    <Dialog className="scroll " fullWidth sx={{ m: 1 }} open={open}>
       <div className="form-wrapper mx-0 my-3 scroll">
         <DialogTitle
           style={{
@@ -75,6 +73,17 @@ function ExamForm({ open, setOpen, chapters }) {
                 </div>
               </div>
               <div className="my-3">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer
+                    components={["DateTimePicker", "MobileDateTimePicker"]}
+                  >
+                    <DemoItem label="Start time">
+                      <MobileDateTimePicker defaultValue={dayjs()} />
+                    </DemoItem>
+                  </DemoContainer>
+                </LocalizationProvider>
+              </div>
+              <div className="my-3">
                 <label
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
@@ -97,6 +106,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   </div>
                 </div>
               </div>
+
               <div className="my-3">
                 <label
                   htmlFor="about"

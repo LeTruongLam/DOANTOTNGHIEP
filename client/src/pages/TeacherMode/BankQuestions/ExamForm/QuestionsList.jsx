@@ -65,7 +65,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
         <div className="relative" key={index}>
           <p
             id={`dropdownCheckboxButton-${index}`}
-            className="w-full  justify-between min-w-96 my-2 text-gray-800 focus:ring-1 border border-blue-300 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-2.5 py-2.5 text-center inline-flex items-center "
+            className="w-[600px]  justify-between  my-2 text-gray-800 focus:ring-1 border border-blue-300 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-2.5 py-2.5 text-center inline-flex items-center "
             onClick={() => {
               toggleDropdown(index);
               console.log(chapter.ChapterId);
@@ -90,30 +90,42 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
           </p>
           {expandedChapter === index && (
             <div
-              className="top-full left-0 z-10 w-full bg-white divide-y divide-slate-200 px-3 rounded-lg shadow"
+              className="top-full  left-0 z-10 w-[600px] bg-white divide-y divide-slate-300 px-3 rounded-lg shadow"
               aria-labelledby={`dropdownCheckboxButton-${index}`}
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
-                {questionData.map((data, index) => (
-                  <li key={index}>
-                    <div className="flex items-center">
-                      <input
-                        id={`checkbox-item-${index}`}
-                        type="checkbox"
-                        value=""
-                        checked={questionList.includes(data.QuestionId)}
-                        onChange={(event) => handleCheckboxChange(event, data)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 "
-                      />
-                      <label
-                        htmlFor={`checkbox-item-${index}`}
-                        className="ms-2 text-sm font-medium text-gray-900"
-                      >
-                        {data?.QuestionContent}
-                      </label>
-                    </div>
-                  </li>
-                ))}
+                {questionData.length > 0 ? (
+                  questionData.map((data, index) => (
+                    <li key={index}>
+                      <div className="flex items-center truncate ...">
+                        <input
+                          id={`checkbox-item-${index}`}
+                          type="checkbox"
+                          value=""
+                          checked={questionList.includes(data.QuestionId)}
+                          onChange={(event) =>
+                            handleCheckboxChange(event, data)
+                          }
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 "
+                        />
+                        <label
+                          htmlFor={`checkbox-item-${index}`}
+                          className="ms-2 text-sm font-medium text-gray-900"
+                        >
+                          <span>
+                            {data?.QuestionContent}
+                          </span>
+                        </label>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <span className="text-gray-900 opacity-85 font-semibold italic">
+                      No data
+                    </span>
+                  </>
+                )}
               </ul>
               <div className="py-3">
                 <label
@@ -138,7 +150,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
                     className=" flex justify-center items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600"
                   >
                     <AutoAwesomeIcon fontSize="small" />
-                    Gửi
+                    Random question
                   </button>
                 </div>
               </div>

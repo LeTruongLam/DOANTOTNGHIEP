@@ -11,7 +11,7 @@ export default function SpeedDialTooltipOpen() {
 
   return (
     <Box>
-      <Backdrop open={open} />
+      <Backdrop open={open} style={{zIndex:"1000"}} />
       <SpeedDial
         ariaLabel="SpeedDial tooltip example"
         sx={{ position: "absolute", bottom: 16, right: 16 }}

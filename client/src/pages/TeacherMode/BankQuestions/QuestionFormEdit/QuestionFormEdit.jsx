@@ -676,7 +676,6 @@ function QuestionFormEdit({
             <button
               onClick={() => {
                 handleSubmitChangeQuestion();
-                console.log(questionOptions);
                 setOnShowDialog(true);
               }}
               type="button"

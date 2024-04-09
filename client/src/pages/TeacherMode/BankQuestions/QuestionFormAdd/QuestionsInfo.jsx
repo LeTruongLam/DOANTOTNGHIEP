@@ -4,7 +4,7 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-// import { message } from "antd";
+import { message } from "antd";
 import Spinner from "../../../../components/Spinners/Spinner";
 
 function classNames(...classes) {
@@ -25,7 +25,6 @@ const choice = [
   },
 ];
 function QuestionsInfo({
-
   questionTitle,
   setQuestionTitle,
   questionType,
@@ -63,6 +62,16 @@ function QuestionsInfo({
   const handleQuestionTitleChange = (event) => {
     setQuestionTitle(event.target.value);
   };
+  const validateSingleChoiceOptions = (options) => {
+    let hasTrueIsAnswer = false;
+    options.forEach((option, index) => {
+      if (option?.isAnswer === true) {
+        hasTrueIsAnswer = true;
+      }
+    });
+
+    return hasTrueIsAnswer ? 1 : 0;
+  };
   const handleAddOption = () => {
     const newOption = {
       id: optionsAnswer.length + 1,
@@ -70,9 +79,20 @@ function QuestionsInfo({
       optionImg: optionImg,
       isAnswer: isAnswer,
     };
-    setOptionsAnswer([...optionsAnswer, newOption]);
-    setNewOptionValue("");
-    setOptionImg("");
+    if (selectedType.value === "Single Choice") {
+      const check = validateSingleChoiceOptions(optionsAnswer);
+      if (check === 1 && isAnswer) {
+        message.warning("Single choice questions have only 1 answer!");
+      } else {
+        setOptionsAnswer([...optionsAnswer, newOption]);
+        setNewOptionValue("");
+        setOptionImg("");
+      }
+    } else {
+      setOptionsAnswer([...optionsAnswer, newOption]);
+      setNewOptionValue("");
+      setOptionImg("");
+    }
   };
   const handleQuestionTypeChange = (value) => {
     setQuestionType(value);
