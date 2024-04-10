@@ -3,6 +3,8 @@ import Dialog from "@mui/material/Dialog";
 import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
+import { useParams } from "react-router-dom";
+import { generateAccessCode } from "../../../../js/TAROHelper";
 import React, { useState, Fragment, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
@@ -10,9 +12,98 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
 import QuestionsList from "./QuestionsList";
-
+import { message } from "antd";
+import axios from "axios";
 function ExamForm({ open, setOpen, chapters }) {
+  const { courseId } = useParams();
+  const [examTitle, setExamTitle] = useState("");
+  const [examDescription, setExamDescription] = useState("");
+  const [startTime, setStartTime] = useState(dayjs());
+  const [timeLimit, setTimeLimit] = useState();
   const [questionList, setQuestionList] = useState([]);
+  const [classes, setClasses] = useState([]);
+
+  const fetchClasses = async () => {
+    try {
+      const response = await axios.get(`/classes/${courseId}`);
+      setClasses(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchClasses();
+  }, [courseId]);
+
+  const [checkedClasses, setCheckedClasses] = useState([]);
+
+  const handleCheckboxChange = (classId) => {
+    if (checkedClasses.includes(classId)) {
+      setCheckedClasses(checkedClasses.filter((id) => id !== classId));
+    } else {
+      setCheckedClasses([...checkedClasses, classId]);
+    }
+  };
+
+  const renderQuestionCount = () => {
+    const filteredQuestionList = questionList.filter(Boolean);
+    const mergedQuestionList = filteredQuestionList.flat();
+    const questionCount = mergedQuestionList.length;
+
+    return (
+      <div>
+        <p className="font-semibold text-base text-blue-700">{questionCount}</p>
+      </div>
+    );
+  };
+  const handleSave = async () => {
+    const filteredQuestionList = questionList.filter(Boolean);
+    const mergedQuestionList = filteredQuestionList.flat();
+
+    const validateForm = () => {
+      if (examTitle.trim() === "") {
+        message.error("Exam title cannot be empty.");
+        return false;
+      }
+      if (mergedQuestionList.length === 0) {
+        message.error("Questions is empty.");
+        return false;
+      }
+      return true;
+    };
+
+    const createExam = async () => {
+      try {
+        const payload = {
+          title: examTitle,
+          description: examDescription,
+          startTime: startTime,
+          timeLimit: timeLimit,
+          questionList: mergedQuestionList,
+        };
+        const response = await axios.post("url_cua_api", payload);
+        message.success("Exam created successfully");
+        setOpen(false);
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+
+    if (validateForm()) {
+      await createExam();
+    }
+  };
+  const [showInput, setShowInput] = useState(false);
+  const [accessCode, setAccessCode] = useState("");
+
+  const handleCheckboxAccessChange = (event) => {
+    setShowInput(event.target.checked);
+  };
+
+  const handleAccessCodeChange = (event) => {
+    setAccessCode(event.target.value);
+  };
   return (
     <Dialog className="scroll " fullWidth sx={{ m: 1 }} open={open}>
       <div className="form-wrapper mx-0 my-3 scroll">
@@ -49,6 +140,8 @@ function ExamForm({ open, setOpen, chapters }) {
                   <textarea
                     id="about"
                     name="about"
+                    value={examTitle}
+                    onChange={(e) => setExamTitle(e.target.value)}
                     rows={1}
                     className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     placeholder="Enter  title "
@@ -67,6 +160,8 @@ function ExamForm({ open, setOpen, chapters }) {
                     id="about"
                     name="about"
                     rows={1}
+                    value={examDescription}
+                    onChange={(e) => setExamDescription(e.target.value)}
                     className="w-full min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     placeholder="Enter  description "
                   />
@@ -78,7 +173,10 @@ function ExamForm({ open, setOpen, chapters }) {
                     components={["DateTimePicker", "MobileDateTimePicker"]}
                   >
                     <DemoItem label="Start time">
-                      <MobileDateTimePicker defaultValue={dayjs()} />
+                      <MobileDateTimePicker
+                        value={startTime}
+                        onChange={(date) => setStartTime(date)}
+                      />
                     </DemoItem>
                   </DemoContainer>
                 </LocalizationProvider>
@@ -94,6 +192,8 @@ function ExamForm({ open, setOpen, chapters }) {
                   <input
                     type="number"
                     min="0"
+                    value={timeLimit}
+                    onChange={(e) => setTimeLimit(e.target.value)}
                     className="max-w-20 min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-center"
                   />
                   <span className="bg-white font-semibold text-gray-700 w-max min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5">
@@ -107,21 +207,91 @@ function ExamForm({ open, setOpen, chapters }) {
                 </div>
               </div>
 
-              <div className="my-3">
+              <div className="my-3 flex justify-between items-center">
                 <label
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Exam quiz
+                  Number of questions
                 </label>
-                <div className="mt-2 flex flex-col items-center justify-start gap-3">
-                  {questionList.length}
-                  {questionList.map((question, index) => (
-                    <div key={index}>
-                      <p>{question}</p>
+                <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                  {renderQuestionCount()}
+                </span>
+              </div>
+              <div>
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Applicable subjects
+                </label>
+                <div className="my-3 px-3 py-2 rounded-md bg-white">
+                  <div className="pb-3 border-b border-slate-300 flex justify-between items-center    ">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      checked={checkedClasses.length === classes.length}
+                      onChange={() => {
+                        if (checkedClasses.length === classes.length) {
+                          setCheckedClasses([]);
+                        } else {
+                          setCheckedClasses(
+                            classes.map((classItem) => classItem.ClassId)
+                          );
+                        }
+                      }}
+                    />
+                    <label className=" text-sm font-medium text-gray-900">
+                      <span>Select all</span>
+                    </label>
+                  </div>
+
+                  {classes.map((classItem) => (
+                    <div
+                      key={classItem.ClassId}
+                      className="flex justify-between items-center py-3"
+                    >
+                      <input
+                        type="checkbox"
+                        value=""
+                        checked={checkedClasses.includes(classItem.ClassId)}
+                        onChange={() => handleCheckboxChange(classItem.ClassId)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <label className="ms-2 text-sm font-medium text-gray-900">
+                        <span>
+                          {classItem.ClassCode} - {classItem.title}
+                        </span>
+                      </label>
                     </div>
                   ))}
                 </div>
+              </div>
+              <div className="my-3 flex justify-between items-center">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Use the access code
+                </label>
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value=""
+                    className="sr-only peer"
+                    onChange={handleCheckboxAccessChange}
+                  />
+                  <div className="relative w-11 h-6 bg-zinc-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+                {showInput && (
+                  <input
+                    type="text"
+                    value={accessCode}
+                    onChange={handleAccessCodeChange}
+                    placeholder="Enter access code"
+                    className="mt-2 border border-gray-300 rounded-md p-2"
+                  />
+                )}
               </div>
             </div>
             <div>
@@ -157,6 +327,7 @@ function ExamForm({ open, setOpen, chapters }) {
           </button>
           <div className="flex gap-2">
             <button
+              onClick={handleSave}
               type="button"
               class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >
