@@ -84,7 +84,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
   };
 
   return (
-    <div className="w-full my-2">
+    <div className="py-3 w-full my-2">
       {chapters.map((chapter, index) => (
         <div className="relative" key={index}>
           <p
@@ -113,7 +113,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
           </p>
           {expandedChapter === index && (
             <div
-              className="top-full  left-0 z-10 w-[600px] bg-white divide-y divide-slate-300 px-3 rounded-lg shadow"
+              className="top-full mb-3 left-0 z-10 w-[600px] bg-white divide-y divide-slate-300 px-3 rounded-lg shadow"
               aria-labelledby={`dropdownCheckboxButton-${index}`}
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">

@@ -2,25 +2,32 @@ import { db } from "../../db.js";
 import { v4 as uuidv4 } from "uuid";
 
 export const addExam = (req, res) => {
-  let questionId = uuidv4();
-  let q = `INSERT INTO Exams(ExamId, ChapterId, CourseId, QuestionContent, QuestionImg, QuestionType, QuestionAnswer, QuestionOptions, IsDeleted, LastModificationTime)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, false, NOW())`;
-  const questionContent = question.questionTitle || "";
-  const questionImg = question.questionImg;
-  const questionType = question.questionType || "";
-  const questionAnswer = question.questionAnswer || "";
-  const questionOptions = JSON.stringify(question.optionsAnswer) || "";
+  const examId = uuidv4();
+  const courseId = req.params.courseId;
+  const {
+    examTitle,
+    examDescription = "",
+    startTime,
+    timeLimit,
+    questions,
+    confirmAccess,
+    accessCode = "",
+    classes = [],
+  } = req.body;
+  let q = `INSERT INTO Exams(ExamId,  CourseId, ExamTitle, ExamDescription,TimeStart , TimeLimit,   ConfirmAccess, AccessCode, IsDeleted )
+        VALUES (?, ?, ?, ?,?,?,?,?,?)`;
   db.query(
     q,
     [
-      questionId,
-      chapterId,
+      examId,
       courseId,
-      questionContent,
-      questionImg,
-      questionType,
-      questionAnswer,
-      questionOptions,
+      examTitle,
+      examDescription,
+      startTime,
+      timeLimit,
+      confirmAccess,
+      accessCode,
+      0,
     ],
     (err, data) => {
       if (err) {
@@ -30,4 +37,16 @@ export const addExam = (req, res) => {
       }
     }
   );
+};
+export const getExam = (req, res) => {
+  const courseId = req.params.courseId;
+  let q = `SELECT * FROM Exams WHERE CourseId = ?`;
+
+  db.query(q, [courseId], (err, data) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(data);
+    }
+  });
 };

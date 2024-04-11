@@ -6,6 +6,7 @@ import {
   updateQuestion,
   getQuestionById,
 } from "../controllers/Question/question.js";
+import { addExam, getExam } from "../controllers/Question/exam.js";
 import { authorize } from "../middlewares/authorize.js";
 
 const router = express.Router();
@@ -15,5 +16,8 @@ router.get("/chapters/:chapterId", authorize, getListQuestionByChapterId);
 router.delete("/chapters/:chapterId", authorize, deleteListQuestion);
 router.put("/:questionId", authorize, updateQuestion);
 router.get("/:questionId", authorize, getQuestionById);
+
+router.post("/exam/:courseId", addExam);
+router.get("/exam/:courseId", getExam);
 
 export default router;

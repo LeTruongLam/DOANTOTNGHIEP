@@ -28,6 +28,8 @@ import AssignmentListStudent from "./pages/TeacherMode/TheAssignment/AssignmentL
 import TheCalender from "./pages/TeacherMode/TheCalender.jsx";
 import BankQuestions from "./pages/TeacherMode/BankQuestions/BankQuestions.jsx";
 import BankQuestionView from "./pages/TeacherMode/BankQuestions/BankQuestionView.jsx";
+import ExamView from "./pages/TeacherMode/BankQuestions/ExamView/ExamView.jsx";
+
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -37,7 +39,7 @@ const Layout = ({ children }) => (
 
 const LayoutViewer = ({ children }) => (
   <>
-    <HeaderVideo  />
+    <HeaderVideo />
     <div className="mr-4">{children}</div>
   </>
 );
@@ -181,6 +183,17 @@ function App() {
                   element={
                     <LayoutTeacher>
                       <BankQuestionView />
+                    </LayoutTeacher>
+                  }
+                />
+              </Route>
+              <Route element={<TeacherRouter />}>
+                <Route
+                  path="/bankquestion/course/:courseId/Exams"
+                  exact
+                  element={
+                    <LayoutTeacher>
+                      <ExamView />
                     </LayoutTeacher>
                   }
                 />

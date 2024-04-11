@@ -1,5 +1,5 @@
 import moment from "moment";
-
+import dayjs from "dayjs";
 export const formatDate = (date) => {
   return moment(new Date(date)).format("DD/MM/YYYY");
 };
@@ -15,6 +15,13 @@ export const truncateString = (str, maxLength) => {
   }
   return str.substring(0, maxLength) + "...";
 };
+
+export const formattedDateTime = (date) => {
+  const dateTime = dayjs(date.$d);
+  const formattedDateTime = dateTime.format("YYYY-MM-DD HH:mm:ss");
+  return formattedDateTime;
+};
+
 export const formatDateString = (dateString) => {
   const originalDate = new Date(dateString);
 

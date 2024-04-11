@@ -4,7 +4,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
-import { generateAccessCode } from "../../../../js/TAROHelper";
+
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+
+import {
+  generateAccessCode,
+  formattedDateTime,
+} from "../../../../js/TAROHelper";
 import React, { useState, Fragment, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
@@ -19,9 +25,12 @@ function ExamForm({ open, setOpen, chapters }) {
   const [examTitle, setExamTitle] = useState("");
   const [examDescription, setExamDescription] = useState("");
   const [startTime, setStartTime] = useState(dayjs());
-  const [timeLimit, setTimeLimit] = useState();
+  const [timeLimit, setTimeLimit] = useState(0);
   const [questionList, setQuestionList] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [showInput, setShowInput] = useState(false);
+  const [accessCode, setAccessCode] = useState("");
+  const [checkedClasses, setCheckedClasses] = useState([]);
 
   const fetchClasses = async () => {
     try {
@@ -35,8 +44,6 @@ function ExamForm({ open, setOpen, chapters }) {
   useEffect(() => {
     fetchClasses();
   }, [courseId]);
-
-  const [checkedClasses, setCheckedClasses] = useState([]);
 
   const handleCheckboxChange = (classId) => {
     if (checkedClasses.includes(classId)) {
@@ -70,19 +77,31 @@ function ExamForm({ open, setOpen, chapters }) {
         message.error("Questions is empty.");
         return false;
       }
+      if (showInput && accessCode.trim() === "") {
+        message.error("Access code cannot be empty.");
+        return false;
+      }
       return true;
     };
 
     const createExam = async () => {
+      const formatStartTime = formattedDateTime(startTime);
       try {
         const payload = {
-          title: examTitle,
-          description: examDescription,
-          startTime: startTime,
+          courseId: courseId,
+          examTitle: examTitle,
+          examDescription: examDescription,
+          startTime: formatStartTime,
           timeLimit: timeLimit,
-          questionList: mergedQuestionList,
+          questions: mergedQuestionList,
+          confirmAccess: showInput,
+          accessCode: accessCode,
+          classes: checkedClasses,
         };
-        const response = await axios.post("url_cua_api", payload);
+        const response = await axios.post(
+          `/questions/exam/${courseId}`,
+          payload
+        );
         message.success("Exam created successfully");
         setOpen(false);
       } catch (error) {
@@ -94,19 +113,25 @@ function ExamForm({ open, setOpen, chapters }) {
       await createExam();
     }
   };
-  const [showInput, setShowInput] = useState(false);
-  const [accessCode, setAccessCode] = useState("");
 
+  const handlegenerateAccessCode = () => {
+    const newAccessCode = generateAccessCode();
+    setAccessCode(newAccessCode);
+  };
   const handleCheckboxAccessChange = (event) => {
     setShowInput(event.target.checked);
+
+    if (!event.target.checked) {
+      setAccessCode("");
+    }
   };
 
   const handleAccessCodeChange = (event) => {
     setAccessCode(event.target.value);
   };
   return (
-    <Dialog className="scroll " fullWidth sx={{ m: 1 }} open={open}>
-      <div className="form-wrapper mx-0 my-3 scroll">
+    <Dialog fullWidth sx={{ m: 1 }} open={open}>
+      <div className="form-wrapper mx-0 my-3 ">
         <DialogTitle
           style={{
             display: "flex",
@@ -267,30 +292,41 @@ function ExamForm({ open, setOpen, chapters }) {
                   ))}
                 </div>
               </div>
-              <div className="my-3 flex justify-between items-center">
-                <label
-                  htmlFor="about"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Use the access code
-                </label>
-                <label className="inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    value=""
-                    className="sr-only peer"
-                    onChange={handleCheckboxAccessChange}
-                  />
-                  <div className="relative w-11 h-6 bg-zinc-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
+              <div className="my-3 flex flex-col">
+                <div className=" flex justify-between items-center">
+                  <label
+                    htmlFor="about"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Use the access code
+                  </label>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value=""
+                      className="sr-only peer"
+                      onChange={handleCheckboxAccessChange}
+                    />
+                    <div className="relative w-11 h-6 bg-zinc-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
                 {showInput && (
-                  <input
-                    type="text"
-                    value={accessCode}
-                    onChange={handleAccessCodeChange}
-                    placeholder="Enter access code"
-                    className="mt-2 border border-gray-300 rounded-md p-2"
-                  />
+                  <div className="relative mt-3">
+                    <input
+                      type="text"
+                      value={accessCode}
+                      onChange={handleAccessCodeChange}
+                      placeholder="Enter access code"
+                      className="w-full min-h-10  border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    />
+                    <button
+                      className="absolute top-0 right-0 h-full opacity-50 px-4 hover:opacity-100 "
+                      title="Generate Access Code"
+                      onClick={handlegenerateAccessCode}
+                    >
+                      <AutoAwesomeIcon color="primary" fontSize="small" />
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
