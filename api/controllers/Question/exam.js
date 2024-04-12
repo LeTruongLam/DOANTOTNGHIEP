@@ -14,8 +14,10 @@ export const addExam = (req, res) => {
     accessCode = "",
     classes = [],
   } = req.body;
-  let q = `INSERT INTO Exams(ExamId,  CourseId, ExamTitle, ExamDescription,TimeStart , TimeLimit,   ConfirmAccess, AccessCode, IsDeleted )
-        VALUES (?, ?, ?, ?,?,?,?,?,?)`;
+
+  let q = `INSERT INTO Exams(ExamId,  CourseId, ExamTitle, ExamDescription, TimeStart, TimeLimit, ConfirmAccess, AccessCode, IsDeleted)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
   db.query(
     q,
     [
@@ -33,14 +35,46 @@ export const addExam = (req, res) => {
       if (err) {
         res.status(500).json(err);
       } else {
+        questions.forEach((questionId) => {
+          const examQuestionId = uuidv4();
+          const questionQuery = `INSERT INTO ExamQuestions (ExamQuestionId, ExamId, QuestionId) VALUES (?, ?, ?)`;
+          db.query(
+            questionQuery,
+            [examQuestionId, examId, questionId],
+            (err) => {
+              if (err) {
+                console.error(err);
+              }
+            }
+          );
+        });
+
+        // Insert classes into examclasses table
+        classes.forEach((classId) => {
+          const examClassId = uuidv4();
+          const classQuery = `INSERT INTO ExamClasses (ExamClassId, ExamId, ClassId) VALUES (?, ?, ?)`;
+          db.query(classQuery, [examClassId, examId, classId], (err) => {
+            if (err) {
+              console.error(err);
+            }
+          });
+        });
+
         res.status(200).json({ message: "Exam added successfully." });
       }
     }
   );
 };
+
 export const getExam = (req, res) => {
   const courseId = req.params.courseId;
-  let q = `SELECT * FROM Exams WHERE CourseId = ?`;
+  let q = `
+    SELECT E.*, COUNT(EQ.ExamQuestionId) AS QuestionCount
+    FROM Exams E
+    LEFT JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+    WHERE E.CourseId = ?
+    GROUP BY E.ExamId
+  `;
 
   db.query(q, [courseId], (err, data) => {
     if (err) {

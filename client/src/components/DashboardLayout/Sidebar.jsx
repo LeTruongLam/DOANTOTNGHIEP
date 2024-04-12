@@ -48,7 +48,7 @@ const Text = styled.span`
 const Sidebar = () => {
   const location = useLocation();
   return (
-    <div className=" min-w-[250px] border-r border-slate-300 flex flex-col justify-between ">
+    <div className=" min-w-[250px] border-r h-[100vh] border-slate-300 flex flex-col justify-between ">
       <Container>
         <SlickBar>
           <Item exact className="mt-10 hover:bg-slate-200 " activeClassName="active" to="/">

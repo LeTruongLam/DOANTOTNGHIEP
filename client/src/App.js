@@ -29,7 +29,7 @@ import TheCalender from "./pages/TeacherMode/TheCalender.jsx";
 import BankQuestions from "./pages/TeacherMode/BankQuestions/BankQuestions.jsx";
 import BankQuestionView from "./pages/TeacherMode/BankQuestions/BankQuestionView.jsx";
 import ExamView from "./pages/TeacherMode/BankQuestions/ExamView/ExamView.jsx";
-
+import ExamViewDetail from "./pages/TeacherMode/BankQuestions/ExamView/ExamViewDetail.jsx";
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -53,7 +53,12 @@ const LayoutTeacher = ({ children }) => (
     </div>
   </div>
 );
-
+const LayoutExam = ({ children }) => (
+  <div className="w-full ">
+    <HeaderLayout />
+    {children}
+  </div>
+);
 function App() {
   return (
     <div className="app">
@@ -195,6 +200,17 @@ function App() {
                     <LayoutTeacher>
                       <ExamView />
                     </LayoutTeacher>
+                  }
+                />
+              </Route>
+              <Route element={<TeacherRouter />}>
+                <Route
+                  path="/bankquestion/course/:courseId/ExamDetail/:examId"
+                  exact
+                  element={
+                    <LayoutExam>
+                      <ExamViewDetail />
+                    </LayoutExam>
                   }
                 />
               </Route>
