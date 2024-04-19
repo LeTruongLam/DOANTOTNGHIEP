@@ -22,7 +22,6 @@ import ClassMenu from "../../../components/SelectMenus/ClassMenu";
 import QuestionFormEdit from "./QuestionFormEdit/QuestionFormEdit";
 import SpeedDialTooltipOpen from "./Components/SpeedDial";
 import ExamForm from "./ExamForm/ExamForm";
-import NoData from "../../../img/empty-box.png";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {

@@ -1,320 +1,200 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { scroller } from "react-scroll";
 
 function ExamViewDetail() {
-  const tabData = Array.from({ length: 50 }, (_, index) => ({
-    id: index + 1,
-    label: (index + 1).toString(),
-  }));
+  const { examId } = useParams();
 
   const [activeTab, setActiveTab] = useState(1);
   const [time, setTime] = useState(3600);
+  const [questions, setQuestions] = useState([]);
+  const [selectedQuestionId, setSelectedQuestionId] = useState(null);
 
-  //   useEffect(() => {
-  //     let timer = null;
-  //     if (time > 0) {
-  //       timer = setInterval(() => {
-  //         setTime((prevTime) => prevTime - 1);
-  //       }, 1000);
-  //     }
+  const componentRef = useRef(null); // Reference to the main component's DOM element
 
-  //     return () => {
-  //       clearInterval(timer);
-  //     };
-  //   }, [time]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`/questions/exam/${examId}`);
+        setQuestions(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, [examId]);
+
+  useEffect(() => {
+    let timer = null;
+    if (time > 0) {
+      timer = setInterval(() => {
+        setTime((prevTime) => prevTime - 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [time]);
+
+  // Event listeners to prevent copying
+  useEffect(() => {
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    const handleKeyDown = (e) => {
+      // Disable Ctrl+C, Ctrl+V, Ctrl+U, F12
+      if (
+        (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 86 || e.keyCode === 85)) ||
+        e.keyCode === 123
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    const element = componentRef.current;
+    element.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      element.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const handleTabClick = (questionId) => {
+    setSelectedQuestionId(questionId);
+    scroller.scrollTo(questionId, {
+      duration: 500,
+      smooth: "easeInOutQuart",
+    });
+  };
 
   const generateTabs = () => {
-    return tabData.map((tab) => (
+    return questions.map((question, index) => (
       <li
-        key={tab.id}
+        key={index}
         className={`rounded-md border border-blue-500 flex ${
-          activeTab === tab.id ? "text-white bg-blue-600" : ""
+          selectedQuestionId === question.QuestionId ? "text-white bg-blue-600" : ""
         }`}
       >
-        <a
-          href="#"
+        <button
           className="inline-flex items-center justify-center flex-grow px-1 py-2 rounded-md hover:text-gray-900 hover:outline-blue-600 hover:outline"
-          onClick={() => setActiveTab(tab.id)}
+          onClick={() => handleTabClick(question.QuestionId)}
         >
-          {tab.label}
-        </a>
+          {(index + 1).toString()}
+        </button>
       </li>
     ));
   };
-  //   const faqData = [
-  //     {
-  //       id: 1,
-  //       question: "Câu hỏi 1",
-  //       answers: [
-  //         { text: "Lựa chọn 1", isCorrect: false },
-  //         { text: "Lựa chọn 2", isCorrect: true },
-  //         { text: "Lựa chọn 3", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 2,
-  //       question: "Câu hỏi 2",
-  //       answers: [
-  //         { text: "Lựa chọn A", isCorrect: true },
-  //         { text: "Lựa chọn B", isCorrect: false },
-  //         { text: "Lựa chọn C", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 3,
-  //       question: "Câu hỏi 3",
-  //       answers: [
-  //         { text: "Lựa chọn X", isCorrect: false },
-  //         { text: "Lựa chọn Y", isCorrect: false },
-  //         { text: "Lựa chọn Z", isCorrect: true },
-  //       ],
-  //     },
-  //     // Thêm các câu hỏi và câu trả lời khác tương tự ở đây
-  //     {
-  //       id: 4,
-  //       question: "Câu hỏi 4",
-  //       answers: [
-  //         { text: "Lựa chọn M", isCorrect: true },
-  //         { text: "Lựa chọn N", isCorrect: false },
-  //         { text: "Lựa chọn P", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 5,
-  //       question: "Câu hỏi 5",
-  //       answers: [
-  //         { text: "Lựa chọn Q", isCorrect: false },
-  //         { text: "Lựa chọn R", isCorrect: true },
-  //         { text: "Lựa chọn S", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 6,
-  //       question: "Câu hỏi 6",
-  //       answers: [
-  //         { text: "Lựa chọn D", isCorrect: false },
-  //         { text: "Lựa chọn E", isCorrect: false },
-  //         { text: "Lựa chọn F", isCorrect: true },
-  //       ],
-  //     },
-  //     {
-  //       id: 7,
-  //       question: "Câu hỏi 7",
-  //       answers: [
-  //         { text: "Lựa chọn G", isCorrect: false },
-  //         { text: "Lựa chọn H", isCorrect: true },
-  //         { text: "Lựa chọn I", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 8,
-  //       question: "Câu hỏi 8",
-  //       answers: [
-  //         { text: "Lựa chọn J", isCorrect: true },
-  //         { text: "Lựa chọn K", isCorrect: false },
-  //         { text: "Lựa chọn L", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 9,
-  //       question: "Câu hỏi 9",
-  //       answers: [
-  //         { text: "Lựa chọn T", isCorrect: false },
-  //         { text: "Lựa chọn U", isCorrect: true },
-  //         { text: "Lựa chọn V", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 10,
-  //       question: "Câu hỏi 10",
-  //       answers: [
-  //         { text: "Lựa chọn W", isCorrect: true },
-  //         { text: "Lựa chọn X", isCorrect: false },
-  //         { text: "Lựa chọn Y", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 11,
-  //       question: "Câu hỏi 11",
-  //       answers: [
-  //         { text: "Lựa chọn N", isCorrect: false },
-  //         { text: "Lựa chọn O", isCorrect: true },
-  //         { text: "Lựa chọn P", isCorrect: false },
-  //       ],
-  //     },
-  //     {
-  //       id: 12,
-  //       question: "Câu hỏi 12",
-  //       answers: [
-  //         { text: "Lựa chọn Q", isCorrect: true },
-  //         { text: "Lựa chọn R", isCorrect: false },
-  //         { text: "Lựa chọn S", isCorrect: false },
-  //       ],
-  //     },
-  //     // Thêm các câu hỏi và câu trả lời khác tương tự ở đây
-  //     // ...
-  //   ];
-  //   const generateFAQs = () => {
-  //     return faqData.map((faq) => (
-  //       <div key={faq.id} className="mb-8">
-  //         <h3 className="text-lg font-semibold">{faq.question}</h3>
-  //         <ul className="mt-2">
-  //           {faq.answers.map((answer, index) => (
-  //             <li
-  //               key={index}
-  //               className={`${
-  //                 answer.isCorrect ? "font-bold text-green-500" : ""
-  //               }`}
-  //             >
-  //               {answer.text}
-  //             </li>
-  //           ))}
-  //         </ul>
-  //       </div>
-  //     ));
-  //   };
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds
-      .toString()
-      .padStart(2, "0")}`;
-  };
-  const radios = [
-    {
-      name: "A",
-      description: "For personal or non-commercial projects.",
-    },
-    {
-      name: "B",
-      description: "For team collaboration with advanced features.",
-    },
-    {
-      name: "C",
-      description: "For teams with security,and performance needs.",
-    },
-  ];
   return (
-    <div className="flex px-5 gap-4 py-5">
-      <div className="w-[30%]">
-        <div className="sticky top-24  ">
-          <ul className="grid py-3 px-2 grid-cols-7 gap-2 text-sm font-medium text-center text-gray-500">
-            {generateTabs()}
-          </ul>
-          <p className="font-semibold mt-3 w-full text-6xl text-center">
-            <span className=" px-2 rounded-md border border-blue-500 mr-2">
-              {Math.floor(time / 60)
-                .toString()
-                .padStart(2, "0")}
+    <div ref={componentRef} className="flex py-5 flex-col px-5"> 
+      <div className="">
+        <div className="flex  justify-between items-center border-b pb-3 border-slate-200">
+          <div className="flex items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:cursor-pointer opacity-85 hover:opacity-100 rounded-md">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="black"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+              />
+            </svg>
+            <span className="text-gray-900 text-sm font-medium opacity-85">
+              Back
             </span>
-            <span>:</span>
-            <span className=" px-2 rounded-md border border-blue-500 mr-2">
-              {(time % 60).toString().padStart(2, "0")}
-            </span>
-          </p>
-          <p className="flex justify-center items-center mt-12">
-            <button className=" w-max  px-5 py-3 bg-blue-600 rounded-md text-white">
+          </div>
+          <div className="flex justify-center items-center gap-4">
+            <button className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3">
               Submit
             </button>
-          </p>
+          </div>
         </div>
       </div>
-      <div className="w-[70%] px-10">
-        {/* {generateFAQs()} */}
-        <div className="text-3xl text-blue-700 font-semibold py-1">
-          The Data Science Course: Complete Data Science Bootcamp 2023
-        </div>
-        <div className="mt-5">
-          <ul id="" className="my-4">
-            <div className="cau-hoi">
-              <span className="text-green-500 font-semibold">
-                #ID 14c97994-74ce-4053-b970-55cbabd5b297
-              </span>
-              <h3 className="font-semibold my-3">
-                CRISP-DM là viết tắt của gì?
-              </h3>
-              <div className="flex justify-center items-center my-3">
-                <img
-                  src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1712897037/BankQuestion/fdeqtuz5mvppiv93bgch.jpg"
-                  alt=""
-                  style={{ width: "50%", height: "auto" }}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2 my-3">
-                <div className="flex  justify-center items-center gap-5">
-                  <input className="w-4 h-4" type="checkbox" id="checkbox1" />
-                  <div>
-                    <span className="py-3">Checkbox 1</span>
-                    <img
-                      src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1712897037/BankQuestion/fdeqtuz5mvppiv93bgch.jpg"
-                      alt=""
-                      style={{ width: "50%", height: "auto" }}
-                    />
-                  </div>
-                </div>
-                <div className="flex  justify-center items-center gap-5">
-                  <input className="w-4 h-4" type="checkbox" id="checkbox1" />
-                  <div>
-                    <span className="py-3">Checkbox 1</span>
-                    <img
-                      src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1712897037/BankQuestion/fdeqtuz5mvppiv93bgch.jpg"
-                      alt=""
-                      style={{ width: "50%", height: "auto" }}
-                    />
-                  </div>
-                </div>
-                <div className="flex  justify-center items-center gap-5">
-                  <input className="w-4 h-4" type="checkbox" id="checkbox1" />
-                  <div>
-                    <span className="py-3">Checkbox 1</span>
-                    <img
-                      src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1712897037/BankQuestion/fdeqtuz5mvppiv93bgch.jpg"
-                      alt=""
-                      style={{ width: "50%", height: "auto" }}
-                    />
-                  </div>
-                </div>
-                <div className="flex  justify-center items-center gap-5">
-                  <input className="w-4 h-4" type="checkbox" id="checkbox1" />
-                  <div>
-                    <span className="py-3">Checkbox 1</span>
-                    <img
-                      src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1712897037/BankQuestion/fdeqtuz5mvppiv93bgch.jpg"
-                      alt=""
-                      style={{ width: "50%", height: "auto" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ul>
 
-          <ul className="mt-6 grid grid-cols-2 gap-4">
-            {radios.map((item, idx) => (
-              <li key={idx}>
-                <label htmlFor={item.name} className="block relative">
-                  <input
-                    id={item.name}
-                    type="radio"
-                    defaultChecked={idx == 1 ? true : false}
-                    name="payment"
-                    class="sr-only peer"
-                  />
-                  <div className="w-full p-5 cursor-pointer rounded-lg  border border-slate-300 bg-white shadow-sm ring-indigo-600 peer-checked:ring-2 duration-200">
-                    <div className="pl-7">
-                      <h3 className="leading-none text-gray-800 font-medium">
-                        {item.name}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-600">
-                        {item.description}
-                      </p>
-                    </div>
+      <div className="flex mt-3 gap-4 ">
+        <div className="w-[20%]">
+          <div className="sticky top-16  ">
+            <ul className="grid border mb-6 rounded-md border-blue-500 py-3 px-4 grid-cols-5 gap-2 text-sm font-medium text-center text-gray-500">
+              {generateTabs()}
+            </ul>
+            <p className="font-semibold  w-full text-xl text-center">
+              <span className=" px-4 py-3 rounded-md border border-blue-500 ">
+                {Math.floor(time / 60)
+                  .toString()
+                  .padStart(2, "0")}
+                {" : "}
+                {(time % 60).toString().padStart(2, "0")}
+              </span>
+            </p>
+          </div>
+        </div>
+        <div className="w-[80%] px-10">
+          <div className="text-3xl text-blue-700 font-semibold py-1">
+            The Data Science Course: Complete Data Science Bootcamp 2023
+          </div>
+          <div className="mt-5">
+            {questions.map((question, index) => (
+              <ul id={question?.QuestionId} className="my-4" key={index}>
+                <div className="cau-hoi">
+                  <span className="text-green-500 font-semibold">
+                    # {question?.QuestionId}
+                  </span>
+                  <h3 className={`font-semibold my-3 ${selectedQuestionId === question.QuestionId ? "bg-yellow-300" : ""}`}>
+                    {question?.QuestionContent}
+                  </h3>
+                  <div className="flex justify-center items-center my-3">
+                    <img
+                      src={question?.QuestionImg}
+                      alt=""
+                      style={{ width: "50%", height: "auto" }}
+                    />
                   </div>
-                  <span className="block absolute top-5 left-5 border peer-checked:border-[5px] peer-checked:border-indigo-600 w-4 h-4 rounded-full"></span>
-                </label>
-              </li>
+                  <ul className="mt-6 grid grid-cols-2 gap-4">
+                    {question?.QuestionOptions.map((item, idx) => (
+                      <li key={idx}>
+                        <label
+                          htmlFor={question?.QuestionId + item.id}
+                          className="block relative"
+                        >
+                          <input
+                            id={question?.QuestionId + item.id}
+                            type="radio"
+                            name="payment"
+                            className="sr-only peer"
+                          />
+                          <div className="w-full p-3 cursor-pointer rounded-lg  border border-slate-300 bg-white shadow-sm ring-indigo-600 peer-checked:ring-2 duration-200">
+                            <div className="pl-7">
+                              <h3 className="mt-0.5 text-gray-800 font-medium">
+                                {item?.optionTitle}
+                              </h3>
+                              <div className="flex justify-center items-center">
+                                <img
+                                  className=" w-auto max-h-48 "
+                                  src={item?.optionImg}
+                                  alt=""
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <span className="block absolute top-5 left-5 border peer-checked:border-[5px] peer-checked:border-indigo-600 w-4 h-4 rounded-full"></span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </ul>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </div>

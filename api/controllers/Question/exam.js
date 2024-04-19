@@ -84,3 +84,25 @@ export const getExam = (req, res) => {
     }
   });
 };
+
+
+export const getExamById = (req, res) => {
+  const examId = req.params.examId;
+  const query = `
+    SELECT Q.*
+    FROM Exams E
+    JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+    JOIN Questions Q ON Q.QuestionId = EQ.QuestionId
+    WHERE E.ExamId = ?
+  `;
+
+  db.query(query, [examId], (error, data) => {
+    console.log(data);
+
+    if (error) {
+      res.status(500).json({ error });
+    } else {
+      res.status(200).json(data);
+    }
+  });
+};

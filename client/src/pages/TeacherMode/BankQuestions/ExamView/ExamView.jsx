@@ -11,7 +11,7 @@ function ExamView() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`/questions/exam/${courseId}`);
+      const response = await axios.get(`/questions/exams/${courseId}`);
       setExams(response.data);
     } catch (error) {
       console.error(error);
