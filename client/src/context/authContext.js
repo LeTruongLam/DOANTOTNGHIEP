@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
-
+import { shuffleArray } from "../js/TAROHelper";
 const SESSIONTIMEOUT = 10000000000000; // 10s
 export const AuthContext = createContext();
 
@@ -20,6 +20,25 @@ export const AuthContexProvider = ({ children }) => {
     const expirationTime = Date.now() + SESSIONTIMEOUT;
     localStorage.setItem("expirationTime", expirationTime);
   };
+  // Lấy danh sách câu hỏi của bài thi
+  const [questions, setQuestions] = useState([]);
+  const [flaggedQuestions, setFlaggedQuestions] = useState([]);
+
+  const fetchExamById = async (examId) => {
+    try {
+      const response = await axios.get(`/questions/exam/${examId}`);
+      const randomizedQuestions = shuffleArray(response.data.questions);
+      setQuestions(randomizedQuestions);
+      localStorage.setItem(
+        "examQuestions",
+        JSON.stringify(randomizedQuestions)
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
   const fetchChapter = async (CourseId) => {
     try {
       const reschapter = await axios.get(`/courses/${CourseId}/chapters`);
@@ -80,9 +99,8 @@ export const AuthContexProvider = ({ children }) => {
   const logout = async () => {
     await axios.post("/auth/logout");
     setCurrentUser(null);
-    localStorage.removeItem("expirationTime");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user"); // Xóa thông tin người dùng từ localStorage
+    localStorage.clear(); // Xóa toàn bộ localStorage
+
   };
 
   useEffect(() => {
@@ -94,6 +112,8 @@ export const AuthContexProvider = ({ children }) => {
     if (expirationTime && Date.now() > Number(expirationTime)) {
       logout();
       setExpiredToken(true);
+      localStorage.clear(); // Xóa toàn bộ localStorage
+
     }
   }, [currentUser]);
 
@@ -103,6 +123,9 @@ export const AuthContexProvider = ({ children }) => {
         currentUser,
         courses,
         chapters,
+        questions,
+        flaggedQuestions,
+        setFlaggedQuestions,
         fetchCourses,
         login,
         logout,
@@ -110,6 +133,7 @@ export const AuthContexProvider = ({ children }) => {
         fetchLesson,
         fetchAssignment,
         fetchCourseById,
+        fetchExamById,
       }}
     >
       {children}

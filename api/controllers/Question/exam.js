@@ -88,21 +88,39 @@ export const getExam = (req, res) => {
 
 export const getExamById = (req, res) => {
   const examId = req.params.examId;
-  const query = `
-    SELECT Q.*
-    FROM Exams E
-    JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
-    JOIN Questions Q ON Q.QuestionId = EQ.QuestionId
-    WHERE E.ExamId = ?
+  console.log(examId);
+
+  const examQuery = `
+    SELECT *
+    FROM Exams
+    WHERE ExamId = ?
   `;
 
-  db.query(query, [examId], (error, data) => {
-    console.log(data);
+  const questionsQuery = `
+    SELECT Q.*
+    FROM ExamQuestions EQ
+    JOIN Questions Q ON Q.QuestionId = EQ.QuestionId
+    WHERE EQ.ExamId = ?
+  `;
 
+  db.query(examQuery, [examId], (error, examData) => {
     if (error) {
+      console.error(error);
       res.status(500).json({ error });
     } else {
-      res.status(200).json(data);
+      const exam = examData[0];
+
+      db.query(questionsQuery, [examId], (error, questionsData) => {
+        if (error) {
+          console.error(error);
+          res.status(500).json({ error });
+        } else {
+          const questions = questionsData;
+
+          exam.questions = questions;
+          res.status(200).json(exam);
+        }
+      });
     }
   });
 };

@@ -1,17 +1,21 @@
-import { Fragment } from "react";
+import { Fragment, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../context/authContext";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function ViewAEditDropdown({ examId }) {
+  const { fetchExamById } = useContext(AuthContext);
+
   const { courseId } = useParams();
   const navigate = useNavigate();
 
   const handleViewExam = () => {
+    fetchExamById(examId);
     navigate(`/bankquestion/course/${courseId}/ExamDetail/${examId}`);
   };
 

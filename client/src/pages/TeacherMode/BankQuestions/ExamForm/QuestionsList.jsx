@@ -26,8 +26,12 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
     if (expandedChapter !== null) {
       fetchQuestionListByChapterId(chapters[expandedChapter]?.ChapterId);
     }
-  }, [expandedChapter]);
 
+    // Clean-up function
+    return () => {
+      setQuestionData([]); // Reset the questionData state to an initial value
+    };
+  }, [expandedChapter]);
   const toggleDropdown = (index) => {
     if (expandedChapter === index) {
       setExpandedChapter(null);

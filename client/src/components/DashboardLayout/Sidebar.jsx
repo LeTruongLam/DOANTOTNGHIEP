@@ -5,7 +5,6 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import styled from "styled-components";
 import { NavLink, useLocation } from "react-router-dom";
-import QuizIcon from "@mui/icons-material/Quiz";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 const Container = styled.div`
   .active {

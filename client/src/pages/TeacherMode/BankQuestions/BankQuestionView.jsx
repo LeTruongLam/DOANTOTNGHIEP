@@ -67,9 +67,7 @@ function BankQuestionView() {
     fetchCourseData();
     fetchChapterData();
   }, []);
-  useEffect(() => {
-    setSelectedIds([]);
-  }, [chapterId]);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -145,7 +143,6 @@ function BankQuestionView() {
     setActiveStep(0);
     setQuestions([]);
   };
-
   const fetchQuestionListByChapterId = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -159,8 +156,14 @@ function BankQuestionView() {
       console.log(err);
     }
   };
+
   useEffect(() => {
     fetchQuestionListByChapterId();
+
+    // Clean-up function
+    return () => {
+      setQuestionData([]); // Reset the questionData state to an initial value
+    };
   }, [chapterId]);
 
   const handleCheckboxChange = (event) => {
@@ -285,7 +288,7 @@ function BankQuestionView() {
         <div className="p-3">
           <div class="  shadow-sm sm:rounded-lg p-4 bg-white ">
             <div className="min-h-[480px] max-h-[500px] overflow-y-auto">
-              {questionData.length > 0 ? (
+              {questionData && questionData.length > 0 ? (
                 <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
                   <thead class="text-sm text-black font-normal">
                     <tr>

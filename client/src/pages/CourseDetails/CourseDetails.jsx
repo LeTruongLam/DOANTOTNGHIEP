@@ -20,6 +20,7 @@ import TheBreadcrumbs from "../../components/Breadcrumbs";
 import ChapterList from "./CourseChapter/ChapterList";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import Exam from "./Exam/Exam";
 const CourseDetails = () => {
   const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
@@ -41,7 +42,7 @@ const CourseDetails = () => {
           },
         });
         setCourse(res.data);
-  
+
         const reschapter = await axios.get(`/courses/${courseId}/chapters`);
         setChapterData(reschapter.data);
         setLoading(true);
@@ -302,6 +303,17 @@ const CourseDetails = () => {
                       },
                     }}
                   />
+                  <Tab
+                    label="Bài thi"
+                    {...a11yProps(4)}
+                    sx={{
+                      textTransform: "none",
+
+                      "&.Mui-selected": {
+                        backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
+                      },
+                    }}
+                  />
                 </Tabs>
               </Box>
               <CustomTabPanel value={value} index={0}>
@@ -332,6 +344,9 @@ const CourseDetails = () => {
                   courseId={courseId}
                   classCodeStudent={course?.ClassCode}
                 />
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={4}>
+                <Exam />
               </CustomTabPanel>
             </Box>
           </div>
