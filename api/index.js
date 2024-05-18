@@ -1,16 +1,17 @@
 import express from "express";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
-import studentRoutes from "./routes/students.js"
+import studentRoutes from "./routes/students.js";
 import courseRoutes from "./routes/courses.js";
-import questionRoutes from "./routes/question.js"
-import classRoutes from "./routes/class.js"
+import questionRoutes from "./routes/question.js";
+import classRoutes from "./routes/class.js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import routeUpload from "./routes/routeUpload.js";
-import {db} from "./db.js"
+import { db } from "./db.js";
+import cors from "cors";
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 const storage = multer.diskStorage({
@@ -72,7 +73,9 @@ app.get("/api/chapters/:chapterId/document", function (req, res) {
       if (err) {
         // Xử lý lỗi truy vấn cơ sở dữ liệu
         console.error(err);
-        res.status(500).json({ error: "Failed to fetch ChapterDocument from database" });
+        res
+          .status(500)
+          .json({ error: "Failed to fetch ChapterDocument from database" });
         return;
       }
 

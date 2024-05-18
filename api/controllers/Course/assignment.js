@@ -18,67 +18,50 @@ export const authorize = (req, res, next) => {
 };
 // Lấy thông tin 1 bài assignment
 export const getAssignment = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-    const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
-    const assignmentId = req.params.assignmentId;
-    const q = `
+  const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
+  const assignmentId = req.params.assignmentId;
+  const q = `
       SELECT assignments.*
       FROM assignments
       JOIN chapters ON assignments.ChapterId = chapters.ChapterId
       WHERE assignments.ChapterId = ? AND assignments.AssignmentId = ?`;
 
-    db.query(q, [chapterId, assignmentId], (err, result) => {
-      if (err) return res.status(500).json(err);
-      const data = result[0];
+  db.query(q, [chapterId, assignmentId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    const data = result[0];
 
-      return res.status(200).json(data);
-    });
+    return res.status(200).json(data);
   });
 };
 // Lấy thông tin 1 bài assignment theo assignmentId
 export const getAssignmentById = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-    const assignmentId = req.params.assignmentId;
-    const q = `
+  const assignmentId = req.params.assignmentId;
+  const q = `
       SELECT assignments.*, courses.title as CourseTitle
       FROM assignments
       JOIN chapters ON assignments.ChapterId = chapters.ChapterId
       JOIN courses ON courses.CourseId = chapters.CourseId
       WHERE assignments.AssignmentId = ?`;
-    db.query(q, [assignmentId], (err, result) => {
-      if (err) return res.status(500).json(err);
-      const data = result[0];
-      return res.status(200).json(data);
-    });
+  db.query(q, [assignmentId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    const data = result[0];
+    return res.status(200).json(data);
   });
 };
 // Lấy thông tin nhiều bài assignment
 
 export const getAssignments = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-    const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
-    const q = `
+  const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
+  const q = `
       SELECT assignments.*
       FROM assignments
       JOIN chapters ON assignments.ChapterId = chapters.ChapterId
       WHERE assignments.ChapterId = ?`;
 
-    db.query(q, [chapterId], (err, data) => {
-      if (err) return res.status(500).json(err);
-      if (data.length === 0) return res.status(200).json([]);
-      return res.status(200).json(data);
-    });
+  db.query(q, [chapterId], (err, data) => {
+    if (err) return res.status(500).json(err);
+    if (data.length === 0) return res.status(200).json([]);
+    return res.status(200).json(data);
   });
 };
 
@@ -134,176 +117,136 @@ export const getAssignmentTitle = (req, res) => {
 };
 
 export const updateAssignmentTitle = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-    const chapterId = req.params.chapterId;
-    const assignmentId = req.params.assignmentId;
-    const assignmentTitle = req.body.assignmentTitle;
-    const q =
-      "UPDATE assignments SET AssignmentTitle = ? WHERE ChapterId = ? AND AssignmentId = ?";
-    const values = [assignmentTitle, chapterId, assignmentId];
+  const chapterId = req.params.chapterId;
+  const assignmentId = req.params.assignmentId;
+  const assignmentTitle = req.body.assignmentTitle;
+  const q =
+    "UPDATE assignments SET AssignmentTitle = ? WHERE ChapterId = ? AND AssignmentId = ?";
+  const values = [assignmentTitle, chapterId, assignmentId];
 
-    // Check user role and chapter update permission
+  // Check user role and chapter update permission
 
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-      if (data.affectedRows === 0) {
-        return res.status(404).json({ error: "assignment not found." });
-      }
-      return res.json({ message: "assignment title has been updated." });
-    });
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "assignment not found." });
+    }
+    return res.json({ message: "assignment title has been updated." });
   });
 };
 
 export const getAssignmentDesc = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const assignmentId = req.params.assignmentId;
+  const chapterId = req.params.chapterId;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q =
+    "SELECT AssignmentDesc FROM assignments WHERE  AssignmentId = ? AND ChapterId = ? ";
+  const values = [assignmentId, chapterId];
 
-    const assignmentId = req.params.assignmentId;
-    const chapterId = req.params.chapterId;
+  // Check user role and course access permission
 
-    const q =
-      "SELECT AssignmentDesc FROM assignments WHERE  AssignmentId = ? AND ChapterId = ? ";
-    const values = [assignmentId, chapterId];
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    // Check user role and course access permission
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Chapter not found." });
+    }
+    const assignment = data[0];
+    const assignmentDesc = assignment.AssignmentDesc;
 
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.length === 0) {
-        return res.status(404).json({ error: "Chapter not found." });
-      }
-      const assignment = data[0];
-      const assignmentDesc = assignment.AssignmentDesc;
-
-      return res.json({ assignmentDesc });
-    });
+    return res.json({ assignmentDesc });
   });
 };
 export const updateAssignmentDesc = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const assignmentId = req.params.assignmentId;
+  const chapterId = req.params.chapterId;
+  const assignmentDesc = req.body.assignmentDesc;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q =
+    "UPDATE  assignments SET  AssignmentDesc = ? WHERE  AssignmentId = ? AND ChapterId = ?";
+  const values = [assignmentDesc, assignmentId, chapterId];
 
-    const assignmentId = req.params.assignmentId;
-    const chapterId = req.params.chapterId;
-    const assignmentDesc = req.body.assignmentDesc;
+  // Check user role and chapter update permission
 
-    const q =
-      "UPDATE  assignments SET  AssignmentDesc = ? WHERE  AssignmentId = ? AND ChapterId = ?";
-    const values = [assignmentDesc, assignmentId, chapterId];
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    // Check user role and chapter update permission
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "assignments not found." });
+    }
 
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.affectedRows === 0) {
-        return res.status(404).json({ error: "assignments not found." });
-      }
-
-      return res.json("assignments description has been updated.");
-    });
+    return res.json("assignments description has been updated.");
   });
 };
 
 export const getAssignmentDate = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const assignmentId = req.params.assignmentId;
+  const chapterId = req.params.chapterId;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q =
+    "SELECT StartDate, EndDate FROM assignments WHERE AssignmentId = ? AND ChapterId = ?";
+  const values = [assignmentId, chapterId];
 
-    const assignmentId = req.params.assignmentId;
-    const chapterId = req.params.chapterId;
+  // Check user role and course access permission
 
-    const q =
-      "SELECT StartDate, EndDate FROM assignments WHERE AssignmentId = ? AND ChapterId = ?";
-    const values = [assignmentId, chapterId];
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    // Check user role and course access permission
+    if (data.length === 0) {
+      return res.status(404).json({ error: "Chapter not found." });
+    }
 
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
+    const assignment = data[0];
+    const startDate = assignment.StartDate;
+    const endDate = assignment.EndDate;
 
-      if (data.length === 0) {
-        return res.status(404).json({ error: "Chapter not found." });
-      }
-
-      const assignment = data[0];
-      const startDate = assignment.StartDate;
-      const endDate = assignment.EndDate;
-
-      return res.json({ startDate, endDate });
-    });
+    return res.json({ startDate, endDate });
   });
 };
 
 export const updateAssignmentDate = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const assignmentId = req.params.assignmentId;
+  const chapterId = req.params.chapterId;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q =
+    "UPDATE  assignments SET  `StartDate`=? ,`EndDate` = ?  WHERE  AssignmentId = ? AND ChapterId = ?";
+  const values = [startDate, endDate, assignmentId, chapterId];
 
-    const assignmentId = req.params.assignmentId;
-    const chapterId = req.params.chapterId;
-    const startDate = req.body.startDate;
-    const endDate = req.body.endDate;
+  // Check user role and chapter update permission
 
-    const q =
-      "UPDATE  assignments SET  `StartDate`=? ,`EndDate` = ?  WHERE  AssignmentId = ? AND ChapterId = ?";
-    const values = [startDate, endDate, assignmentId, chapterId];
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    // Check user role and chapter update permission
-
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.affectedRows === 0) {
-        return res.status(404).json({ error: "assignments not found." });
-      }
-      return res.json("assignments date has been updated.");
-    });
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "assignments not found." });
+    }
+    return res.json("assignments date has been updated.");
   });
 };
 
 export const getAssignmentFile = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const assignmentId = req.params.assignmentId;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q = "SELECT * FROM assignmentfile WHERE AssignmentId = ? ";
+  const values = [assignmentId];
 
-    const assignmentId = req.params.assignmentId;
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    const q = "SELECT * FROM assignmentfile WHERE AssignmentId = ? ";
-    const values = [assignmentId];
-
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.length === 0) {
-        return res.json({ message: "assignmentId not found." });
-      }
-      const chapter = data[0];
-      return res.json(data);
-    });
+    if (data.length === 0) {
+      return res.json({ message: "assignmentId not found." });
+    }
+    const chapter = data[0];
+    return res.json(data);
   });
 };
 export const updateAssignmentFile = (
@@ -313,40 +256,26 @@ export const updateAssignmentFile = (
   req,
   res
 ) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q =
+    "UPDATE assignments SET AssignmentFile = ? WHERE ChapterId = ? AND AssignmentId = ?";
+  const values = [assignmentFile, chapterId, assignmentId];
 
-    const q =
-      "UPDATE assignments SET AssignmentFile = ? WHERE ChapterId = ? AND AssignmentId = ?";
-    const values = [assignmentFile, chapterId, assignmentId];
+  // Check user role and chapter update permission
 
-    // Check user role and chapter update permission
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.affectedRows === 0) {
-        return res.status(404).json({ error: "assignmentFile not found." });
-      }
-      return res.json({ message: "assignmentFile has been updated." });
-    });
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "assignmentFile not found." });
+    }
+    return res.json({ message: "assignmentFile has been updated." });
   });
 };
 // trả Api để giáo viên có thể xem các assignment mà sinh viên đã nộp
 export const getAssignmentSubmission = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) {
-      return res.status(500).json({ error: err });
-    }
-
-    const assignmentId = req.params.assignmentId;
-    const q = `SELECT
+  const assignmentId = req.params.assignmentId;
+  const q = `SELECT
         submissions.SubmissionId,
         submissions.SubmissionDate,
         submissions.Score,
@@ -371,103 +300,45 @@ export const getAssignmentSubmission = (req, res) => {
       WHERE 
         submissions.AssignmentId = ? AND submissions.Status = 1 `;
 
-    db.query(q, [assignmentId], (err, data) => {
-      if (err) {
-        return res.status(500).json({ error: err });
-      }
-      if (data.length === 0) {
-        return res.json({ message: "assignment submited none." });
-      }
-      return res.json(data);
-    });
+  db.query(q, [assignmentId], (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
+    if (data.length === 0) {
+      return res.json({ message: "assignment submited none." });
+    }
+    return res.json(data);
   });
 };
 
-// export const assignmentSubmission = (req, res) => {
-//   const assignmentId = req.body.assignmentId;
-//   const chapterId = req.body.chapterId;
-//   const studentId = req.body.studentId;
-//   const courseId = req.body.courseId;
-//   const submissonFile = JSON.stringify(req.body.submissonFile);
-//   const submissionContent = req.body.submissionContent;
-//   const submissionDate = new Date().toISOString();
-//   const status = 1;
-//   const data = [
-//     assignmentId,
-//     chapterId,
-//     studentId,
-//     courseId,
-//     submissionDate,
-//     submissionContent,
-//     status,
-//     submissonFile,
-//   ];
-//   const q = `
-//     INSERT INTO submissions (AssignmentId, ChapterId, StudentId, CourseId, SubmissionDate, SubmissionContent, Status, SubmissonFile)
-//     VALUES (?, ?, ?, ?,NOW(), ?, ?, ?)
-//   `;
-
-//   db.query(
-//     q,
-//     [
-//       assignmentId,
-//       chapterId,
-//       studentId,
-//       courseId,
-//       submissionContent,
-//       status,
-//       submissonFile,
-//     ],
-//     (err, result) => {
-//       if (err) return res.status(500).json(err);
-//       return res
-//         .status(201)
-//         .json({ message: "Assignment submission successful" });
-//     }
-//   );
-// };
 export const updateReviewAssignment = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const submissionId = req.params.submissionId;
+  const assignmentReview = req.body.assignmentReview;
+  const q = "UPDATE  submissions SET  `Review` = ?  WHERE  SubmissionId = ?";
+  db.query(q, [assignmentReview, submissionId], (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const submissionId = req.params.submissionId;
-    const assignmentReview = req.body.assignmentReview;
-    const q = "UPDATE  submissions SET  `Review` = ?  WHERE  SubmissionId = ?";
-    db.query(q, [assignmentReview, submissionId], (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.affectedRows === 0) {
-        return res.status(404).json({ error: "assignments not found." });
-      }
-      return res.json("submissions review  has been updated.");
-    });
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "assignments not found." });
+    }
+    return res.json("submissions review  has been updated.");
   });
 };
 export const updatePointAssignment = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const submissionId = req.params.submissionId;
+  const assignmentPoint = req.body.assignmentPoint;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q = "UPDATE  submissions SET  `Score` = ?  WHERE  SubmissionId = ?";
+  const values = [assignmentPoint, submissionId];
+  db.query(q, values, (err, data) => {
+    if (err)
+      return res.status(500).json({ error: "An unexpected error occurred." });
 
-    const submissionId = req.params.submissionId;
-    const assignmentPoint = req.body.assignmentPoint;
-
-    const q = "UPDATE  submissions SET  `Score` = ?  WHERE  SubmissionId = ?";
-    const values = [assignmentPoint, submissionId];
-    db.query(q, values, (err, data) => {
-      if (err)
-        return res.status(500).json({ error: "An unexpected error occurred." });
-
-      if (data.affectedRows === 0) {
-        return res.status(404).json({ error: "assignments not found." });
-      }
-      return res.json("submissions score  has been updated.");
-    });
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "assignments not found." });
+    }
+    return res.json("submissions score  has been updated.");
   });
 };
 
@@ -567,36 +438,26 @@ export const deleteAssignmentFile = (req, res) => {
 
 // Lấy tất cả assignment của 1 môn học
 export const getAllAssignmentsOfCourse = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const courseId = req.params.courseId;
-    const q = `
+  const courseId = req.params.courseId;
+  const q = `
       SELECT a.AssignmentId, a.AssignmentTitle, a.ChapterId , a.EndDate, c.CourseId, c.title, chapters.* , c.TeacherId, c.CourseCode
       FROM assignments a
       JOIN courses c ON a.CourseId = c.CourseId
       JOIN chapters ON chapters.ChapterId = a.ChapterId
       WHERE a.CourseId = ?`;
 
-    db.query(q, [courseId], (err, data) => {
-      if (err) return res.status(500).json(err);
-      if (data.length === 0) return res.status(200).json([]);
-      return res.status(200).json(data);
-    });
+  db.query(q, [courseId], (err, data) => {
+    if (err) return res.status(500).json(err);
+    if (data.length === 0) return res.status(200).json([]);
+    return res.status(200).json(data);
   });
 };
 // Lấy tất cả sinh viên của 1 lớp có nộp bài hoặc chưa
 
 export const getAllStudentAndAssignmentStatus = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-    const classId = req.params.classId;
-    const assignmentId = req.params.assignmentId;
-    const q = `
+  const classId = req.params.classId;
+  const assignmentId = req.params.assignmentId;
+  const q = `
     SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, s.UserId
     FROM students s
     JOIN class_student sc ON s.StudentId = sc.StudentId
@@ -605,14 +466,13 @@ export const getAllStudentAndAssignmentStatus = (req, res) => {
     LEFT JOIN submissions sb ON s.UserId = sb.UserId AND cs.CourseId = sb.CourseId AND sb.AssignmentId = ?
     WHERE c.ClassId = ?
     ORDER BY s.StudentCode `;
-    db.query(q, [assignmentId, classId], (err, data) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json(err);
-      }
-      if (data.length === 0) return res.status(200).json([]);
-      return res.status(200).json(data);
-    });
+  db.query(q, [assignmentId, classId], (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    if (data.length === 0) return res.status(200).json([]);
+    return res.status(200).json(data);
   });
 };
 // Giao vien tao bai submission neu sinh vien khong nop bai

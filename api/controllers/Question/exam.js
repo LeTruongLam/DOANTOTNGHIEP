@@ -85,11 +85,8 @@ export const getExam = (req, res) => {
   });
 };
 
-
 export const getExamById = (req, res) => {
   const examId = req.params.examId;
-  console.log(examId);
-
   const examQuery = `
     SELECT *
     FROM Exams
@@ -121,6 +118,89 @@ export const getExamById = (req, res) => {
           res.status(200).json(exam);
         }
       });
+    }
+  });
+};
+export const ResultExams = (req, res) => {
+  const resultExamId = uuidv4();
+  const userInfo = req.userInfo;
+
+  const examId = req.params.examId;
+  const answers = req.body.answers;
+  const questionsQuery = `
+    SELECT Q.QuestionType, Q.QuestionAnswer, Q.QuestionId, Q.QuestionOptions
+    FROM ExamQuestions EQ
+    JOIN Questions Q ON Q.QuestionId = EQ.QuestionId
+    WHERE EQ.ExamId = ?
+  `;
+
+  // Truy vấn thông tin bài thi
+  db.query(questionsQuery, [examId], (error, examResults) => {
+    if (error) {
+      console.error("Lỗi truy vấn cơ sở dữ liệu:", error);
+      res.sendStatus(500);
+    } else {
+      // Kiểm tra xem bài thi có tồn tại hay không
+      if (examResults.length === 0) {
+        res.status(404).json({ message: "Không tìm thấy bài thi." });
+      } else {
+        // console.log(examResults);
+        // Lấy câu trả lời chính xác từ bài thi
+        const correctAnswers = examResults.map((question) => {
+          const options = question.QuestionOptions;
+          // console.log(correctOption);
+          const correctOptions = options.filter((option) => option.isAnswer);
+          const correctAnswerIds = correctOptions.map((option) => option.id);
+          return {
+            questionId: question.QuestionId,
+            correctAnswer:
+              correctAnswerIds.length > 0 ? correctAnswerIds : null,
+          };
+        });
+
+        console.log(correctAnswers);
+
+        let score = 0;
+
+        // So sánh câu trả lời của người dùng với câu trả lời chính xác
+        for (const answer of answers) {
+          const questionId = answer.questionId;
+          const answerIds = answer.answerId;
+          const correctAnswer = correctAnswers.find(
+            (ca) => ca.questionId === questionId
+          );
+
+          if (
+            correctAnswer &&
+            correctAnswer.correctAnswer &&
+            answerIds.length === correctAnswer.correctAnswer.length &&
+            answerIds.every((answerId) =>
+              correctAnswer.correctAnswer.includes(answerId)
+            )
+          ) {
+            score++;
+          }
+        }
+        console.log(score);
+        // Lưu trữ kết quả thi và điểm số vào cơ sở dữ liệu
+        const insertQuery = `
+        INSERT INTO ResultExams (ResultExamId, ExamId, SubmissionAnswers, Score, UserId, SubmissionTime)
+        VALUES (?, ?, ?, ?, ?, NOW())
+      `;
+
+        db.query(
+          insertQuery,
+          [resultExamId, examId, JSON.stringify(answers), score, userInfo.id],
+          (error, result) => {
+            if (error) {
+              console.error("Lỗi lưu trữ kết quả thi:", error);
+              res.sendStatus(500);
+            } else {
+              res.status(200).json({ score });
+            }
+          }
+        );
+      }
     }
   });
 };

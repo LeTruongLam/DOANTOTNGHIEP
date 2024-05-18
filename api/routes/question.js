@@ -6,7 +6,12 @@ import {
   updateQuestion,
   getQuestionById,
 } from "../controllers/Question/question.js";
-import { addExam, getExam, getExamById } from "../controllers/Question/exam.js";
+import {
+  addExam,
+  getExam,
+  getExamById,
+  ResultExams,
+} from "../controllers/Question/exam.js";
 import { authorize } from "../middlewares/authorize.js";
 
 const router = express.Router();
@@ -20,5 +25,6 @@ router.get("/:questionId", authorize, getQuestionById);
 router.post("/exam/:courseId", addExam);
 router.get("/exams/:courseId", getExam);
 router.get("/exam/:examId", getExamById);
+router.post("/exam/:examId/results", authorize, ResultExams);
 
 export default router;

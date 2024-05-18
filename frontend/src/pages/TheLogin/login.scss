@@ -1,0 +1,71 @@
+ // LOGIN
+ .auth {
+     margin-top: 40px;
+     display: flex;
+     gap: 20px;
+     align-items: flex-start;
+     .image {
+         flex: 1;
+         margin-right: 10px;
+         position: relative;
+
+         img {
+             width: 600px;
+             height: 550px;
+             border-radius: 8px;
+         }
+     }
+
+     .content {
+         flex: 1;
+         margin-left: 10px;
+         display: flex;
+         align-items: center;
+         flex-direction: column;
+         justify-content: center;
+         gap: 20px;
+         width: 100%;
+
+         h1 {
+             margin: 0;
+             color: blueviolet;
+         }
+
+
+         .login-form {
+             h6 {
+                 margin: 0;
+                 font-size: 16px;
+                 font-style: normal;
+             }
+
+             form {
+                 display: flex;
+                 flex-direction: column;
+
+                 input {
+                     border-radius: 34px;
+                     padding: 10px;
+                     border: 1px solid gray;
+                     margin-bottom: 20px;
+                     margin-top: 5px;
+                     font-size: 14px;
+                 }
+
+
+
+                 span {
+                     margin-top: 20px;
+
+                     font-size: 16px;
+                     text-align: center;
+                 }
+             }
+
+             a {
+                 text-align: right;
+                 margin-bottom: 10px;
+             }
+         }
+     }
+ }

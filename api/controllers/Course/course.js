@@ -177,107 +177,72 @@ export const getCourseTitle = (req, res) => {
   });
 };
 export const updateCourseTitle = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q = "UPDATE courses SET `title`=? WHERE `courseId` = ? ";
+  const values = [req.body.title, courseId];
 
-    const courseId = req.params.id;
-
-    const q = "UPDATE courses SET `title`=? WHERE `courseId` = ? ";
-    const values = [req.body.title, courseId];
-
-    db.query(q, values, (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.json({ message: "Course title has been updated." });
-    });
+  db.query(q, values, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json({ message: "Course title has been updated." });
   });
 };
 export const getCourseCode = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
+  const q = "SELECT CourseCode FROM courses WHERE CourseId = ? ";
+  db.query(q, [courseId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Course code not found" });
+    }
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const courseId = req.params.id;
-    const q = "SELECT CourseCode FROM courses WHERE CourseId = ? ";
-    db.query(q, [courseId], (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result.length === 0) {
-        return res.status(404).json({ message: "Course code not found" });
-      }
-
-      const course = result[0];
-      return res.status(200).json({ courseCode: course.CourseCode });
-    });
+    const course = result[0];
+    return res.status(200).json({ courseCode: course.CourseCode });
   });
 };
 export const updateCourseCode = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q = "UPDATE courses SET `CourseCode`=? WHERE `courseId` = ? ";
+  const values = [req.body.courseCode, courseId];
 
-    const courseId = req.params.id;
-
-    const q = "UPDATE courses SET `CourseCode`=? WHERE `courseId` = ? ";
-    const values = [req.body.courseCode, courseId];
-
-    db.query(q, values, (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.json("Course code has been updated.");
-    });
+  db.query(q, values, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json("Course code has been updated.");
   });
 };
 
 export const updateCourseDesc = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q = "UPDATE courses SET `desc`=? WHERE `courseId` = ? ";
+  const values = [req.body.desc, courseId];
 
-    const courseId = req.params.id;
+  // Check user role and course update permission
+  if (userInfo.role !== "admin") {
+    return res.status(403).json("Unauthorized!");
+  }
 
-    const q = "UPDATE courses SET `desc`=? WHERE `courseId` = ? ";
-    const values = [req.body.desc, courseId];
-
-    // Check user role and course update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
-    db.query(q, values, (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.json("Course title has been updated.");
-    });
+  db.query(q, values, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json("Course title has been updated.");
   });
 };
 
 export const updateCourseDate = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const courseId = req.params.id;
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  const q =
+    "UPDATE courses SET `StartDate`=? ,`EndDate` = ?  WHERE `courseId` = ? ";
+  const values = [req.body.StartDate, req.body.EndDate, courseId];
 
-    const courseId = req.params.id;
+  // Check user role and course update permission
+  if (userInfo.role !== "admin") {
+    return res.status(403).json("Unauthorized!");
+  }
 
-    const q =
-      "UPDATE courses SET `StartDate`=? ,`EndDate` = ?  WHERE `courseId` = ? ";
-    const values = [req.body.StartDate, req.body.EndDate, courseId];
-
-    // Check user role and course update permission
-    if (userInfo.role !== "admin") {
-      return res.status(403).json("Unauthorized!");
-    }
-
-    db.query(q, values, (err, data) => {
-      if (err) return res.status(500).json(err);
-      return res.json("Course date has been updated.");
-    });
+  db.query(q, values, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json("Course date has been updated.");
   });
 };

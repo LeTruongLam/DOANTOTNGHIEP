@@ -30,12 +30,7 @@ function ExamDetail() {
   };
 
   useEffect(() => {
-    const storedQuestions = localStorage.getItem("examQuestions");
-    if (storedQuestions) {
-      setQuestions(JSON.parse(storedQuestions));
-    } else {
-      fetchExamById(examId);
-    }
+    fetchExamById(examId);
   }, []);
 
   const handleTabClick = (questionId, index) => {
