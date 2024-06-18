@@ -25,10 +25,10 @@ function classNames(...classes) {
 }
 
 const columns = [
-  { id: "title", label: "Name", minWidth: 250 },
+  { id: "title", label: "Tên sinh viên", minWidth: 250 },
   {
     id: "start",
-    label: "Status",
+    label: "Trạng thái",
     minWidth: 300,
     align: "left",
     format: (value) => value.toLocaleString("en-US"),
@@ -36,7 +36,7 @@ const columns = [
 
   {
     id: "options",
-    label: "Points",
+    label: "Điểm",
     minWidth: 60,
     align: "center",
     format: (value) => value.toFixed(2),
@@ -44,7 +44,6 @@ const columns = [
   {
     id: "views",
     minWidth: 40,
-
     align: "right",
     format: (value) => value.toFixed(2),
   },
@@ -96,6 +95,9 @@ const AssignmentListStudent = () => {
   const [classId, setClassId] = useState();
   const [classCode, setClassCode] = useState("");
   const [classStudent, setClassStudent] = useState([]);
+  const [gradedStudents, setGradedStudents] = useState([]);
+  const [ungradedStudents, setUngradedStudents] = useState([]);
+
   useEffect(() => {
     fetchClassesOfCourse();
     fetchAssignment();
@@ -103,7 +105,9 @@ const AssignmentListStudent = () => {
   // Lấy danh sách lớp của môn học
   const fetchClassesOfCourse = async () => {
     try {
-      const res = await axios.get(`/classes/${courseId}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/classes/${courseId}`
+      );
       setClasses(res.data);
       setClassCode(res.data[0]?.ClassCode);
       setSelected(res.data[0]?.ClassCode);
@@ -115,7 +119,9 @@ const AssignmentListStudent = () => {
   // Lấy thông tin của assignment
   const fetchAssignment = async () => {
     try {
-      const res = await axios.get(`/courses/assignments/${assignmentId}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/courses/assignments/${assignmentId}`
+      );
       setAssignment(res.data);
     } catch (error) {
       console.error(error);
@@ -124,13 +130,19 @@ const AssignmentListStudent = () => {
   const fetchStudentAndAssignmentStatus = async (classId) => {
     try {
       const res = await axios.get(
-        `/courses/assignments/${assignmentId}/classroom/${classId}`
+        `http://localhost:8800/api/courses/assignments/${assignmentId}/classroom/${classId}`
       );
-      setClassStudent(res.data);
+      const students = res.data;
+      const graded = students.filter((student) => student.Graded === 1);
+      const ungraded = students.filter((student) => student.Graded !== 1);
+      setClassStudent(students);
+      setGradedStudents(graded);
+      setUngradedStudents(ungraded);
     } catch (error) {
       console.error(error);
     }
   };
+
   const handleToAssignmentDetail = async (student) => {
     console.log(student);
     if (student.SubmissionId) {
@@ -145,7 +157,7 @@ const AssignmentListStudent = () => {
     } else {
       try {
         const res = await axios.post(
-          `/courses/chapters/${assignment.ChapterId}/submission/teacherAdd`,
+          `http://localhost:8800/api/courses/chapters/${assignment.ChapterId}/submission/teacherAdd`,
           {
             assignmentId: assignmentId,
             chapterId: assignment.ChapterId,
@@ -168,33 +180,37 @@ const AssignmentListStudent = () => {
     }
   };
 
-  const rows = classStudent?.map((student, index) => {
-    return createData(
-      `${student?.StudentName}  ${student?.StudentCode}`,
-      student.Status === 1 ? (
-        <div className="flex justify-start items-center gap-2">
-          <CheckIcon color="primary" />
-          <span className="text-blue-800">
-            Turned in {formatDateString(student?.SubmissionDate)}
-          </span>
-        </div>
-      ) : (
-        <div className="flex justify-start items-center gap-2">
-          <BlockIcon color="error" />
-          <span className="text-red-800">Not turned in</span>
-        </div>
-      ),
-      <div className="rounded-md opacity-50 bg-gray-50 py-2.5 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        {student?.Score} / 10
-      </div>,
-      <button
-        onClick={() => handleToAssignmentDetail(student)} // Sử dụng hàm mô phỏng để truyền tham số
-        className="font-medium text-indigo-600 hover:text-indigo-500"
-      >
-        View
-      </button>
-    );
-  });
+  const createRows = (students) => {
+    return students?.map((student, index) => {
+      return createData(
+        `${student?.StudentName}  ${student?.StudentCode}`,
+        student.Status === 1 ? (
+          <div className="flex justify-start items-center gap-2">
+            <CheckIcon color="primary" />
+            <span className="text-blue-800">
+              Đã nộp lúc {formatDateString(student?.SubmissionDate)}
+            </span>
+          </div>
+        ) : (
+          <div className="flex justify-start items-center gap-2">
+            <BlockIcon color="error" />
+            <span className="text-red-800">Chưa nộp bài</span>
+          </div>
+        ),
+        <div className="rounded-md opacity-50 bg-gray-50 py-2.5 text-sm font-semibold text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          {student?.Score} / 10
+        </div>,
+        <button
+          onClick={() => handleToAssignmentDetail(student)}
+          className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none"
+        >
+          Xem chi tiết
+        </button>
+      );
+    });
+  };
+  const rowsUngraded = createRows(ungradedStudents);
+  const rowsGraded = createRows(gradedStudents);
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -216,20 +232,12 @@ const AssignmentListStudent = () => {
             {assignment?.AssignmentTitle}
           </h1>
           <span className="text-lg">
-            <span className=" text-red-700 font-bold"> Due in </span>
+            <span className=" text-red-700 font-bold"> Đến hạn lúc </span>
             <span className=" opacity-70">
               {formatDateString(assignment?.EndDate)}
             </span>
           </span>
         </div>
-        {/* <input
-          type="text"
-          name="search-course"
-          id="search-course"
-          autoComplete="given-name"
-          placeholder="Search students"
-          className=" outline-none block w-80 rounded-md border-0 px-3.5 py-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
-        /> */}
       </div>
       <div className="mb-5">
         <Box sx={{ width: "100%" }}>
@@ -238,22 +246,23 @@ const AssignmentListStudent = () => {
               <div className="flex justify-between items-center ">
                 <Tabs value={value} onChange={handleChange}>
                   <Tab
+                    className="border-none outline-none focus:outline-none focus-visible:outline-none"
                     label={
-                      <span style={{ fontWeight: "bold" }}>To return (30)</span>
+                      <span style={{ fontWeight: "bold" }}>
+                        Đang trả bài ({ungradedStudents?.length})
+                      </span>
                     }
                     {...a11yProps(0)}
                     sx={{ textTransform: "none" }}
                   />
                   <Tab
-                    label={<span style={{ fontWeight: "bold" }}>Returned</span>}
-                    {...a11yProps(1)}
-                    sx={{ textTransform: "none" }}
-                  />
-                  <Tab
+                    className="border-none outline-none focus:outline-none focus-visible:outline-none"
                     label={
-                      <span style={{ fontWeight: "bold" }}>Duplicate</span>
+                      <span style={{ fontWeight: "bold" }}>
+                        Đã trả bài ({gradedStudents?.length})
+                      </span>
                     }
-                    {...a11yProps(2)}
+                    {...a11yProps(1)}
                     sx={{ textTransform: "none" }}
                   />
                 </Tabs>
@@ -364,7 +373,7 @@ const AssignmentListStudent = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows
+                    {rowsUngraded
                       .slice(
                         page * rowsPerPage,
                         page * rowsPerPage + rowsPerPage
@@ -396,7 +405,7 @@ const AssignmentListStudent = () => {
               <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
-                count={rows.length}
+                count={rowsUngraded.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -404,8 +413,68 @@ const AssignmentListStudent = () => {
               />
             </Paper>
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}></CustomTabPanel>
-          <CustomTabPanel value={value} index={2}></CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <Paper sx={{ width: "100%", overflow: "hidden", marginTop: 1 }}>
+              <TableContainer sx={{ height: "100%", minHeight: 450 }}>
+                <Table stickyHeader aria-label="sticky table">
+                  <TableHead>
+                    <TableRow>
+                      {columns.map((column) => (
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={{
+                            minWidth: column.minWidth,
+                            maxWidth: column.maxWidth,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rowsGraded
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row) => {
+                        return (
+                          <TableRow
+                            hover
+                            role="checkbox"
+                            tabIndex={-1}
+                            key={row.code}
+                          >
+                            {columns.map((column) => {
+                              const value = row[column.id];
+                              return (
+                                <TableCell key={column.id} align={column.align}>
+                                  {column.format && typeof value === "number"
+                                    ? column.format(value)
+                                    : value}
+                                </TableCell>
+                              );
+                            })}
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[10, 25, 100]}
+                component="div"
+                count={rowsGraded.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Paper>
+          </CustomTabPanel>
         </Box>
       </div>
     </div>

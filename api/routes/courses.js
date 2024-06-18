@@ -8,6 +8,7 @@ import {
   getAllCourses,
   getCourseTitle,
   getCourseCode,
+  getCourseDesc,
   updateCourseTitle,
   updateCourseCode,
   updateCourseDate,
@@ -42,6 +43,7 @@ import {
   getAssignments,
   getAssignmentById,
   deleteAssignment,
+  deleteAssignmentFileAttached,
   addAssignmentTitle,
   getAssignmentTitle,
   updateAssignmentTitle,
@@ -70,11 +72,12 @@ router.get("/all", authorize, getAllCourses);
 router.get("/:id", authorize, getCourseById);
 router.post("/", authorize, addCourse);
 router.delete("/:id", authorize, deleteCourse);
-router.put("/:id", authorize, updateCourse);
 router.get("/title/:id", authorize, getCourseTitle);
-router.put("/title/:id", updateCourseTitle);
 router.get("/code/:id", getCourseCode);
+router.get("/desc/:id", getCourseDesc);
 
+router.put("/:id", authorize, updateCourse);
+router.put("/title/:id", updateCourseTitle);
 router.put("/code/:id", updateCourseCode);
 router.put("/date/:id", updateCourseDate);
 router.put("/desc/:id", updateCourseDesc);
@@ -113,14 +116,21 @@ router.put("/chapters/:chapterId/lessons/desc/:lessonId", updateLessonDesc);
 router.get("/chapters/:chapterId/assignments", getAssignments);
 router.get("/chapters/:chapterId/assignments/:assignmentId", getAssignment);
 router.get("/assignments/:assignmentId", getAssignmentById);
+//Xóa assignment
 router.delete(
   "/chapters/:chapterId/assignments/:assignmentId",
   deleteAssignment
+);
+// Xóa file đính kèm
+router.delete(
+  "/assignments/:assignmentId/assignmentFile/:assignmentFileId",
+  deleteAssignmentFileAttached
 );
 router.get(
   "/chapters/:chapterId/assignmentfile/:assignmentId",
   getAssignmentFile
 );
+
 router.get("/assignments/:assignmentId/submission", getAssignmentSubmission);
 
 router.get(
@@ -133,6 +143,11 @@ router.put(
 );
 router.post("/chapters/assignments", addAssignmentTitle);
 router.post("/chapters/:chapterId/submission", insertAssignmentSubmission);
+// Sinh vien xoa file da nop sau khi unsubmit
+router.delete(
+  "/chapters/:chapterId/assignments/:assignmentId/submission/assignmentfile/:fileId",
+  getAssignmentFile
+);
 router.post(
   "/chapters/:chapterId/submission/teacherAdd",
   insertAssignmentSubmissionTeacher

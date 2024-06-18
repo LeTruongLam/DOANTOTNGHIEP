@@ -16,11 +16,14 @@ export default function CourseTitle({ title, subTitle }) {
   const fetchCourseTitle = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:8800/api/courses/title/${location.state.CourseId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-        },
-      });
+      const res = await axios.get(
+        `http://localhost:8800/api/courses/title/${location.state.CourseId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
       setCourseTitle(res.data.courseTitle);
     } catch (error) {
       message.error(error.message);
@@ -42,9 +45,12 @@ export default function CourseTitle({ title, subTitle }) {
   const handleSaveClick = async () => {
     const updatedTitle = courseTitle;
     try {
-      await axios.put(`http://localhost:8800/api/courses/title/${location.state.CourseId}`, {
-        title: updatedTitle,
-      });
+      await axios.put(
+        `http://localhost:8800/api/courses/title/${location.state.CourseId}`,
+        {
+          title: updatedTitle,
+        }
+      );
       message.success("Sửa thành công!");
     } catch (error) {
       message.error(error.message);
@@ -64,7 +70,7 @@ export default function CourseTitle({ title, subTitle }) {
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
@@ -78,17 +84,12 @@ export default function CourseTitle({ title, subTitle }) {
                 className="bg-main"
                 onChange={(e) => setCourseTitle(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

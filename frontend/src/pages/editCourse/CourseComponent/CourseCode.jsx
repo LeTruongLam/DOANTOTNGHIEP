@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 import EditIcon from "@mui/icons-material/Edit";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { message } from "antd";
 
@@ -16,7 +15,9 @@ export default function CourseCode({ title, subTitle }) {
 
   const fetchCourseCode = async () => {
     try {
-      const res = await axios.get(`http://localhost:8800/api/courses/code/${location.state.CourseId}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/courses/code/${location.state.CourseId}`
+      );
       setCourseCode(res.data.courseCode);
     } catch (error) {
       message.error(error.message);
@@ -38,9 +39,12 @@ export default function CourseCode({ title, subTitle }) {
   const handleSaveClick = async () => {
     const updatedCode = courseCode;
     try {
-      await axios.put(`http://localhost:8800/api/courses/code/${location.state.CourseId}`, {
-        courseCode: updatedCode,
-      });
+      await axios.put(
+        `http://localhost:8800/api/courses/code/${location.state.CourseId}`,
+        {
+          courseCode: updatedCode,
+        }
+      );
       message.success("Sửa thành công!");
     } catch (error) {
       message.error(error.message);
@@ -60,7 +64,7 @@ export default function CourseCode({ title, subTitle }) {
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
@@ -74,17 +78,12 @@ export default function CourseCode({ title, subTitle }) {
                 className="bg-main"
                 onChange={(e) => setCourseCode(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className=" text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

@@ -45,7 +45,7 @@ const CourseFile = (props) => {
     <div className="course-image">
       <div className="course-image-wrapper">
         <div className="course-image-header  mt-3 mb-3">
-          <p>Resources & Attachments</p>
+          <p>Tài nguyên & Tệp đính kèm</p>
           <div
             onClick={handleIconClick}
             style={{
@@ -56,7 +56,7 @@ const CourseFile = (props) => {
             }}
           >
             <ControlPointIcon fontSize="small" />
-            <span>Add a file</span>
+            <span>Thêm tập tin</span>
           </div>
           <input
             ref={fileInputRef}
@@ -75,7 +75,6 @@ const CourseFile = (props) => {
                 src={
                   ImageConfig[item.type.split("/")[1]] || ImageConfig["default"]
                 }
-                alt=""
               />
               <p>{item.name}</p>
               <span
@@ -96,7 +95,7 @@ const CourseFile = (props) => {
             variant="contained"
             onClick={handleSaveClick}
           >
-            Save
+            Lưu
           </Button>
         </div>
       )}

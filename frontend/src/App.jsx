@@ -24,12 +24,13 @@ import PrivateRouter from "./utils/PrivateRouter.jsx";
 import TeacherRouter from "./utils/TeacherRouter.jsx";
 import AssignmentView from "./pages/TeacherMode/TheAssignment/AssignmentView.jsx";
 import AssignmentListStudent from "./pages/TeacherMode/TheAssignment/AssignmentListStudent.jsx";
-import TheCalender from "./pages/TeacherMode/TheCalender.jsx";
 import BankQuestions from "./pages/TeacherMode/BankQuestions/BankQuestions.jsx";
 import BankQuestionView from "./pages/TeacherMode/BankQuestions/BankQuestionView.jsx";
 import ExamView from "./pages/TeacherMode/BankQuestions/ExamView/ExamView.jsx";
 import ExamViewDetail from "./pages/TeacherMode/BankQuestions/ExamView/ExamViewDetail/ExamViewDetail.jsx";
 import ExamDetail from "./pages/CourseDetails/Exam/ExamDetail/ExamDetail.jsx";
+import ExamOverview from "./pages/CourseDetails/Exam/ExamOverview/ExamOverview.jsx";
+import PrivateExamRouter from "./utils/PrivateExamRouter.jsx";
 const Layout = ({ children }) => (
   <>
     <TheHeader />
@@ -83,6 +84,18 @@ function App() {
                   </Layout>
                 }
               />
+
+              <Route
+                path="/course/:courseId/exams/:examId/overview"
+                exact
+                element={
+                  <Layout>
+                    <ExamOverview />
+                  </Layout>
+                }
+              />
+            </Route>
+            <Route element={<PrivateExamRouter />}>
               <Route
                 path="/course/:courseId/exams/:examId"
                 exact
@@ -93,6 +106,7 @@ function App() {
                 }
               />
             </Route>
+
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course"
@@ -178,7 +192,6 @@ function App() {
                   </LayoutTeacher>
                 }
               />
-              <Route path="/calender" element={<TheCalender />} />
             </Route>
             <Route element={<TeacherRouter />}>
               <Route

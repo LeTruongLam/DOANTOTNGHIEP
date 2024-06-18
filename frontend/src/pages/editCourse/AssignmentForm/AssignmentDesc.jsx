@@ -12,6 +12,7 @@ export default function ChapterDesc({
   title,
   subTitle,
   chapterId,
+  fetchAssignmentData,
   assignmentId,
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -47,6 +48,7 @@ export default function ChapterDesc({
           assignmentDesc: assignmentDesc,
         }
       );
+      fetchAssignmentData();
     } catch (error) {
       console.log(error);
     }
@@ -63,7 +65,7 @@ export default function ChapterDesc({
             className="course-title-action"
           >
             {isEditing ? (
-              <span>Cancel</span>
+              <span>Hủy</span>
             ) : (
               <>
                 <EditIcon fontSize="small" />
@@ -89,14 +91,12 @@ export default function ChapterDesc({
           )}
         </div>
         {isEditing && (
-          <Button
-            sx={{ color: "white", backgroundColor: "black" }}
-            style={{ marginTop: "12px" }}
-            variant="contained"
+          <button
+            className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
             onClick={handleSaveClick}
           >
-            Save
-          </Button>
+            Lưu
+          </button>
         )}
       </div>
     </div>

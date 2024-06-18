@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -9,6 +9,13 @@ import AssignmentTitle from "./AssignmentTitle";
 import AssignmentDesc from "./AssignmentDesc";
 import AssignmentDate from "./AssginmentDate";
 import AssignmentFile from "./AssginmentFile";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import {
+  LocalizationProvider,
+  MobileDateTimePicker,
+} from "@mui/x-date-pickers";
+import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import dayjs from "dayjs";
 export default function AssginmentForm({
   isOpen,
   isClose,
@@ -16,6 +23,8 @@ export default function AssginmentForm({
   assignmentId,
   fetchAssignmentData,
 }) {
+  const [startTime, setStartTime] = useState(dayjs());
+
   const handleClose = () => {
     isClose();
   };
@@ -38,30 +47,28 @@ export default function AssginmentForm({
             </Button>
           </DialogTitle>
           <AssignmentTitle
-            title="Assignment Title"
-            subTitle="Edit Title"
+            title="Tiêu đề bài tập"
+            subTitle="Sửa"
             chapterId={chapterId}
             assignmentId={assignmentId}
             fetchAssignmentData={fetchAssignmentData}
           />
           <AssignmentDesc
-            title="Assignment Description"
-            subTitle="Edit  Description"
+            title="Mô tả bài tập"
+            subTitle="Sửa"
             chapterId={chapterId}
             assignmentId={assignmentId}
+            fetchAssignmentData={fetchAssignmentData}
           />
           <AssignmentDate
-            title="Assignment Date"
-            subTitle="Edit  Date"
+            title="Ngày đến hạn"
+            subTitle="Sửa"
             chapterId={chapterId}
             assignmentId={assignmentId}
+            fetchAssignmentData={fetchAssignmentData}
           />
-          <AssignmentFile
-            title="Assignment Date"
-            subTitle="Edit  Date"
-            chapterId={chapterId}
-            assignmentId={assignmentId}
-          />
+
+          <AssignmentFile chapterId={chapterId} assignmentId={assignmentId} />
         </div>
       </Dialog>
     </div>

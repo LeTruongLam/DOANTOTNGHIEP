@@ -107,7 +107,7 @@ const CourseVideo = () => {
                         style={{
                           color: " rgb(147 51 234)",
                         }}
-                        primary={`Lesson ${lessonIndex + 1}: ${
+                        primary={`Bài ${lessonIndex + 1}: ${
                           lesson.LessonTitle
                         }`}
                       />
@@ -116,7 +116,7 @@ const CourseVideo = () => {
                     <>
                       <PlayCircleOutlineIcon />
                       <ListItemText
-                        primary={`Lesson ${lessonIndex + 1}: ${
+                        primary={`Bài ${lessonIndex + 1}: ${
                           lesson.LessonTitle
                         }`}
                       />

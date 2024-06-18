@@ -9,7 +9,7 @@ import ChapterDesc from "../CourseForm/ChapterDesc";
 import ChapterTitle from "../CourseForm/ChapterTitle";
 import CourseLesson from "../CourseComponent/CourseLesson";
 import { useNavigate } from "react-router-dom";
-import CourseAssignment from "../CourseComponent/CourseAssignment";
+import CourseMaterials from "../CourseComponent/CourseMaterials";
 const ChapterStepper = ({
   chapterId,
   handleBack,
@@ -22,7 +22,7 @@ const ChapterStepper = ({
   return (
     <div className="grow-[3]">
       <div className="flex justify-between py-3 m-3 items-center	">
-        <p className="text-2xl	font-semibold	">Chapter Creation</p>
+        <p className="text-2xl	font-semibold	">Chi tiết chương học</p>
         <p>
           <button
             onClick={() => {
@@ -31,16 +31,15 @@ const ChapterStepper = ({
             type="button"
             className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 "
           >
-            Back
+            Quay lại
           </button>
           <button
             onClick={() => {
               navigate(-1);
             }}
-            type="button"
-            className="mr-2 rounded-md bg-black	 text-white px-2.5 py-2 text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
+            className="text-white text-sm border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
           >
-            Done
+            Hoàn tất
           </button>
         </p>
       </div>
@@ -50,26 +49,18 @@ const ChapterStepper = ({
             <div className="course-custom-icon">
               <GridViewOutlinedIcon />
             </div>
-            <p className="text-xl	font-semibold	">Customer Chapter</p>
+            <p className="text-xl	font-semibold	">Thiết lập chương học</p>
           </div>
           <ChapterTitle
             chapterId={chapterId}
-            title="Chapter Title"
-            subTitle="Edit "
+            title="Tiêu đề chương học"
+            subTitle="Sửa "
           />
           <div className="editorContainer">
             <ChapterDesc
               chapterId={chapterId}
-              title="Chapter Description"
-              subTitle="Edit "
-            />
-          </div>
-          <div>
-            <CourseAssignment
-              chapterId={chapterId}
-              title="Assignments"
-              subTitle="Add"
-              courseId={courseId}
+              title="Mô tả chương học"
+              subTitle="Sửa "
             />
           </div>
         </div>
@@ -78,14 +69,19 @@ const ChapterStepper = ({
             <div className="course-custom-icon">
               <CastForEducationIcon />
             </div>
-            <p className="text-xl	font-semibold	">Customer Lessons</p>
+            <p className="text-xl	font-semibold	">Thiết lập bài học</p>
           </div>
           <CourseLesson
             handleNext={handleNext}
             setSelectedLessonId={setSelectedLessonId}
             chapterId={chapterId}
-            title="Lessons "
-            subTitle="Add "
+            title="Bài học "
+            subTitle="Thêm "
+          />
+          <CourseMaterials
+            chapterId={chapterId}
+            title="Tài liệu chương học"
+            subTitle="Thêm "
           />
         </div>
       </div>

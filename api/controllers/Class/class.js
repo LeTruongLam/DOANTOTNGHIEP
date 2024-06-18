@@ -32,43 +32,67 @@ export const getClassCourse = (req, res) => {
     return res.status(200).json(data);
   });
 };
+export const deleteClass = (req, res) => {
+  
+  const classId = req.params.classId;
+  const query = `
+    DELETE FROM classes
+    WHERE ClassId = ?
+  `;
+
+  db.query(query, [classId], (err, result) => {
+    if (err) {
+      return res.status(500).json(err);
+    }
+    return res.status(200).json({ message: "Class deleted successfully" });
+  });
+};
 export const addClassCourse = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+  const { classCode, teacherId } = req.body;
+  const { courseId } = req.params;
+  const classId = uuidv4();
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
+  // Query to check for duplicate ClassCode
+  const checkDuplicateQuery = `
+    SELECT COUNT(*) AS count
+    FROM classes
+    WHERE ClassCode = ?
+  `;
 
-    const { classCode, teacherId } = req.body;
-    const classId = uuidv4();
-    const checkDuplicateQ = `
-      SELECT COUNT(*) AS count
-      FROM classes
-      WHERE ClassCode = ?
-    `;
+  // Query to insert new class
+  const insertClassQuery = `
+    INSERT INTO classes (ClassId, ClassCode, CourseId, TeacherId)
+    VALUES (?, ?, ?, ?)
+  `;
 
-    const insertClassQ = `
-      INSERT INTO classes (ClassId, ClassCode, CourseId, TeacherId)
-      VALUES (?, ?, ?, ?)
-    `;
+  // Check if ClassCode already exists
+  db.query(checkDuplicateQuery, [classCode], (err, result) => {
+    if (err) {
+      console.error("Error checking for duplicate class code:", err);
+      return res.status(500).json({ error: "Database error", details: err });
+    }
 
-    db.query(checkDuplicateQ, [classCode], (err, result) => {
-      if (err) return res.status(500).json(err);
+    const isDuplicate = result[0].count > 0;
+    if (isDuplicate) {
+      return res.status(400).json({ message: "Class code already exists" });
+    }
 
-      const isDuplicate = result[0].count > 0;
-      if (isDuplicate) {
-        return res.status(400).json({ message: "ClassCode already exists" });
-      }
-
-      db.query(
-        insertClassQ,
-        [classId, classCode, req.params.courseId, teacherId],
-        (err, result) => {
-          if (err) return res.status(500).json(err);
-          return res.status(201).json({ message: "Class added successfully" });
+    // Insert new class if no duplicate found
+    db.query(
+      insertClassQuery,
+      [classId, classCode, courseId, teacherId],
+      (err, result) => {
+        if (err) {
+          console.error("Error inserting new class:", err);
+          return res
+            .status(500)
+            .json({ error: "Database error", details: err });
         }
-      );
-    });
+        return res
+          .status(201)
+          .json({ message: "Class added successfully", classId });
+      }
+    );
   });
 };
 const checkClassStudent = (courseId, studentId) => {

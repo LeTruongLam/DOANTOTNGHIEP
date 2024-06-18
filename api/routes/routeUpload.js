@@ -254,6 +254,7 @@ router.post(
   (req, res) => {
     const { assignmentId } = req.params;
     if (req.file) {
+      console.log(req.file);
       cloudinary.uploader
         .upload(req.file.path, {
           folder: "CourseAssignment/Teacher",
@@ -307,23 +308,24 @@ function submitAssignment(
     ...(submittedFiles ? JSON.parse(submittedFiles) : []),
   ];
   const submissionFilesJson = JSON.stringify(combinedFiles);
+
   let query;
-  if (submittedFiles !== []) {
+  let queryParams;
+
+  if (submittedFiles && JSON.parse(submittedFiles).length > 0) {
     query = `UPDATE submissions SET SubmissionFiles = ? WHERE AssignmentId = ? AND UserId = ?`;
+    queryParams = [submissionFilesJson, assignmentId, userId];
   } else {
     query = `INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, ?, NOW(), ?);`;
+    queryParams = [
+      submissionId,
+      assignmentId,
+      userId,
+      chapterId,
+      courseId,
+      submissionFilesJson,
+    ];
   }
-
-  const queryParams = submittedFiles
-    ? [submissionFilesJson, assignmentId, userId]
-    : [
-        submissionId,
-        assignmentId,
-        userId,
-        chapterId,
-        courseId,
-        submissionFilesJson,
-      ];
 
   db.query(query, queryParams, (err, result) => {
     if (err) {
@@ -341,7 +343,7 @@ function submitAssignment(
       );
       res.status(201).json({
         success: true,
-        message: "fileUrl has been uploaded!",
+        message: "Submission data has been inserted or updated!",
         data: result,
       });
     }
@@ -351,7 +353,6 @@ router.post(
   "/chapters/uploadAssignmentFile/:assignmentId/submission",
   upload.array("documentSubmit", 10),
   (req, res, next) => {
-    console.log("Up file");
     const assignmentId = req.body.assignmentId;
     const chapterId = req.body.chapterId;
     const userId = req.body.userId;

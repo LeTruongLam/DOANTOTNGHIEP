@@ -60,7 +60,7 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
             className="course-title-action"
           >
             {isEditing ? (
-              <span>Cancel</span>
+              <span>Hủy</span>
             ) : (
               <>
                 <EditIcon fontSize="small" />
@@ -71,8 +71,10 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            !lessonDesc  ? (
-              <div className="italic text-slate-400		">No lesson description </div>
+            !lessonDesc ? (
+              <div className="italic text-slate-400		">
+                Không có mô tả bài học
+              </div>
             ) : (
               <div
                 dangerouslySetInnerHTML={{
@@ -90,14 +92,12 @@ export default function ChapterDesc({ title, subTitle, chapterId, lessonId }) {
           )}
         </div>
         {isEditing && (
-          <Button
-            sx={{ color: "white", backgroundColor: "black" }}
-            style={{ marginTop: "12px" }}
-            variant="contained"
+          <button
+            className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
             onClick={handleSaveClick}
           >
-            Save
-          </Button>
+            Lưu
+          </button>
         )}
       </div>
     </div>

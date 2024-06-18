@@ -1,17 +1,32 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import axios from "axios";
+import { message } from "antd";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Dropdown() {
+export default function Dropdown({ fetchClasses, classId }) {
+  const handleDeleteClass = async () => {
+    try {
+      await axios.delete(
+        `http://localhost:8800/api/classes/${classId}`
+      );
+      message.success("Xóa thành công");
+      fetchClasses()
+    } catch (err) {
+      message.error(err.message);
+      console.log(err);
+    }
+  };
+
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <Menu.Button>
-          <MoreVertIcon fontSize={"medium"} aria-hidden="true" />
+        <Menu.Button className="p-0 border-none outline-none">
+          <MoreVertIcon fontSize={"small"} aria-hidden="true" />
         </Menu.Button>
       </div>
       <Transition
@@ -24,12 +39,12 @@ export default function Dropdown() {
         leaveTo="transform opacity-0 scale-95"
       >
         <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div >
+          <div>
             <Menu.Item className={"m-2 rounded "}>
               {({ active }) => (
                 <div
                   className={classNames(
-                    active ? "bg-blue-100		 text-gray-900" : "text-gray-700",
+                    active ? "bg-blue-100 text-gray-900" : "text-gray-700",
                     "block px-2 py-2 text-base flex gap-2"
                   )}
                 >
@@ -55,7 +70,7 @@ export default function Dropdown() {
               {({ active }) => (
                 <div
                   className={classNames(
-                    active ? "bg-blue-100		 text-gray-900" : "text-gray-700",
+                    active ? "bg-blue-100 text-gray-900" : "text-gray-700",
                     "block px-2 py-2 text-base flex gap-2"
                   )}
                 >
@@ -77,9 +92,12 @@ export default function Dropdown() {
               {({ active }) => (
                 <div
                   className={classNames(
-                    active ? "bg-blue-100		 text-gray-900" : "text-gray-700",
-                    "block px-2 py-2 text-base flex gap-2"
+                    active ? "bg-blue-100 text-gray-900" : "text-gray-700",
+                    "block px-2 py-2 text-base flex gap-2 cursor-pointer"
                   )}
+                  onClick={() => {
+                    handleDeleteClass();
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

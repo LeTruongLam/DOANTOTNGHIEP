@@ -3,13 +3,13 @@ import axios from "axios";
 import { AuthContext } from "../../../context/authContext";
 
 import EditIcon from "@mui/icons-material/Edit";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
 import "../EditWrite.scss";
 import AssginmentForm from "../AssignmentForm/AssginmentForm";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { message } from "antd";
 export default function CourseAssignment({
   title,
   subTitle,
@@ -71,11 +71,16 @@ export default function CourseAssignment({
 
   const handleSaveClick = async () => {
     try {
-      await axios.post(`http://localhost:8800/api/courses/chapters/assignments`, {
-        assignmentTitle: assignmentTitle,
-        chapterId: chapterId,
-        courseId: courseId,
-      });
+      await axios.post(
+        `http://localhost:8800/api/courses/chapters/assignments`,
+        {
+          assignmentTitle: assignmentTitle,
+          chapterId: chapterId,
+          courseId: courseId,
+        }
+      );
+      message.success("Tạo thành công!");
+
       fetchAssignmentData();
     } catch (error) {
       console.log(error);
@@ -89,8 +94,7 @@ export default function CourseAssignment({
         `http://localhost:8800/api/courses/chapters/${chapterId}/assignments/${assignmentId}`
       );
       fetchAssignmentData();
-
-      alert("Xóa thành công");
+      message.success("Xóa thành công!");
     } catch (error) {
       console.log(error);
     }
@@ -128,14 +132,14 @@ export default function CourseAssignment({
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action ">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
         <div className="course-title-body">
           {!isEditing ? (
             !assignments[0] ? (
-              <div className="italic text-slate-400		">No assignments</div>
+              <div className="italic text-slate-400		">Không có bài tập </div>
             ) : (
               <>{assignmentItems}</>
             )
@@ -145,17 +149,12 @@ export default function CourseAssignment({
                 className="bg-main"
                 onChange={(e) => setAssignmentTitle(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

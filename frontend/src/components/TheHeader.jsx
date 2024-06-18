@@ -83,17 +83,17 @@ const TheHeader = () => {
             <SlickBar className="h-full items-center " clicked={click}>
               <Item exact activeClassName="active" to="/">
                 <span className="py-4 mx-2 font-semibold" clicked={click}>
-                  Home
+                  Trang chủ
                 </span>
               </Item>
               <Item activeClassName="active" to="/news">
                 <span className="py-4 mx-2 font-semibold" clicked={click}>
-                  News
+                  Tin tức
                 </span>
               </Item>
               <Item activeClassName="active" to="/course">
                 <span className="py-4 mx-2 font-semibold" clicked={click}>
-                  Course
+                  Môn học
                 </span>
               </Item>
             </SlickBar>
@@ -158,7 +158,7 @@ const TheHeader = () => {
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
                 <MenuItem onClick={handleToProfile}>
-                  <Avatar /> My account
+                  <Avatar /> Tài khoản
                 </MenuItem>
                 <Divider />
                 {currentUser.Role === "teacher" && (
@@ -171,24 +171,24 @@ const TheHeader = () => {
                         inputProps={{ "aria-label": "controlled" }}
                       />
                     </ListItemIcon>
-                    Teacher mode
+                    Chế độ giáo viên
                   </MenuItem>
                 )}
                 <MenuItem onClick={handleLogout}>
                   <ListItemIcon>
                     <Logout fontSize="small" />
                   </ListItemIcon>
-                  Logout
+                  Đăng xuất
                 </MenuItem>
               </Menu>
             </>
           ) : (
             <div className="content ml-5">
               <Link to="/login">
-                <Button variant="contained">Login</Button>
+                <Button variant="contained">Đăng nhập</Button>
               </Link>
               <Link to="/register">
-                <Button variant="contained">Register</Button>
+                <Button variant="contained">Đăng ký</Button>
               </Link>
             </div>
           )}

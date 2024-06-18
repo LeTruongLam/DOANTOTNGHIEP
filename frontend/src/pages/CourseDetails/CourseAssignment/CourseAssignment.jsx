@@ -185,6 +185,7 @@ export default function CourseAssignment() {
             `http://localhost:8800/api/users/chapters/uploadAssignmentFile/${assignment.AssignmentId}/submission`,
             fileData
           );
+          fetchAssignmentData();
           setCongratulation(true);
           setTimeout(function () {
             setCongratulation(false);
@@ -219,12 +220,11 @@ export default function CourseAssignment() {
     }
   };
   const handleDeleteFile = async (assignmentFileId) => {
-    alert(assignmentFileId);
     try {
-      const response = await axios.put(
-        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/assignmentfile/${assignmentId}`,
+      await axios.delete(
+        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/assignments/${assignmentId}/submission/assignmentfile/${assignmentFileId}`,
         {
-          assignmentFileId: assignmentFileId,
+          userId: currentUser.UserId,
         }
       );
     } catch (error) {
@@ -261,17 +261,17 @@ export default function CourseAssignment() {
                       <div className="flex justify-between items-center">
                         <Tabs value={value} onChange={handleChange}>
                           <Tab
-                            label="Upcoming"
+                            label="Sắp tới"
                             {...a11yProps(0)}
                             sx={{ textTransform: "none" }}
                           />
                           <Tab
-                            label="Pass due"
+                            label="Đã qua"
                             {...a11yProps(1)}
                             sx={{ textTransform: "none" }}
                           />
                           <Tab
-                            label="Completed"
+                            label="Hoàn thành"
                             {...a11yProps(3)}
                             sx={{ textTransform: "none" }}
                           />
@@ -308,7 +308,9 @@ export default function CourseAssignment() {
                         className="flex-none rounded-md text-base hover:bg-blue-500 bg-black px-3 py-1.5  font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                         onClick={handleSubmit}
                       >
-                        {submissionStatus === 1 ? "Undo Submit" : " Submit"}
+                        {submissionStatus === 1
+                          ? "Hoàn tác nộp bài"
+                          : " Nộp bài"}
                       </button>
                     </div>
                     <AssignmentList
@@ -319,35 +321,38 @@ export default function CourseAssignment() {
                     />
                     <div className="px-2 py-2 ">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
-                        Due in{" "}
+                        Thời hạn đến{" "}
                         <span>{formatDateString(assignment?.EndDate)}</span>
                       </dt>
                     </div>
                     <div className="px-2 py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
                         <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
-                          Instructions
+                          Mô tả
                         </span>
                       </dt>
                       <dd className="mt-2  text-base  bg-zinc-100 rounded-md	 text-gray-900 sm:col-span-2 sm:mt-0">
                         <p className="py-2 px-3 italic opacity-90">
                           {assignment?.AssignmentDesc
                             ? getText(assignment?.AssignmentDesc)
-                            : "No value"}
+                            : "Không có mô tả"}
                         </p>
                       </dd>
                     </div>
                     <div className=" py-2 ">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
                         <span className="bg-zinc-100 flex max-w-max items-center	mb-2 px-3 py-1 rounded-xl">
-                          Attachments
+                          Đính kèm
                         </span>
                       </dt>
                       <dd className="mt-2 text-base  bg-zinc-100 rounded-xl	 text-gray-900 sm:col-span-2 sm:mt-0">
                         <dd className=" text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
                           {attachFile.length > 0 ? (
                             attachFile.map((file, index) => (
-                              <li className="flex items-center justify-between first:pt-3 last:pb-3 py-2 px-3 text-sm leading-4">
+                              <li
+                                key={index}
+                                className="flex items-center justify-between first:pt-3 last:pb-3 py-2 px-3 text-sm leading-4"
+                              >
                                 <input
                                   type="radio"
                                   id={`hosting-small-${index}`}
@@ -380,7 +385,7 @@ export default function CourseAssignment() {
                                       download
                                       className="font-medium text-indigo-600 hover:text-indigo-500"
                                     >
-                                      Download
+                                      Tải xuống
                                     </a>
                                   </div>
                                 </label>
@@ -388,7 +393,7 @@ export default function CourseAssignment() {
                             ))
                           ) : (
                             <p className="py-2 px-3 italic opacity-90">
-                              No value
+                              Không có đính kèm
                             </p>
                           )}
                         </dd>
@@ -398,7 +403,7 @@ export default function CourseAssignment() {
                       <p className="font-semibold gap-4 py-2    flex justify-between ">
                         <div className="bg-zinc-100 px-3 py-1 flex items-center rounded-xl justify-center gap-1">
                           <AttachmentIcon />
-                          <span>Attach</span>
+                          <span>Nộp đính kèm</span>
                         </div>
                         <input
                           ref={fileInputRef}
@@ -416,7 +421,7 @@ export default function CourseAssignment() {
                             submissionStatus === 1 && "	 cursor-not-allowed	"
                           } bg-white  px-2.5 py-1.5 text-sm font-semibold text-black hover:outline-blue-600 hover:outline shadow-sm ring-1 ring-inset ring-gray-300 hover:opacity-80`}
                         >
-                          Select files
+                          Chọn tệp tin
                         </button>
                       </p>
                       <dd className="mt-2 bg-zinc-100  rounded-xl text-base	 text-gray-900 sm:col-span-2 sm:mt-0 w-full">
@@ -494,7 +499,7 @@ export default function CourseAssignment() {
                     <div className="px-2 py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                       <dt className="text-base 	font-medium leading-6 text-gray-900">
                         <span className="bg-zinc-100 flex max-w-max items-center	 px-3 py-1 rounded-xl">
-                          Review & evaluation
+                          Nhận xét và đánh giá
                         </span>
                       </dt>
                       {assignmentSubmitted && (
@@ -503,7 +508,7 @@ export default function CourseAssignment() {
                             <div className="flex justify-between items-center">
                               <div className="flex justify-center gap-3">
                                 <CreditScoreIcon />
-                                <span className=" font-semibold">Points</span>
+                                <span className=" font-semibold">Điểm</span>
                               </div>
                               <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-base font-bold text-red-700 ring-1 ring-inset ring-red-600/10">
                                 {assignmentSubmitted?.Score}
@@ -512,7 +517,7 @@ export default function CourseAssignment() {
                             <div className="flex flex-col items-start">
                               <div className="flex justify-center gap-3">
                                 <ReviewsIcon />
-                                <span className=" font-semibold">Review </span>
+                                <span className=" font-semibold">Nhận xét</span>
                               </div>
                               <p className="mt-1">
                                 {assignmentSubmitted?.Review}

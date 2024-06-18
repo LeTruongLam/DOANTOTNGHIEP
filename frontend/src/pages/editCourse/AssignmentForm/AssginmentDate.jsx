@@ -5,35 +5,35 @@ import dayjs from "dayjs";
 import "../EditWrite.scss";
 import Button from "@mui/material/Button";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import {
+  LocalizationProvider,
+  MobileDateTimePicker,
+} from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import moment from "moment";
 
 export default function AssignmentDate({
   title,
   subTitle,
   chapterId,
+  fetchAssignmentData,
   assignmentId,
 }) {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const getAssignmentDate = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8800/api/courses/chapters/${chapterId}/assignments/date/${assignmentId}`
-      );
-      setStartDate(res.data.startDate);
-      setEndDate(res.data.endDate);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
+    const getAssignmentDate = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8800/api/courses/chapters/${chapterId}/assignments/date/${assignmentId}`
+        );
+        setEndDate(dayjs(res.data.endDate));
+      } catch (error) {
+        console.error(error);
+      }
+    };
     getAssignmentDate();
-  }, [assignmentId]);
+  }, [chapterId, assignmentId]);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -44,32 +44,18 @@ export default function AssignmentDate({
   };
 
   const handleSaveClick = async () => {
-    const updatedStartDate = moment(startDate).format("YYYY-MM-DD HH:mm:ss");
-    const updatedEndDate = moment(endDate).format("YYYY-MM-DD HH:mm:ss");
-
     try {
       await axios.put(
         `http://localhost:8800/api/courses/chapters/${chapterId}/assignments/date/${assignmentId}`,
         {
-          startDate: updatedStartDate,
-          endDate: updatedEndDate,
+          endDate: endDate.format("YYYY-MM-DD HH:mm:ss"),
         }
       );
+      setIsEditing(false);
+      fetchAssignmentData();
     } catch (error) {
       console.log(error);
     }
-
-    setIsEditing(false);
-  };
-
-  const onSetStartDate = (newStartDate) => {
-    const formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
-    setStartDate(formattedStartDate);
-  };
-
-  const onSetEndDate = (newEndDate) => {
-    const formattedEndDate = newEndDate.format("YYYY-MM-DD HH:mm:ss");
-    setEndDate(formattedEndDate);
   };
 
   return (
@@ -100,46 +86,36 @@ export default function AssignmentDate({
                 cursor: "pointer",
               }}
             >
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
         <div className="course-title-body">
-          {!isEditing ? (
-            <div>
-              {dayjs(startDate).format("DD/MM/YYYY")}
-              {" - "}
-              {dayjs(endDate).format("DD/MM/YYYY")}
-            </div>
-          ) : (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  label="Ngày bắt đầu"
-                  className="bg-main"
-                  value={dayjs(startDate)}
-                  onChange={onSetStartDate}
-                />
-
-                <DatePicker
-                  label="Ngày kết thúc"
-                  value={dayjs(endDate)}
-                  className="bg-main"
-                  onChange={onSetEndDate}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
-          )}
-
-          {isEditing && (
-            <Button
-              sx={{ color: "white", backgroundColor: "black" }}
-              style={{ marginTop: "12px" }}
-              variant="contained"
-              onClick={handleSaveClick}
-            >
-              Save
-            </Button>
+          {endDate && (
+            <>
+              {!isEditing ? (
+                <div>{endDate.format("DD/MM/YYYY HH:mm:ss")}</div>
+              ) : (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer
+                    components={["DateTimePicker", "MobileDateTimePicker"]}
+                  >
+                    <MobileDateTimePicker
+                      value={endDate}
+                      onChange={(date) => setEndDate(date)}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              )}
+              {isEditing && (
+                <button
+                  className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
+                  onClick={handleSaveClick}
+                >
+                  Lưu
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -67,10 +67,6 @@ const Sidebar = () => {
             <ListAltIcon />
             <Text>Courses</Text>
           </Item>
-          <Item className="hover:bg-slate-200" activeClassName="active" to="/calender">
-            <CalendarMonthIcon />
-            <Text>Calender</Text>
-          </Item>
           <Item
             activeClassName="active"
             to="/assignments"

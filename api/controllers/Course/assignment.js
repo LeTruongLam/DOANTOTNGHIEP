@@ -48,7 +48,7 @@ export const getAssignmentById = (req, res) => {
     return res.status(200).json(data);
   });
 };
-// Lấy thông tin nhiều bài assignment
+// Lấy thông tin nhiều bài assignment theo chương
 
 export const getAssignments = (req, res) => {
   const chapterId = req.params.chapterId; // Sử dụng req.params.chapterId thay vì req.param.chapterId
@@ -80,22 +80,45 @@ export const deleteAssignment = (req, res) => {
     return res.status(200).json({ message: "Assignment deleted successfully" });
   });
 };
+// Xóa file assignment đã đính kèm
+
+export const deleteAssignmentFileAttached = (req, res) => {
+  const assignmentFileId = req.params.assignmentFileId;
+  const assignmentId = req.params.assignmentId;
+  const q = `
+      DELETE FROM assignmentfile
+      WHERE AssignmentFileId = ? AND AssignmentId = ?
+    `;
+
+  db.query(q, [assignmentFileId, assignmentId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    return res
+      .status(200)
+      .json({ message: "Assignment file attached deleted successfully" });
+  });
+};
 // Thêm title assignment
 
 export const addAssignmentTitle = (req, res) => {
+  const assignmentId = uuidv4();
+
   const assignmentTitle = req.body.assignmentTitle;
   const chapterId = req.body.chapterId;
   const courseId = req.body.courseId;
 
   const q = `
-      INSERT INTO assignments (AssignmentTitle, ChapterId, CourseId)
-      VALUES (?, ?, ?)
+      INSERT INTO assignments (AssignmentId, AssignmentTitle, ChapterId, CourseId)
+      VALUES (?, ?, ?, ?)
     `;
 
-  db.query(q, [assignmentTitle, chapterId, courseId], (err, result) => {
-    if (err) return res.status(500).json(err);
-    return res.status(201).json({ message: "Assignment added successfully" });
-  });
+  db.query(
+    q,
+    [assignmentId, assignmentTitle, chapterId, courseId],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      return res.status(201).json({ message: "Assignment added successfully" });
+    }
+  );
 };
 
 export const getAssignmentTitle = (req, res) => {
@@ -212,13 +235,11 @@ export const getAssignmentDate = (req, res) => {
 export const updateAssignmentDate = (req, res) => {
   const assignmentId = req.params.assignmentId;
   const chapterId = req.params.chapterId;
-  const startDate = req.body.startDate;
   const endDate = req.body.endDate;
 
   const q =
-    "UPDATE  assignments SET  `StartDate`=? ,`EndDate` = ?  WHERE  AssignmentId = ? AND ChapterId = ?";
-  const values = [startDate, endDate, assignmentId, chapterId];
-
+    "UPDATE  assignments SET  `EndDate` = ?  WHERE  AssignmentId = ? AND ChapterId = ?";
+  const values = [endDate, assignmentId, chapterId];
   // Check user role and chapter update permission
 
   db.query(q, values, (err, data) => {
@@ -310,35 +331,32 @@ export const getAssignmentSubmission = (req, res) => {
     return res.json(data);
   });
 };
-
+// Giáo viên nhận xét đánh giá
 export const updateReviewAssignment = (req, res) => {
   const submissionId = req.params.submissionId;
   const assignmentReview = req.body.assignmentReview;
-  const q = "UPDATE  submissions SET  `Review` = ?  WHERE  SubmissionId = ?";
-  db.query(q, [assignmentReview, submissionId], (err, data) => {
-    if (err)
-      return res.status(500).json({ error: "An unexpected error occurred." });
+  const gradedStatus = true;
 
-    if (data.affectedRows === 0) {
-      return res.status(404).json({ error: "assignments not found." });
-    }
-    return res.json("submissions review  has been updated.");
+  const q =
+    "UPDATE submissions SET `Review` = ?, `Graded` = ? WHERE SubmissionId = ?";
+  db.query(q, [assignmentReview, gradedStatus, submissionId], (err, data) => {
+    if (err) return res.status(500).json({ error: err.message });
+    return res.json("Submission review has been updated.");
   });
 };
+
 export const updatePointAssignment = (req, res) => {
   const submissionId = req.params.submissionId;
   const assignmentPoint = req.body.assignmentPoint;
+  const gradedStatus = true;
 
-  const q = "UPDATE  submissions SET  `Score` = ?  WHERE  SubmissionId = ?";
-  const values = [assignmentPoint, submissionId];
+  const q =
+    "UPDATE submissions SET `Score` = ?, `Graded` = ? WHERE SubmissionId = ?";
+  const values = [assignmentPoint, gradedStatus, submissionId];
   db.query(q, values, (err, data) => {
-    if (err)
-      return res.status(500).json({ error: "An unexpected error occurred." });
+    if (err) return res.status(500).json({ error: err.message });
 
-    if (data.affectedRows === 0) {
-      return res.status(404).json({ error: "assignments not found." });
-    }
-    return res.json("submissions score  has been updated.");
+    return res.json("Submission score has been updated.");
   });
 };
 
@@ -398,7 +416,6 @@ export const insertAssignmentSubmission = (req, res) => {
     VALUES (?, ?, ?, ?, ?, NOW());
   `;
   const values = [submissionId, assignmentId, userId, chapterId, courseId];
-  console.log(values);
   db.query(query, values, (err, result) => {
     if (err) {
       console.error("Error inserting submission data into the database:", err);
@@ -440,7 +457,7 @@ export const deleteAssignmentFile = (req, res) => {
 export const getAllAssignmentsOfCourse = (req, res) => {
   const courseId = req.params.courseId;
   const q = `
-      SELECT a.AssignmentId, a.AssignmentTitle, a.ChapterId , a.EndDate, c.CourseId, c.title, chapters.* , c.TeacherId, c.CourseCode
+      SELECT a.*, c.CourseId, c.title, chapters.* , c.TeacherId, c.CourseCode
       FROM assignments a
       JOIN courses c ON a.CourseId = c.CourseId
       JOIN chapters ON chapters.ChapterId = a.ChapterId
@@ -458,7 +475,7 @@ export const getAllStudentAndAssignmentStatus = (req, res) => {
   const classId = req.params.classId;
   const assignmentId = req.params.assignmentId;
   const q = `
-    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, s.UserId
+    SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score,sb.Graded, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, s.UserId
     FROM students s
     JOIN class_student sc ON s.StudentId = sc.StudentId
     JOIN classes c ON sc.ClassId = c.ClassId

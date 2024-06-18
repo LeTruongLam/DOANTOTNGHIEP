@@ -65,7 +65,7 @@ export default function AssignmentTitle({
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
@@ -79,17 +79,12 @@ export default function AssignmentTitle({
                 className="bg-main"
                 onChange={(e) => setAssignmentTitle(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

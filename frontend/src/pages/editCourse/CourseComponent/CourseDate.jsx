@@ -95,7 +95,7 @@ export default function CourseDate({ title, subTitle }) {
                 cursor: "pointer",
               }}
             >
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
@@ -133,7 +133,7 @@ export default function CourseDate({ title, subTitle }) {
               variant="contained"
               onClick={handleSaveClick}
             >
-              Save
+              Lưu
             </Button>
           )}
         </div>

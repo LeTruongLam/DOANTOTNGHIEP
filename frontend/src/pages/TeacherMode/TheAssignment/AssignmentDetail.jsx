@@ -40,7 +40,7 @@ export default function AssignmentDetail() {
   const fetchAssignmentSubmitted = async () => {
     try {
       const res = await axios.get(
-        `/courses/assignments/submitted/${submissionId}`
+        `http://localhost:8800/api/courses/assignments/submitted/${submissionId}`
       );
       const data = res.data;
       setSelected(data[0]);
@@ -79,7 +79,7 @@ export default function AssignmentDetail() {
   const updateAssignmentReview = async () => {
     try {
       await axios.put(
-        `/courses/assignments/review/${assignment?.SubmissionId}`,
+        `http://localhost:8800/api/courses/assignments/review/${assignment?.SubmissionId}`,
         {
           assignmentReview: assignmentReview,
         }
@@ -92,7 +92,7 @@ export default function AssignmentDetail() {
   const updateAssignmentPoint = async () => {
     try {
       await axios.put(
-        `/courses/assignments/score/${assignment?.SubmissionId}`,
+        `http://localhost:8800/api/courses/assignments/score/${assignment?.SubmissionId}`,
         {
           assignmentPoint: assignmentPoint,
         }
@@ -138,7 +138,7 @@ export default function AssignmentDetail() {
           </div>
           <div className="links" onClick={handleExit}>
             <ExitToAppIcon />
-            <span>Exit</span>
+            <span>Thoát</span>
           </div>
         </div>
       </div>
@@ -241,20 +241,20 @@ export default function AssignmentDetail() {
                   aria-hidden="true"
                 />
                 <span className="text-blue-800">
-                  Turned in {formatDateString(assignment?.SubmissionDate)}
+                  Đã nộp lúc {formatDateString(assignment?.SubmissionDate)}
                 </span>
               </div>
             ) : (
               <div className="flex mt-3 justify-start items-center gap-2">
                 <BlockIcon color="error" />
-                <span className="text-red-800">Not turned in</span>
+                <span className="text-red-800">Chưa nộp bài</span>
               </div>
             )}
 
             <div className="mt-3 border-t border-slate-300">
               <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                 <dt className="text-base	font-medium leading-6 text-gray-900">
-                  Student responses
+                  Phản hồi của sinh viên
                 </dt>
                 <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
                   <ul
@@ -306,7 +306,7 @@ export default function AssignmentDetail() {
                                               download
                                               className="font-medium  text-indigo-600 hover:text-indigo-500"
                                             >
-                                              Download
+                                              Tải về
                                             </a>
                                           </div>
                                         </label>
@@ -316,7 +316,7 @@ export default function AssignmentDetail() {
                                 </>
                               ) : (
                                 <span className=" px-4 italic opacity-50">
-                                  None
+                                  Không có phản hồi
                                 </span>
                               )}
                             </ul>
@@ -329,7 +329,7 @@ export default function AssignmentDetail() {
               </div>
               <div className="px-4 py-3 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-0">
                 <dt className="text-base	 font-medium leading-6 text-gray-900">
-                  Review & evaluation
+                  Nhận xét & đánh giá
                 </dt>
                 <dd className="mt-2 text-base	 text-gray-900 sm:col-span-2 sm:mt-0">
                   <ul
@@ -367,14 +367,14 @@ export default function AssignmentDetail() {
                                 handleCloseEditPoint();
                               }}
                             >
-                              Cancle
+                              Hủy
                             </p>
                           ) : (
                             <p
                               className="font-medium hover:cursor-pointer text-indigo-600 hover:text-indigo-500"
                               onClick={handleEditPointClick}
                             >
-                              Edit
+                              Sửa
                             </p>
                           )}
                         </p>
@@ -392,7 +392,7 @@ export default function AssignmentDetail() {
                               variant="contained"
                               onClick={updateAssignmentPoint}
                             >
-                              Save
+                              Lưu
                             </Button>
                           </div>
                         )}
@@ -402,7 +402,7 @@ export default function AssignmentDetail() {
                         <div className="font-semibold gap-4 py-4 pl-4 pr-5  flex items-center  justify-between ">
                           <div className="flex items-center justify-center gap-1">
                             <ReviewsIcon />
-                            <span>Review</span>
+                            <span>Nhận xét</span>
                           </div>
                           {isEditReview ? (
                             <p
@@ -411,14 +411,14 @@ export default function AssignmentDetail() {
                                 handleCloseEditReview();
                               }}
                             >
-                              Cancle
+                              Hủy
                             </p>
                           ) : (
                             <p
                               className="font-medium hover:cursor-pointer text-indigo-600 hover:text-indigo-500"
                               onClick={handleEditReviewClick}
                             >
-                              Edit
+                              Sửa
                             </p>
                           )}
                         </div>
@@ -441,7 +441,7 @@ export default function AssignmentDetail() {
                               variant="contained"
                               onClick={updateAssignmentReview}
                             >
-                              Save
+                              Lưu
                             </Button>
                           </div>
                         ) : (

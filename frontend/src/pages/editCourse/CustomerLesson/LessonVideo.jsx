@@ -13,11 +13,11 @@ import PropTypes from "prop-types";
 const people = [
   {
     id: 1,
-    name: "Select file",
+    name: "Chọn tệp tin",
   },
   {
     id: 2,
-    name: "URL",
+    name: "Đường dẫn",
   },
 ];
 function classNames(...classes) {
@@ -189,19 +189,21 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
         <div className="course-title-body my-8">
           {!isEditing ? (
             videoUrl == null ? (
-              <div className="italic text-slate-400		">No lesson video </div>
+              <div className="italic text-slate-400		">
+                Không có video bài học{" "}
+              </div>
             ) : (
               <div className="">
                 <iframe
                   src={videoUrl}
-                  title="Chapter Video"
+                  title="Video bài học"
                   className="rounded-md w-full min-h-60"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -226,17 +228,17 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
                             src={URL.createObjectURL(selectedFile)}
                             type="video/mp4"
                           />
-                          Your browser does not support the video tag.
+                          Trình duyệt của bạn không hỗ trợ thẻ video.
                         </video>
                       </div>
                     ) : (
                       <div className="drop-file-input__label">
                         <CloudUploadIcon fontSize="large" />
                         <p className="font-normal	">
-                          <span className="text-purple-600	">Upload a file</span>
-                          <span> or drag and drop </span>
+                          <span className="text-purple-600	">Chọn video</span>
+                          <span> hoặc kéo và thả </span>
                         </p>
-                        <p className="font-light text-sm">MP4 up to 100MB</p>
+                        <p className="font-light text-sm">MP4 lên tới 100MB</p>
                       </div>
                     )}
                     <input type="file" value="" onChange={onFileDrop} />
@@ -245,25 +247,17 @@ export default function LessonVideo({ title, subTitle, chapterId, lessonId }) {
               )}
               {selected === people[1] && (
                 <TextField
-                  id="image-url"
-                  label="Nhập link video chương học"
                   value={videoUrl}
-                  style={{ marginTop: "16px" }}
-                  fullWidth
+                  className="bg-main w-full"
                   onChange={handleVideoUrl}
                 />
               )}
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </>
           )}
         </div>

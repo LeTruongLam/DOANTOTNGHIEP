@@ -66,15 +66,17 @@ export const addExam = (req, res) => {
   );
 };
 
-export const getExam = (req, res) => {
+export const getExams = (req, res) => {
   const courseId = req.params.courseId;
   let q = `
-    SELECT E.*, COUNT(EQ.ExamQuestionId) AS QuestionCount
+    SELECT C.title, E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status,E.ConfirmAccess, COUNT(EQ.ExamQuestionId) AS QuestionCount
     FROM Exams E
-    LEFT JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+     JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+     JOIN Courses C ON C.CourseId = E.CourseId
     WHERE E.CourseId = ?
     GROUP BY E.ExamId
   `;
+  // JOIN ExamClassses EQ ON E.ExamId = EQ.ExamId
 
   db.query(q, [courseId], (err, data) => {
     if (err) {
@@ -90,6 +92,8 @@ export const getExamById = (req, res) => {
   const examQuery = `
     SELECT *
     FROM Exams
+    JOIN Courses C ON C.CourseId = Exams.CourseId
+
     WHERE ExamId = ?
   `;
 
@@ -121,7 +125,7 @@ export const getExamById = (req, res) => {
     }
   });
 };
-export const ResultExams = (req, res) => {
+export const createResultExams = (req, res) => {
   const resultExamId = uuidv4();
   const userInfo = req.userInfo;
 
@@ -144,7 +148,6 @@ export const ResultExams = (req, res) => {
       if (examResults.length === 0) {
         res.status(404).json({ message: "Không tìm thấy bài thi." });
       } else {
-        // console.log(examResults);
         // Lấy câu trả lời chính xác từ bài thi
         const correctAnswers = examResults.map((question) => {
           const options = question.QuestionOptions;
@@ -181,26 +184,81 @@ export const ResultExams = (req, res) => {
             score++;
           }
         }
-        console.log(score);
+        // Calculate the score as the ratio of NumberCorrectAnswers to NumberQuestions
+        const calculatedScore =
+          examResults.length > 0 ? (score / examResults.length) * 10 : 0;
+
         // Lưu trữ kết quả thi và điểm số vào cơ sở dữ liệu
         const insertQuery = `
-        INSERT INTO ResultExams (ResultExamId, ExamId, SubmissionAnswers, Score, UserId, SubmissionTime)
-        VALUES (?, ?, ?, ?, ?, NOW())
+        INSERT INTO ResultExams (ResultExamId, ExamId, SubmissionAnswers, Score, UserId, NumberQuestions, NumberAnswers, NumberCorrectAnswers, SubmissionTime)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
       `;
 
         db.query(
           insertQuery,
-          [resultExamId, examId, JSON.stringify(answers), score, userInfo.id],
+          [
+            resultExamId,
+            examId,
+            JSON.stringify(answers),
+            calculatedScore,
+            userInfo.id,
+            examResults.length,
+            answers.length,
+            score,
+          ],
           (error, result) => {
             if (error) {
               console.error("Lỗi lưu trữ kết quả thi:", error);
               res.sendStatus(500);
             } else {
-              res.status(200).json({ score });
+              res.status(200).json({ score: calculatedScore });
             }
           }
         );
       }
+    }
+  });
+};
+export const getResultExamById = (req, res) => {
+  const userInfo = req.userInfo;
+  const examId = req.params.examId;
+
+  let q = `
+    SELECT RE.*, E.ExamTitle, C.title
+    FROM ResultExams RE
+    LEFT JOIN Exams E ON E.ExamId = RE.ExamId
+    LEFT JOIN Courses C ON E.CourseId = C.CourseId
+
+    WHERE RE.ExamId = ? AND RE.UserId = ? 
+  `;
+  db.query(q, [examId, userInfo.id], (err, data) => {
+    if (err) {
+      console.log(err);
+
+      res.status(500).json(err);
+    } else {
+      // console.log(data);
+      console.log(data[0]);
+      res.status(200).json(data[0]);
+    }
+  });
+};
+export const getExamOverview = (req, res) => {
+  const examId = req.params.examId;
+  let q = `
+    SELECT C.title, E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status,E.ConfirmAccess, COUNT(EQ.ExamQuestionId) AS QuestionCount
+    FROM Exams E
+     JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+     JOIN Courses C ON C.CourseId = E.CourseId
+    WHERE E.ExamId = ?
+   
+  `;
+
+  db.query(q, [examId], (err, data) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(data);
     }
   });
 };

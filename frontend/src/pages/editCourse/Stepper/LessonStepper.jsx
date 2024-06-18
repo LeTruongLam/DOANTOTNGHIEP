@@ -9,12 +9,12 @@ import LessonVideo from "../CustomerLesson/LessonVideo";
 import { useNavigate } from "react-router-dom";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 const LessonStepper = ({ chapterId, handleBack, lessonId }) => {
-    const navigate = useNavigate();
- 
-    return (
+  const navigate = useNavigate();
+
+  return (
     <div className="grow-[3]">
       <div className="flex justify-between py-3 m-3 items-center	">
-        <p className="text-2xl	font-semibold	">Lesson setup</p>
+        <p className="text-2xl	font-semibold	">Chi tiết bài học</p>
         <p>
           <button
             onClick={() => {
@@ -23,17 +23,15 @@ const LessonStepper = ({ chapterId, handleBack, lessonId }) => {
             type="button"
             className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 "
           >
-            Back
+            Quay lại
           </button>
           <button
             onClick={() => {
-                navigate(-1);
-
+              navigate(-1);
             }}
-            type="button"
-            className="mr-2 rounded-md bg-black	 text-white px-2.5 py-2 text-sm font-semibold text-gray-900   ring-gray-300 hover:bg-blue-500	"
+            className="text-white text-sm border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
           >
-            Done
+            Hoàn tất
           </button>
         </p>
       </div>
@@ -43,20 +41,20 @@ const LessonStepper = ({ chapterId, handleBack, lessonId }) => {
             <div className="course-custom-icon">
               <GridViewOutlinedIcon />
             </div>
-            <p className="text-xl	font-semibold	">Customer Lesson</p>
+            <p className="text-xl	font-semibold	">Thiết lập chương học</p>
           </div>
           <LessonTitle
             chapterId={chapterId}
             lessonId={lessonId}
-            title="Lesson Title"
-            subTitle="Edit Title"
+            title="Tiêu đề bài học"
+            subTitle="Sửa"
           />
           <div className="editorContainer">
             <LessonDesc
               chapterId={chapterId}
               lessonId={lessonId}
-              title="Lesson Desccription"
-              subTitle="Edit desccription"
+              title="Mô tả bài học"
+              subTitle="Sửa"
             />
           </div>
         </div>
@@ -65,13 +63,13 @@ const LessonStepper = ({ chapterId, handleBack, lessonId }) => {
             <div className="course-custom-icon">
               <VideocamOutlinedIcon />
             </div>
-            <p className="text-xl	font-semibold	">Add a video</p>
+            <p className="text-xl	font-semibold	">Thêm video bài học</p>
           </div>
           <LessonVideo
             chapterId={chapterId}
             lessonId={lessonId}
-            title="Lesson Video "
-            subTitle="Edit video"
+            title="Video bài học"
+            subTitle="Sửa"
           />
         </div>
       </div>

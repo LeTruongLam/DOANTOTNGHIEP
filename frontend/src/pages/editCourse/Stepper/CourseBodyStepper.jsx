@@ -30,11 +30,10 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
     const formData = new FormData();
     formData.append("image", files);
     axios
-      .post(`/users/${courseId}/uploadImage`, formData)
+      .post(`http://localhost:8800/api/users/${courseId}/uploadImage`, formData)
       .then((response) => {
         const { imageUrl } = response.data;
-        message.success("Subject image changed successfully");
-
+        message.success("Hình ảnh môn học đã được thay đổi thành công");
         setImageUrl(imageUrl);
       })
       .catch((error) => {
@@ -50,11 +49,14 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(`http://localhost:8800/api/courses/${location.state?.CourseId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-        },
-      });
+      await axios.delete(
+        `http://localhost:8800/api/courses/${location.state?.CourseId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
       message.success("Xóa thành công");
       navigate("/dashboard");
     } catch (err) {
@@ -76,22 +78,21 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
           type="1"
           handleOke={handleDelete}
         />
-        <p className="text-2xl	font-semibold	">Course Setup</p>
+        <p className="text-2xl	font-semibold	">Thiết lập môn học</p>
         <p>
+          <button
+            onClick={onShowDialog}
+            className="mr-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 	"
+          >
+            <DeleteOutlineIcon />
+          </button>
           <button
             onClick={() => {
               navigate(-1);
             }}
-            type="button"
-            className="bg-black hover:bg-blue-500 text-white  px-2.5 py-2  rounded text-sm font-semibold	"
-          >
-            Back
-          </button>
-          <button
-            onClick={onShowDialog}
-            className="mr-2 rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-gray-900  ring-gray-300 hover:bg-blue-50 	"
-          >
-            <DeleteOutlineIcon />
+            className="text-white text-sm border-none bg-gray-800  py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
+            >
+            Quay lại
           </button>
         </p>
       </div>
@@ -101,19 +102,16 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
             <div className="course-custom-icon">
               <GridViewOutlinedIcon />
             </div>
-            <p className="text-xl	font-semibold	">Customer your course</p>
+            <p className="text-xl	font-semibold	">Thiết lập thông tin khóa học</p>
           </div>
-          <CourseTitle title="Course Title" subTitle="Edit Title" />
-          <CourseCode title="Course Code" subTitle="Edit Code" />
-          <CourseDate title="Course Date" subTitle="Edit Date" />
+          <CourseTitle title="Tiêu đề môn học" subTitle="Sửa" />
+          <CourseCode title="Mã môn học" subTitle="Sửa" />
+          {/* <CourseDate title="Thời gian học" subTitle="Sửa" /> */}
           <div className="course-img ">
-            <DropFileInput title="Course img" onFileChange={onFileChange} />
+            <DropFileInput title="Ảnh môn học" onFileChange={onFileChange} />
           </div>
           <div className="editorContainer">
-            <CourseDesc
-              title="Course Desccription"
-              subTitle="Edit desccription"
-            />
+            <CourseDesc title="Mô tả môn học" subTitle="Sửa " />
           </div>
         </div>
         <div className="course-custom">
@@ -121,12 +119,12 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
             <div className="course-custom-icon">
               <ChecklistOutlinedIcon />
             </div>
-            <p className="text-xl	font-semibold	">Course Chapter</p>
+            <p className="text-xl	font-semibold	">Chương học</p>
           </div>
           <div className="course-chapter">
             <CourseChapter
-              title="Course Chapter"
-              subTitle=" Add Chapter"
+              title="Chương học"
+              subTitle="Thêm "
               handleEdit={handleEdit}
             />
           </div>
@@ -134,9 +132,9 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
             <div className="course-custom-icon">
               <GroupsOutlinedIcon />
             </div>
-            <p className="text-xl	font-semibold	">Class Course</p>
+            <p className="text-xl	font-semibold	">Lớp học</p>
           </div>
-          <CourseClass title="Course Classes" subTitle="Add Class" />
+          <CourseClass courseId={courseId} title="Lớp học" subTitle="Thêm " />
         </div>
       </div>
     </div>

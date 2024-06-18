@@ -13,14 +13,15 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
   const [isEditing, setIsEditing] = useState(false);
   const getChapterTitle = async () => {
     try {
-      const res = await axios.get(`http://localhost:8800/api/courses/chapters/title/${chapterId}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/courses/chapters/title/${chapterId}`
+      );
       setChapterTitle(res.data.chapterTitle);
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
-    console.log("id: " + chapterId);
     getChapterTitle();
   }, []);
   const handleIconClick = () => {
@@ -33,9 +34,12 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`http://localhost:8800/api/courses/chapters/title/${chapterId}`, {
-        chapterTitle: chapterTitle,
-      });
+      await axios.put(
+        `http://localhost:8800/api/courses/chapters/title/${chapterId}`,
+        {
+          chapterTitle: chapterTitle,
+        }
+      );
       message.success("Sửa thành công!");
     } catch (error) {
       message.error(error.message);
@@ -55,14 +59,16 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
         <div className="course-title-body">
           {!isEditing ? (
             !chapterTitle ? (
-              <div className="italic text-slate-400		">No chapter title</div>
+              <div className="italic text-slate-400		">
+                Không có tiêu đề chương học
+              </div>
             ) : (
               <div>{chapterTitle}</div>
             )
@@ -73,17 +79,12 @@ export default function ChapterTitle({ title, subTitle, chapterId }) {
                 className="bg-main"
                 onChange={(e) => setChapterTitle(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

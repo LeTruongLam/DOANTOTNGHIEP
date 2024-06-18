@@ -6,26 +6,25 @@ import DOMPurify from "dompurify";
 import { message } from "antd";
 
 import EditIcon from "@mui/icons-material/Edit";
-import Button from "@mui/material/Button";
-
 import "../EditWrite.scss";
 
 export default function CourseDesc({ title, subTitle }) {
   const location = useLocation();
-  const storedCourseDesc = localStorage.getItem("courseDesc");
-  const [courseDesc, setCourseDesc] = useState(
-    storedCourseDesc || location.state?.desc || ""
-  );
+  const [courseDesc, setCourseDesc] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    const storedCourseDesc = localStorage.getItem("courseDesc");
-    if (storedCourseDesc) {
-      setCourseDesc(storedCourseDesc);
-    } else {
-      setCourseDesc(location.state?.desc || "");
+  const fetchCourseDesc = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8800/api/courses/desc/${location.state.CourseId}`
+      );
+      setCourseDesc(res.data.courseDesc);
+    } catch (error) {
+      message.error(error.message);
     }
-  }, [location.state?.desc]);
+  };
+  useEffect(() => {
+    fetchCourseDesc();
+  }, []);
 
   const handleIconClick = () => {
     setIsEditing(!isEditing);
@@ -37,10 +36,12 @@ export default function CourseDesc({ title, subTitle }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`http://localhost:8800/api/courses/desc/${location.state.CourseId}`, {
-        desc: courseDesc,
-      });
-      localStorage.setItem("courseDesc", courseDesc);
+      await axios.put(
+        `http://localhost:8800/api/courses/desc/${location.state.CourseId}`,
+        {
+          desc: courseDesc,
+        }
+      );
       message.success("Sửa thành công!");
     } catch (error) {
       message.error(error.message);
@@ -58,7 +59,7 @@ export default function CourseDesc({ title, subTitle }) {
             className="course-title-action"
           >
             {isEditing ? (
-              <span>Cancel</span>
+              <span>Hủy</span>
             ) : (
               <>
                 <EditIcon fontSize="small" />
@@ -88,14 +89,12 @@ export default function CourseDesc({ title, subTitle }) {
           )}
         </div>
         {isEditing && (
-          <Button
-            sx={{ color: "white", backgroundColor: "black" }}
-            style={{ marginTop: "12px" }}
-            variant="contained"
+          <button
+            className="text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
             onClick={handleSaveClick}
           >
-            Save
-          </Button>
+            Lưu
+          </button>
         )}
       </div>
     </div>

@@ -12,7 +12,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
     const fetchQuestionListByChapterId = async (chapterId) => {
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get(`/questions/chapters/${chapterId}`, {
+        const res = await axios.get(`http://localhost:8800/api/questions/chapters/${chapterId}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
           },

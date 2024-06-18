@@ -15,7 +15,9 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
 
   const getChapterDesc = async () => {
     try {
-      const res = await axios.get(`http://localhost:8800/api/courses/chapters/desc/${chapterId}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/courses/chapters/desc/${chapterId}`
+      );
       setChapterDesc(res.data.chapterDesc);
     } catch (error) {
       console.error(error);
@@ -35,14 +37,15 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.put(`http://localhost:8800/api/courses/chapters/desc/${chapterId}`, {
-        chapterDesc: chapterDesc,
-      });
+      await axios.put(
+        `http://localhost:8800/api/courses/chapters/desc/${chapterId}`,
+        {
+          chapterDesc: chapterDesc,
+        }
+      );
       message.success("Sửa thành công!");
-
     } catch (error) {
       message.error(error.message);
-
     }
     setIsEditing(false);
   };
@@ -57,7 +60,7 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
             className="course-title-action"
           >
             {isEditing ? (
-              <span>Cancel</span>
+              <span>Hủy</span>
             ) : (
               <>
                 <EditIcon fontSize="small" />
@@ -68,16 +71,17 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-             !chapterDesc ? (
-              <div className="italic text-slate-400		">No chapter description</div>
+            !chapterDesc ? (
+              <div className="italic text-slate-400		">
+                Không có mô tả chương học
+              </div>
             ) : (
               <div
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(chapterDesc),
-              }}
-            ></div>
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(chapterDesc),
+                }}
+              ></div>
             )
-         
           ) : (
             <ReactQuill
               className="editor bg-main"
@@ -88,15 +92,12 @@ export default function ChapterDesc({ title, subTitle, chapterId }) {
           )}
         </div>
         {isEditing && (
-          <Button
-          sx={{ color: "white", backgroundColor: "black" }}
-
-            style={{ marginTop: "12px" }}
-            variant="contained"
+          <button
+            className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
             onClick={handleSaveClick}
           >
-            Save
-          </Button>
+            Lưu
+          </button>
         )}
       </div>
     </div>

@@ -3,6 +3,9 @@ import dayjs from "dayjs";
 export const formatDate = (date) => {
   return moment(new Date(date)).format("DD/MM/YYYY");
 };
+export const formatDateFull = (date) => {
+  return moment(new Date(date)).format("YYYY-MM-DD HH:mm:ss");
+};
 
 export const getText = (html) => {
   const doc = new DOMParser().parseFromString(html, "text/html");

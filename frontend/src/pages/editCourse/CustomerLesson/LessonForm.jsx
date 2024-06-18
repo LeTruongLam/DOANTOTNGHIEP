@@ -37,21 +37,21 @@ export default function LessonForm({
             </Button>
           </DialogTitle>
           <LessonTitle
-            title="Lesson Title"
-            subTitle="Edit Title"
+            title="Tiêu đề bài học"
+            subTitle="Sửa"
             chapterId={chapterId}
             lessonId={lessonId}
             fetchLessonData={fetchLessonData}
           />
           <LessonVideo
-            title="Lesson Video"
-            subTitle="Edit  Video"
+            title="Video bài học"
+            subTitle="Sửa"
             chapterId={chapterId}
             lessonId={lessonId}
           />
           <LessonDesc
-            title="Lesson Description"
-            subTitle="Edit  Description"
+            title="Mô tả bài học"
+            subTitle="Sửa"
             chapterId={chapterId}
             lessonId={lessonId}
           />

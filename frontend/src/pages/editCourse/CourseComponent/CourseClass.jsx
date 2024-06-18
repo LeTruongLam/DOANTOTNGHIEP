@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import ClassOutlinedIcon from "@mui/icons-material/ClassOutlined";
 import "../EditWrite.scss";
 import Dropdown from "../../../components/Dropdowns/Dropdown";
-export default function CourseClass({ title, subTitle }) {
+import { message } from "antd";
+export default function CourseClass({ courseId, title, subTitle }) {
   const location = useLocation();
-
   const [isEditing, setIsEditing] = useState(false);
   const [classes, setClasses] = useState([]);
   const [classCode, setClassCode] = useState("");
 
   const fetchClasses = async () => {
     try {
-      const res = await axios.get(`http://localhost:8800/api/classes/${location.state.CourseId}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/classes/${courseId}`
+      );
       setClasses(res.data);
     } catch (error) {
       console.error(error);
@@ -33,7 +33,7 @@ export default function CourseClass({ title, subTitle }) {
         <ClassOutlinedIcon />
         {classItem.ClassCode}
       </div>
-      <Dropdown />
+      <Dropdown classId={classItem.ClassId} fetchClasses={fetchClasses} />
     </div>
   ));
 
@@ -47,10 +47,11 @@ export default function CourseClass({ title, subTitle }) {
 
   const handleSaveClick = async () => {
     try {
-      await axios.post(`http://localhost:8800/api/classes/${location.state.CourseId}`, {
+      await axios.post(`http://localhost:8800/api/classes/${courseId}`, {
         classCode: classCode,
         teacherId: location.state.TeacherId,
       });
+      message.success("Tạo thành công");
     } catch (error) {
       console.log(error);
     }
@@ -73,7 +74,7 @@ export default function CourseClass({ title, subTitle }) {
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
@@ -83,7 +84,7 @@ export default function CourseClass({ title, subTitle }) {
               {classes[0] ? (
                 <>{classItems}</>
               ) : (
-                <div className=" text-slate-400	 italic">No course class </div>
+                <div className=" text-slate-400	 italic">Không có lớp học </div>
               )}
             </>
           ) : (
@@ -92,17 +93,12 @@ export default function CourseClass({ title, subTitle }) {
                 className="bg-main"
                 onChange={(e) => setClassCode(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

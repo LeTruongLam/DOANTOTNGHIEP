@@ -1,5 +1,6 @@
 import { db } from "../../db.js";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 export const authorize = (req, res, next) => {
   const token = req.cookies.access_token;
@@ -64,13 +65,14 @@ export const deleteLesson = (req, res) => {
 export const addLessonTitle = (req, res) => {
   const lessonTitle = req.body.lessonTitle;
   const chapterId = req.body.chapterId;
+  const lessonId = uuidv4();
 
   const q = `
-      INSERT INTO lessons (LessonTitle, ChapterId)
-      VALUES (?, ?)
+      INSERT INTO lessons (LessonId, LessonTitle, ChapterId)
+      VALUES (? ,?, ?)
     `;
 
-  db.query(q, [lessonTitle, chapterId], (err, result) => {
+  db.query(q, [lessonId, lessonTitle, chapterId], (err, result) => {
     if (err) return res.status(500).json(err);
     return res.status(201).json({ message: "Lesson added successfully" });
   });

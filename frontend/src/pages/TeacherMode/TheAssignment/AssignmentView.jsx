@@ -2,184 +2,275 @@ import React, { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useParams } from "react-router-dom";
 import { formatDateString } from "../../../js/TAROHelper";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import PropTypes from "prop-types";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 2 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
+import ClassMenu from "../../../components/SelectMenus/ClassMenu";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AssginmentForm from "../../editCourse/AssignmentForm/AssginmentForm";
+import { message } from "antd";
+import AddAssignmentForm from "../../../components/Dialogs/AddAssignmentForm";
 
 const AssignmentView = () => {
-  const navigate = useNavigate();
-  const { fetchChapter, chapters } = useContext(AuthContext);
-  const { courseId } = useParams();
-  const [value, setValue] = React.useState(0);
-  const [assignments, setAssignments] = useState([]);
-  const [upComing, setUpComing] = useState([]);
-  const [passDue, setPassDue] = useState([]);
+  const [course, setCourse] = useState();
+  const [openAddForm, setOpenAddForm] = useState(false);
 
+  const { courseId } = useParams();
+  const { fetchChapter, fetchCourseById } = useContext(AuthContext);
+  const [assignments, setAssignments] = useState([]);
+  const [chapters, setChapters] = useState([]);
+  const [chapterId, setChapterId] = useState();
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selected, setSelected] = useState();
+  const [openForm, setOpenForm] = useState(false);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState();
+  const navigate = useNavigate();
   const handleToAssignment = (assignment) => {
     navigate(
       `/course/${courseId}/assignment/${assignment.AssignmentId}/classrooms`
     );
   };
-  const fetchAssignments = async () => {
+  const fetchAssignmentsByChapter = async () => {
     try {
-      const response = await axios.get(`/courses/${courseId}/assignments`);
+      const response = await axios.get(
+        `http://localhost:8800/api/courses/chapters/${chapterId}/assignments`
+      );
       setAssignments(response.data);
-      const now = new Date(); // Ngày và giờ hiện tại
-
-      const upcomingAssignments = [];
-      const passDueAssignments = [];
-      response.data.forEach((assignment) => {
-        if (new Date(assignment.EndDate) > now) {
-          upcomingAssignments.push(assignment);
-        } else {
-          passDueAssignments.push(assignment);
-        }
-      });
-      setUpComing(upcomingAssignments);
-      setPassDue(passDueAssignments);
     } catch (err) {
       console.log(err);
     }
   };
+  const fetchCourseData = async () => {
+    try {
+      let res = await fetchCourseById(courseId);
+      setCourse(res);
+    } catch (error) {}
+  };
+  const fetchChapterData = async () => {
+    try {
+      const chapterData = await fetchChapter(courseId);
+      setChapters(chapterData);
+      setSelected(chapterData[0]);
+      setChapterId(chapterData[0].ChapterId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
-    fetchAssignments();
-    fetchChapter(courseId);
+    fetchCourseData();
+    fetchChapterData();
   }, []);
+  useEffect(() => {
+    fetchAssignmentsByChapter();
+  }, [chapterId]);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleDeleteClick = async (assignmentId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8800/api/courses/chapters/${chapterId}/assignments/${assignmentId}`
+      );
+      message.success("Xóa thành công!");
+      fetchAssignmentsByChapter();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onCloseForm = () => {
+    setOpenForm(false);
+  };
+  const onShowForm = async (assignmentId) => {
+    setSelectedAssignmentId(assignmentId);
+    setOpenForm(true);
   };
   return (
     <div className="px-5">
-      <Box sx={{ width: "100%" }}>
-        <Box>
-          <div className="flex justify-between items-center">
-            <Tabs value={value} onChange={handleChange}>
-              <Tab
-                label="Upcoming"
-                {...a11yProps(0)}
-                sx={{ textTransform: "none" }}
+      {openForm && (
+        <AssginmentForm
+          isOpen={openForm}
+          isClose={onCloseForm}
+          selectedAssignmentId={selectedAssignmentId}
+          chapterId={chapterId}
+          assignmentId={selectedAssignmentId}
+          fetchAssignmentData={fetchAssignmentsByChapter}
+        ></AssginmentForm>
+      )}
+      {openAddForm && (
+        <AddAssignmentForm
+          chapterId={chapterId}
+          courseId={courseId}
+          open={openAddForm}
+          setOpen={setOpenAddForm}
+          title="Tạo bài tập chương học"
+          fetchAssignmentData={fetchAssignmentsByChapter}
+        />
+      )}
+
+      <div className="flex justify-between items-center px-3 mt-3 border-b border-slate-300 pb-3">
+        <span className="text-xl font-bold text-blue-600">
+          {course?.title} - {course?.CourseCode}
+        </span>
+      </div>
+      <div
+        className="rounded-b-lg min-h-[600px]"
+        style={{ backgroundColor: "#F5F5F5" }}
+      >
+        <div className="p-3 pb-0 flex justify-end items-center ">
+          <div className="flex justify-between items-center gap-3">
+            <div>
+              <ClassMenu
+                setSelected={setSelected}
+                selected={selected}
+                chapters={chapters}
+                setChapterId={setChapterId}
               />
-              <Tab
-                label="Pass due"
-                {...a11yProps(1)}
-                sx={{ textTransform: "none" }}
-              />
-            </Tabs>
-            <button
-              type="submit"
-              className="flex-none rounded-md mt-2 hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            >
-              <AddCircleOutlineIcon className="mr-1" />
-             Assignment
-            </button>
+            </div>
+            {selectedIds.length === 0 ? (
+              <button
+                onClick={() => setOpenAddForm(true)}
+                className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3"
+              >
+                Tạo bài tập
+              </button>
+            ) : (
+              <div
+                onClick={() => {
+                  handleDeleteClick(assignment.AssignmentId);
+                }}
+                className="flex justify-center items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:rounded-md hover:cursor-pointer"
+              >
+                <DeleteIcon
+                  style={{ color: "rgb(220 38 38)", fontSize: "20px" }}
+                />
+                <span className="text-red-600 text-sm font-semibold">Xóa</span>
+              </div>
+            )}
           </div>
-        </Box>
-        <CustomTabPanel value={value} index={0}>
-          <ul role="list" className="divide-y divide-slate-200 mt-3">
-            {upComing.map((assignment) => (
-              <li
-                onClick={() => handleToAssignment(assignment)}
-                key={assignment.AssignmentId}
-                className=" border border-gray-50 rounded-lg shadow mb-4"
-              >
-                <div className="px-4 flex justify-between gap-x-6 py-5 hover:text-indigo-500  hover:bg-slate-50	hover:cursor-pointer">
-                  <div className="flex min-w-0 gap-x-4">
-                    <div className="min-w-0 flex-auto">
-                      <p className="text-sm font-semibold leading-6 text-gray-900">
-                        {assignment.AssignmentTitle}
-                      </p>
-                      <p className="mt-1 truncate text-sm leading-5 text-gray-500">
-                        Deadline is {formatDateString(assignment.EndDate)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex justify-items-center items-center pr-4 gap-4">
-                    <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                      <p className=" font-semibold	 text-sm leading-6 text-gray-900">
-                        {assignment.title}
-                      </p>
-                      <p className="text-sm italic leading-6 text-gray-900">
-                        {assignment.CourseCode}/ {assignment.ChapterTitle}
-                      </p>
+        </div>
+        <div className="p-3">
+          <div className="  shadow-sm sm:rounded-lg p-4 bg-white ">
+            <div className="min-h-[480px] max-h-[500px] overflow-y-auto">
+              {assignments && assignments?.length > 0 ? (
+                <table className="w-full  text-sm text-left rtl:text-right text-gray-500">
+                  <thead className="text-sm text-black font-normal">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-2"
+                        style={{ width: "30%" }}
+                      >
+                        Tiêu đề bài tập
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-2"
+                        style={{ width: "30%" }}
+                      >
+                        Mô tả bài tập
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-2"
+                        style={{ width: "10%" }}
+                      >
+                        Hạn nộp bài
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 text-center py-2"
+                        style={{ width: "25%" }}
+                      >
+                        Hành động
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assignments?.map((assignment) => (
+                      <tr
+                        key={assignment?.AssignmentId}
+                        className="bg-white border-t border-slate-300 hover:bg-zinc-100"
+                      >
+                        <td className="px-6 py-3 max-w-96 truncate">
+                          <span title={assignment?.AssignmentTitle}>
+                            {assignment?.AssignmentTitle}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3 truncate ...">
+                          {assignment?.AssignmentDesc}
+                        </td>
+
+                        <td className="px-6 py-2 truncate">
+                          {formatDateString(assignment?.EndDate)}
+                        </td>
+                        <td className="px-6 py-3 flex gap-2">
+                          <button
+                            onClick={() => {
+                              handleDeleteClick(assignment.AssignmentId);
+                            }}
+                            className="font-semibold text-xs text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            Xóa
+                          </button>
+                          <button
+                            onClick={() => {
+                              onShowForm(assignment?.AssignmentId);
+                            }}
+                            className="font-semibold text-xs text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleToAssignment(assignment);
+                            }}
+                            className="font-semibold text-xs bg-blue-600 text-white text-blue-600 dark:text-blue-500 hover:underline"
+                          >
+                            Xem chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="flex gap-6 flex-col justify-center items-center w-full min-h-[480px] max-h-[500px]">
+                  <div className="w-full flex items-center flex-wrap justify-center gap-10">
+                    <div className="grid gap-4 w-60">
+                      <div className="w-20 h-20 mx-auto bg-slate-200 rounded-full shadow-sm justify-center items-center inline-flex">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="33"
+                          height="32"
+                          viewBox="0 0 33 32"
+                          fill="none"
+                        >
+                          <g id="File Serch">
+                            <path
+                              id="Vector"
+                              d="M19.9762 4V8C19.9762 8.61954 19.9762 8.92931 20.0274 9.18691C20.2379 10.2447 21.0648 11.0717 22.1226 11.2821C22.3802 11.3333 22.69 11.3333 23.3095 11.3333H27.3095M18.6429 19.3333L20.6429 21.3333M19.3095 28H13.9762C10.205 28 8.31934 28 7.14777 26.8284C5.9762 25.6569 5.9762 23.7712 5.9762 20V12C5.9762 8.22876 5.9762 6.34315 7.14777 5.17157C8.31934 4 10.205 4 13.9762 4H19.5812C20.7604 4 21.35 4 21.8711 4.23403C22.3922 4.46805 22.7839 4.90872 23.5674 5.79006L25.9624 8.48446C26.6284 9.23371 26.9614 9.60833 27.1355 10.0662C27.3095 10.524 27.3095 11.0253 27.3095 12.0277V20C27.3095 23.7712 27.3095 25.6569 26.138 26.8284C24.9664 28 23.0808 28 19.3095 28ZM19.3095 16.6667C19.3095 18.5076 17.8171 20 15.9762 20C14.1352 20 12.6429 18.5076 12.6429 16.6667C12.6429 14.8257 14.1352 13.3333 15.9762 13.3333C17.8171 13.3333 19.3095 14.8257 19.3095 16.6667Z"
+                              stroke="#4F46E5"
+                              stroke-width="1.6"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </g>
+                        </svg>
+                      </div>
+                      <div>
+                        <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
+                          Không có bài tập nào
+                        </h2>
+                        <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
+                          Hãy cập nhật thêm bài tập
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          <ul role="list" className="divide-y divide-slate-200 mt-3">
-            {passDue.map((assignment) => (
-              <li
-                onClick={() => handleToAssignment(assignment)}
-                key={assignment.AssignmentId}
-                className=" border border-gray-50 rounded-lg shadow mb-4"
-              >
-                <div className="px-4 flex justify-between gap-x-6 py-5 hover:outline-blue-500 hover:outline	 hover:outline-2 hover:rounded   hover:bg-slate-50	hover:cursor-pointer">
-                  <div className="flex min-w-0 gap-x-4">
-                    <div className="min-w-0 flex-auto">
-                      <p className="text-sm font-semibold leading-6 text-gray-900">
-                        {assignment.AssignmentTitle}
-                      </p>
-                      <p className="mt-1 truncate text-sm leading-5 text-gray-500">
-                        Deadline is {formatDateString(assignment.EndDate)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex justify-items-center items-center pr-4 gap-4">
-                    <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
-                      <p className=" font-semibold	 text-sm leading-6 text-gray-900">
-                        {assignment.title}
-                      </p>
-                      <p className="text-sm italic leading-6 text-gray-900">
-                        {assignment.CourseCode}/ {assignment.ChapterTitle}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </CustomTabPanel>
-      </Box>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

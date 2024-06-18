@@ -75,7 +75,10 @@ function BankQuestionView() {
     try {
       const formData = new FormData();
       formData.append("image", imgFile);
-      const response = await axios.post("/users/questions/uploadImg", formData);
+      const response = await axios.post(
+        "http://localhost:8800/api/users/questions/uploadImg",
+        formData
+      );
       setIsLoading(false); // Đặt setIsLoading(false) ở đây, sau khi nhận được response thành công
       return response.data;
     } catch (error) {
@@ -88,7 +91,7 @@ function BankQuestionView() {
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        `/questions/course/${courseId}`,
+        `http://localhost:8800/api/questions/course/${courseId}`,
         { questions, chapterId },
         {
           headers: {
@@ -146,11 +149,14 @@ function BankQuestionView() {
   const fetchQuestionListByChapterId = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(`/questions/chapters/${chapterId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-        },
-      });
+      const res = await axios.get(
+        `http://localhost:8800/api/questions/chapters/${chapterId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
       setQuestionData(res.data);
     } catch (err) {
       console.log(err);
@@ -181,12 +187,15 @@ function BankQuestionView() {
   const handleDeleteQuestion = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`/questions/chapters/${chapterId}`, {
-        data: { selectedIds }, // Pass selectedIds as the request body
-        headers: {
-          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-        },
-      });
+      await axios.delete(
+        `http://localhost:8800/api/questions/chapters/${chapterId}`,
+        {
+          data: { selectedIds }, // Pass selectedIds as the request body
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
       message.success("Questions deleted successfully.");
       setSelectedIds([]);
       fetchQuestionListByChapterId();
@@ -231,7 +240,7 @@ function BankQuestionView() {
           className="flex-none rounded-md hover:bg-blue-500 bg-black px-3 py-1.5 text-sm font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >
           <AddCircleOutlineIcon className="mr-1" />
-          Exam
+          Thêm bài thi
         </button>
       </div>
       <div
@@ -247,10 +256,10 @@ function BankQuestionView() {
               <RefreshIcon />
             </div>
             <span className="mx-2 text-slate-500">|</span>
-            <span className=" ">{selectedIds.length} questions selected</span>
+            <span className=" ">Đã chọn {selectedIds.length} mục </span>
             {selectedIds.length !== 0 && (
               <span className="ml-4 px-3 py-2 hover:bg-slate-200  hover:cursor-pointer hover:rounded-md text-blue-700 text-sm">
-                Clean
+                Bỏ chọn
               </span>
             )}
           </div>
@@ -268,7 +277,7 @@ function BankQuestionView() {
                 onClick={() => handleClickOpen()}
                 className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3"
               >
-                Add Question
+                Tạo câu hỏi
               </button>
             ) : (
               <div
@@ -278,54 +287,52 @@ function BankQuestionView() {
                 <DeleteIcon
                   style={{ color: "rgb(220 38 38)", fontSize: "20px" }}
                 />
-                <span className="text-red-600 text-sm font-semibold">
-                  Delete
-                </span>
+                <span className="text-red-600 text-sm font-semibold">Xóa</span>
               </div>
             )}
           </div>
         </div>
         <div className="p-3">
-          <div class="  shadow-sm sm:rounded-lg p-4 bg-white ">
+          <div className="  shadow-sm sm:rounded-lg p-4 bg-white ">
             <div className="min-h-[480px] max-h-[500px] overflow-y-auto">
               {questionData && questionData.length > 0 ? (
-                <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
-                  <thead class="text-sm text-black font-normal">
+                <table className="w-full  text-sm text-left rtl:text-right text-gray-500">
+                  <thead className="text-sm text-black font-normal">
                     <tr>
-                      <th scope="col" class="p-4"></th>
+                      <th scope="col" className="p-4"></th>
                       <th
                         scope="col"
-                        class="px-6 py-2"
+                        className="px-6 py-2"
                         style={{ width: "30%" }}
                       >
-                        Question Content
+                        Nội dung câu hỏi
                       </th>
                       <th
                         scope="col"
-                        class="px-6 py-2"
+                        className="px-6 py-2"
                         style={{ width: "20%" }}
                       >
-                        Question ID
+                        Id câu hỏi
                       </th>
                       <th
                         scope="col"
                         className="px-6 py-2 flex justify-center items-center w-max"
                       >
-                        Question Type
+                        Kiểu câu hỏi
                       </th>
                       <th
                         scope="col"
-                        class="px-6 py-2"
+                        className="px-6 py-2"
                         style={{ width: "20%" }}
                       >
-                        Created At
+                        Tạo lúc
                       </th>
                       <th
                         scope="col"
-                        class="px-6 py-2"
+                        className="px-6 py-2"
                         style={{ width: "10%" }}
                       >
-                        Action
+                        Hành động
                       </th>
                     </tr>
                   </thead>
@@ -415,7 +422,7 @@ function BankQuestionView() {
                             }}
                             className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                           >
-                            Edit
+                            Sửa
                           </button>
                         </td>
                       </tr>
@@ -453,7 +460,7 @@ function BankQuestionView() {
                         <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
                           Please update more questions
                         </p>
-                        <div class="mx-auto w-full justify-center items-center inline-flex ">
+                        <div className="mx-auto w-full justify-center items-center inline-flex ">
                           <button
                             onClick={() => handleClickOpen()}
                             className=" flex  justify-center gap-2 items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 transition-all duration-500 rounded-full text-white text-xs font-semibold leading-4"

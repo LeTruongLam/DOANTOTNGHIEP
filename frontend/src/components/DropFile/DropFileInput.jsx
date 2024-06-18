@@ -25,7 +25,7 @@ const DropFileInput = (props) => {
     <div className="course-image">
       <div className="course-image-wrapper">
         <div className="course-image-header  mt-3 mb-3">
-          <p>{props.title}</p>
+          <p>{props?.title}</p>
         </div>
         <div
           ref={wrapperRef}
@@ -45,7 +45,7 @@ const DropFileInput = (props) => {
           ) : (
             <div className="drop-file-input__label">
               <CloudUploadIcon fontSize="large" />
-              <p>Drag & Drop your file here</p>
+              <p>Kéo và thả tập tin của bạn vào đây</p>
             </div>
           )}
           <input type="file" value="" onChange={onFileDrop} />
@@ -53,7 +53,7 @@ const DropFileInput = (props) => {
       </div>
       <div className="px-5 pb-3">
         <span className="text-slate-400	 italic">
-          Drag & Drop your file here
+          Kéo và thả tập tin của bạn vào đây
         </span>
       </div>
     </div>

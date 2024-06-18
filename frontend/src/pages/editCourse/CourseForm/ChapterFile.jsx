@@ -86,7 +86,7 @@ const ChapterFile = ({ chapterId }) => {
     <div className="course-image">
       <div className="course-image-wrapper">
         <div className="course-image-header  mt-3 mb-3">
-          <p>Resources & Attachments</p>
+          <p>Tài nguyên & Tệp đính kèm</p>
           <div
             onClick={handleIconClick}
             style={{
@@ -97,7 +97,7 @@ const ChapterFile = ({ chapterId }) => {
             }}
           >
             <ControlPointIcon fontSize="small" />
-            <span>Add a file</span>
+            <span>Thêm tệp tin</span>
           </div>
           <input
             ref={fileInputRef}
@@ -108,7 +108,7 @@ const ChapterFile = ({ chapterId }) => {
         </div>
         {datas.length > 0 && (
           <>
-            <p className=" mt-3 mb-3 font-bold">Attached:</p>
+            <p className=" mt-3 mb-3 font-bold">Đã đính kèm:</p>
 
             {datas.map((data, index) => (
               <div key={index} className="drop-file-preview__item">
@@ -131,7 +131,7 @@ const ChapterFile = ({ chapterId }) => {
       {fileList.length > 0 && (
         <div className="drop-file-preview">
           <p>
-            <b>Attaching: </b>
+            <b>Đính kèm : </b>
           </p>
 
           {fileList.map((item, index) => (
@@ -161,7 +161,7 @@ const ChapterFile = ({ chapterId }) => {
             variant="contained"
             onClick={handleSaveClick}
           >
-            Save
+            Lưu
           </Button>
         </div>
       )}

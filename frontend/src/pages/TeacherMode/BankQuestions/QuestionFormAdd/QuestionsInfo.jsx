@@ -19,10 +19,7 @@ const choice = [
     id: 2,
     value: "Multiple Choice",
   },
-  {
-    id: 3,
-    value: "Text Input",
-  },
+ 
 ];
 function QuestionsInfo({
   questionTitle,

@@ -10,14 +10,7 @@ import ChapterTitle from "./ChapterTitle";
 import axios from "axios";
 import ChapterFile from "../CourseForm/ChapterFile";
 import ChapterDesc from "../CourseForm/ChapterDesc";
-export default function ChapterForm({
-  isOpen,
-  isClose,
-  chapterId,
-  type,
-}) {
-
-
+export default function ChapterForm({ isOpen, isClose, chapterId, type }) {
   const location = useLocation();
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +20,6 @@ export default function ChapterForm({
             `http://localhost:8800/api/courses/${location.state.CourseId}/chapters/${chapterId}`
           );
           const chapterData = response.data;
-
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -52,14 +44,14 @@ export default function ChapterForm({
             </Button>
           </DialogTitle>
           <ChapterTitle
-            title="Chapter Title"
-            subTitle="Edit Title"
+            title="Tiêu đề chương học"
+            subTitle="Sửa"
             chapterId={chapterId}
           />
           <ChapterFile chapterId={chapterId} />
           <ChapterDesc
-            title="Chapter Description"
-            subTitle="Edit Description"
+            title="Mô  tả chương học"
+            subTitle="Sửa"
             chapterId={chapterId}
           />
         </div>

@@ -43,7 +43,7 @@ const TheHeader = () => {
         </div>
         <div className="links" onClick={handleExit}>
           <ExitToAppIcon />
-          <span>Exit</span>
+          <span>Thoát</span>
         </div>
       </div>
     </div>

@@ -4,10 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
-import { formatDate, getText } from "../../js/TAROHelper";
-import ScheduleIcon from "@mui/icons-material/Schedule";
 import SchoolIcon from "@mui/icons-material/School";
-import GroupsIcon from "@mui/icons-material/Groups";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
@@ -15,7 +12,6 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import ClassList from "./CourseClass/ClassList";
-import Comment from "./Comment/Comment";
 import TheBreadcrumbs from "../../components/Breadcrumbs";
 import ChapterList from "./CourseChapter/ChapterList";
 import Backdrop from "@mui/material/Backdrop";
@@ -168,105 +164,44 @@ const CourseDetails = () => {
         </>
       ) : (
         <div className="single">
-          <div className="single-container">
+          <div className="single-container ">
             <div className="header-single">
-              <div className="bg-black min-h-20 h-[300px]">
+              <div className="bg-black relative min-h-20 h-[300px]">
                 <div className="mx-10 w-[60%] h-full pt-5">
                   <TheBreadcrumbs courseTitle={course.title} />
                   <div className="flex items-center gap-5 ">
-                    <span className="text-white font-medium py-2 px-3 bg-gray rounded-lg">
-                      Created
+                    <span className="text-white font-medium py-2 px-3 bg-gray-500 rounded-lg">
+                      Tạo bởi
                     </span>
-                    <span className="text-white">
-                      <span className=" text-gray-50">by </span>
-                      <span className="font-medium	">{course.TeacherName}</span>
+                    <span className="font-medium text-white	">
+                      {course.TeacherName}
                     </span>
                   </div>
                   <div className="text-white text-4xl my-5 font-medium	">
                     {course.title}
                   </div>
-                  <div className=" flex gap-5  mb-3 text-white w-full">
-                    <ul className="flex gap-2 items-center">
-                      <SchoolIcon
-                        style={{
-                          color: "rgb(101, 163, 13)",
-                        }}
-                      />
-                      <span>{course.CourseCode}</span>
-                    </ul>
-                    <ul className="flex gap-2 items-center">
-                      <ScheduleIcon
-                        style={{
-                          color: "rgb(101, 163, 13)",
-                        }}
-                      />
-                      <span>15h</span>
-                    </ul>
-                    <ul className="flex gap-2 items-center">
-                      <GroupsIcon
-                        style={{
-                          color: "rgb(101, 163, 13)",
-                        }}
-                      />
-                      <span>160</span>
-                    </ul>
-                    <ul className="flex gap-2 items-center">
-                      <InsertDriveFileIcon
-                        style={{
-                          color: "rgb(101, 163, 13)",
-                        }}
-                      />
-                      <span>{chapterData.length}</span>
-                    </ul>
-                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="header-sub drop-shadow-2xl">
-              <div className="header-sub-wrapper">
-                {course.img && <img src={`${course.img}`} alt="" />}
-                <div class="flex mt-5 overview_time_discount">
-                  <div class="mr-5 w-1 flex justify-center items-center bg-gradient-to-b from-transparent via-pink-400 to-transparent">
-                    <div class="w-7 h-7 rounded-full px-1 bg-white flex justify-center items-center shadow-md shadow-indigo-950	 	">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="white"
-                          stroke-width="2"
-                          fill="transparent"
-                        ></circle>
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
-                        ></path>
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div>
-                      <div class="text-guid text-base">Bắt đầu</div>
-                      <div class="text-lg">{formatDate(course.StartDate)}</div>
-                    </div>
-                    <div>
-                      <div class="text-guid text-base">Kết thúc</div>
-                      <div class="text-lg">{formatDate(course.EndDate)}</div>
+                <div className="bg-white rounded-2xl absolute top-8 right-8 drop-shadow-2xl">
+                  <div className="p-5">
+                    {course.img && (
+                      <img
+                        className="max-h-40 rounded-xl"
+                        src={`${course.img}`}
+                        alt=""
+                      />
+                    )}
+                    <div className=" flex flex-col gap-3  mt-3 text-gray font-semibold  w-full">
+                      <ul className="flex gap-2 items-center">
+                        <SchoolIcon className="text-green-500" />
+                        <span>Mã môn học {course.CourseCode}</span>
+                      </ul>
+                      <ul className="flex gap-2 items-center">
+                        <InsertDriveFileIcon className="text-green-500" />
+                        <span>{chapterData.length} Chương học</span>
+                      </ul>
                     </div>
                   </div>
                 </div>
-
-                {/* <Button variant="contained" sx={{ width: "100%" }}>
-                  MEETING
-                </Button> */}
               </div>
             </div>
           </div>
@@ -287,6 +222,7 @@ const CourseDetails = () => {
                   <Tab
                     label="Mô tả"
                     {...a11yProps(0)}
+                    className="border-none outline-none focus:outline-none focus-visible:outline-none"
                     sx={{
                       textTransform: "none",
 
@@ -298,6 +234,7 @@ const CourseDetails = () => {
                   <Tab
                     label="Danh sách bài học"
                     {...a11yProps(1)}
+                    className="border-none outline-none focus:outline-none focus-visible:outline-none"
                     sx={{
                       textTransform: "none",
 
@@ -307,18 +244,9 @@ const CourseDetails = () => {
                     }}
                   />
                   <Tab
-                    label="Trao đổi"
-                    {...a11yProps(2)}
-                    sx={{
-                      textTransform: "none",
-                      "&.Mui-selected": {
-                        backgroundColor: "#F5F5F5", // Thay đổi màu nền của tab được chọn ở đây
-                      },
-                    }}
-                  />
-                  <Tab
                     label="Danh sách lớp"
-                    {...a11yProps(3)}
+                    {...a11yProps(2)}
+                    className="border-none outline-none focus:outline-none focus-visible:outline-none"
                     sx={{
                       textTransform: "none",
 
@@ -329,7 +257,8 @@ const CourseDetails = () => {
                   />
                   <Tab
                     label="Bài thi"
-                    {...a11yProps(4)}
+                    {...a11yProps(3)}
+                    className="border-none outline-none focus:outline-none focus-visible:outline-none"
                     sx={{
                       textTransform: "none",
 
@@ -361,15 +290,12 @@ const CourseDetails = () => {
                 />
               </CustomTabPanel>
               <CustomTabPanel value={value} index={2}>
-                <Comment />
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={3}>
                 <ClassList
                   courseId={courseId}
                   classCodeStudent={course?.ClassCode}
                 />
               </CustomTabPanel>
-              <CustomTabPanel value={value} index={4}>
+              <CustomTabPanel value={value} index={3}>
                 <Exam />
               </CustomTabPanel>
             </Box>

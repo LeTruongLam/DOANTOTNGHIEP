@@ -60,14 +60,16 @@ export default function LessonTitle({ title, subTitle, chapterId, lessonId }) {
             </div>
           ) : (
             <div onClick={handleCancelClick} className="course-title-action">
-              <span>Cancel</span>
+              <span>Hủy</span>
             </div>
           )}
         </div>
         <div className="course-title-body">
           {!isEditing ? (
-            !lessonTitle  ? (
-              <div className="italic text-slate-400		">No lesson title</div>
+            !lessonTitle ? (
+              <div className="italic text-slate-400		">
+                Không có tiêu đề bài học
+              </div>
             ) : (
               <div>{lessonTitle}</div>
             )
@@ -78,17 +80,12 @@ export default function LessonTitle({ title, subTitle, chapterId, lessonId }) {
                 className="bg-main"
                 onChange={(e) => setLessonTitle(e.target.value)}
               />
-              <Button
-                sx={{ color: "white", backgroundColor: "black" }}
-                style={{
-                  marginTop: "12px",
-                  width: "max-content",
-                }}
-                variant="contained"
+              <button
+                className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
                 onClick={handleSaveClick}
               >
-                Save
-              </Button>
+                Lưu
+              </button>
             </div>
           )}
         </div>

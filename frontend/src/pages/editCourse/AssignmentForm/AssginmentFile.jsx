@@ -1,67 +1,65 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import "../EditWrite.scss";
-// import { ImageConfig } from "../../../config/ImageConfig";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import "../../../components/DropFile/drop-file-input.css";
 import CloseIcon from "@mui/icons-material/Close";
-import Button from "@mui/material/Button";
+import { message } from "antd";
 
 const AssignmentFile = ({ chapterId, assignmentId }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileList, setFileList] = useState([]);
-  const [docs, setDocs] = useState([]);
-  const [datas, setData] = useState([]);
-  const fetchAssignmentFiles = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8800/api/courses/chapters/${chapterId}/assignmentfile/${assignmentId}`
-      );
-      setData(response.data);
-      const documentUrls = response.data.map((item) => item.DocumentUrl);
-      const documents = documentUrls.map((url) => ({ uri: url }));
-      setDocs(documents);
-    } catch (error) {
-      console.error("Error fetching course files:", error);
-    }
-  };
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchAssignmentFiles();
   }, []);
 
+  const fetchAssignmentFiles = async () => {
+    try {
+      const { data } = await axios.get(
+        `http://localhost:8800/api/courses/chapters/${chapterId}/assignmentfile/${assignmentId}`
+      );
+      setFiles(data);
+    } catch (error) {
+      console.error("Error fetching course files:", error);
+    }
+  };
+
   const handleSaveClick = async () => {
     try {
       const formData = new FormData();
       formData.append("document", selectedFile);
-
-      const response = await axios.post(
+      const { data } = await axios.post(
         `http://localhost:8800/api/users/chapters/uploadAssignmentFile/${assignmentId}`,
         formData
       );
-      setSelectedFile(response.data);
+      setSelectedFile(data);
+      message.success("Đính kèm thành công!");
+
       fetchAssignmentFiles();
       setFileList([]);
-      return response.data;
+      return data;
     } catch (error) {
-      console.log(error);
+      console.error("Error uploading file:", error);
     }
   };
+
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
     if (newFile) {
       setSelectedFile(newFile);
-      const updatedList = [...fileList, newFile];
-      setFileList(updatedList);
-      console.log("file: " + newFile);
+      setFileList([...fileList, newFile]);
     }
   };
+
   const handleDeleteFile = async (documentId) => {
     try {
       await axios.delete(
-        `http://localhost:8800/api/courses/chapters/${chapterId}/document/${documentId}`
+        `http://localhost:8800/api/courses/assignments/${assignmentId}/assignmentFile/${documentId}`
       );
-      alert("Xóa thành công");
+      message.success("Xóa thành công!");
       fetchAssignmentFiles();
     } catch (error) {
       console.error("Lỗi xóa tệp tin:", error);
@@ -69,11 +67,8 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
   };
 
   const fileRemove = (file) => {
-    const updatedList = fileList.filter((item) => item !== file);
-    setFileList(updatedList);
+    setFileList(fileList.filter((item) => item !== file));
   };
-
-  const fileInputRef = useRef(null);
 
   const handleIconClick = () => {
     fileInputRef.current.click();
@@ -83,18 +78,13 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
     <div className="course-image">
       <div className="course-image-wrapper">
         <div className="course-image-header  mt-3 mb-3">
-          <p>Resources & Attachments</p>
+          <p>Tài nguyên & Tệp đính kèm</p>
           <div
+            className="flex items-center gap-2 cursor-pointer"
             onClick={handleIconClick}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              cursor: "pointer",
-            }}
           >
             <ControlPointIcon fontSize="small" />
-            <span>Add a file</span>
+            <span>Thêm tập tin</span>
           </div>
           <input
             ref={fileInputRef}
@@ -103,21 +93,20 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
             onChange={onFileDrop}
           />
         </div>
-        {datas.length > 0 && (
+        {files.length > 0 && (
           <>
             <p>
-              <b>Attached: </b>
+              <b>Đã đính kèm: </b>
             </p>
-
-            {datas.map((data, index) => (
-              <div key={index} className="drop-file-preview__item">
-                {/* <img src={ImageConfig["default"]} alt="" /> */}
-                <p>{data.FileTitle}</p>
+            {files.map((file) => (
+              <div
+                key={file.AssignmentFileId}
+                className="drop-file-preview__item"
+              >
+                <p>{file.FileTitle}</p>
                 <span className="drop-file-preview__item__del">
                   <CloseIcon
-                    onClick={() => {
-                      handleDeleteFile(data.AssignmentFileId);
-                    }}
+                    onClick={() => handleDeleteFile(file.AssignmentFileId)}
                     fontSize="small"
                   />
                 </span>
@@ -129,37 +118,24 @@ const AssignmentFile = ({ chapterId, assignmentId }) => {
 
       {fileList.length > 0 && (
         <div className="drop-file-preview ">
-          <p className=" mt-3 mb-3 font-bold">Attaching:</p>
-
-          {fileList.map((item, index) => (
+          <p className=" mt-3 mb-3 font-bold">Đính kèm:</p>
+          {fileList.map((file, index) => (
             <div key={index} className="drop-file-preview__item">
-              {/* <img
-                src={
-                  ImageConfig[item.type.split("/")[1]] || ImageConfig["default"]
-                }
-                alt=""
-              /> */}
-              <p>{item.name}</p>
+              <p>{file.name}</p>
               <span
                 className="drop-file-preview__item__del"
-                onClick={() => fileRemove(item)}
+                onClick={() => fileRemove(file)}
               >
                 <CloseIcon fontSize="small" />
               </span>
             </div>
           ))}
-
-          <Button
-            sx={{ color: "white", backgroundColor: "black" }}
-            style={{
-              marginTop: "12px",
-              width: "max-content",
-            }}
-            variant="contained"
+          <button
+            className="text-white  border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
             onClick={handleSaveClick}
           >
-            Save
-          </Button>
+            Lưu
+          </button>
         </div>
       )}
     </div>

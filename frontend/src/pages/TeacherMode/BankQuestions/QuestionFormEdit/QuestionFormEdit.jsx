@@ -49,7 +49,7 @@ function QuestionFormEdit({
     const token = localStorage.getItem("token");
     try {
       if (questionId) {
-        const res = await axios.get(`/questions/${questionId}`, {
+        const res = await axios.get(`http://localhost:8800/api/questions/${questionId}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
           },
@@ -224,7 +224,7 @@ function QuestionFormEdit({
 
     try {
       await axios.put(
-        `/questions/${questionId}`,
+        `http://localhost:8800/api/questions/${questionId}`,
         {
           questionContent,
           questionType: selectedType,

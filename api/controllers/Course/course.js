@@ -200,6 +200,19 @@ export const getCourseCode = (req, res) => {
     return res.status(200).json({ courseCode: course.CourseCode });
   });
 };
+export const getCourseDesc = (req, res) => {
+  const courseId = req.params.id;
+  const q = "SELECT `desc` FROM courses WHERE CourseId = ? ";
+  db.query(q, [courseId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Course desc not found" });
+    }
+
+    const course = result[0];
+    return res.status(200).json({ courseDesc: course.desc });
+  });
+};
 export const updateCourseCode = (req, res) => {
   const courseId = req.params.id;
 
@@ -219,9 +232,6 @@ export const updateCourseDesc = (req, res) => {
   const values = [req.body.desc, courseId];
 
   // Check user role and course update permission
-  if (userInfo.role !== "admin") {
-    return res.status(403).json("Unauthorized!");
-  }
 
   db.query(q, values, (err, data) => {
     if (err) return res.status(500).json(err);

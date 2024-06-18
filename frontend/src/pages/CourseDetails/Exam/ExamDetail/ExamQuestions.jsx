@@ -7,9 +7,7 @@ function ExamQuestions({
   answers,
   setAnswers,
 }) {
-  useEffect(() => {
-    console.log(answers);
-  }, [answers]);
+
 
   const handleAnswerChange = (questionId, optionId, isMultipleChoice) => {
     setAnswers((prevAnswers) => {
@@ -43,9 +41,9 @@ function ExamQuestions({
 
   return (
     <div className="w-[80%] px-10">
-      <div className="text-3xl text-blue-700 font-semibold py-1">
+      {/* <div className="text-3xl text-blue-700 font-semibold py-1">
         The Data Science Course: Complete Data Science Bootcamp 2023
-      </div>
+      </div> */}
       <div className="mt-5">
         {questions.map((question, index) => (
           <ul
@@ -63,8 +61,8 @@ function ExamQuestions({
                   onClick={() => toggleFlag(question.QuestionId)}
                 >
                   {flaggedQuestions.includes(question.QuestionId)
-                    ? "Unflag"
-                    : "Flag"}
+                    ? "Bỏ đánh dâu"
+                    : "Đánh dấu"}
                 </button>
               </div>
               <h3 className="font-semibold my-3">

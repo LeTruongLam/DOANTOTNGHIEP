@@ -34,7 +34,7 @@ function ExamForm({ open, setOpen, chapters }) {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get(`/classes/${courseId}`);
+      const response = await axios.get(`http://localhost:8800/api/classes/${courseId}`);
       setClasses(response.data);
     } catch (error) {
       console.error(error);
@@ -99,7 +99,7 @@ function ExamForm({ open, setOpen, chapters }) {
           classes: checkedClasses,
         };
         const response = await axios.post(
-          `/questions/exam/${courseId}`,
+          `http://localhost:8800/api/questions/exam/${courseId}`,
           payload
         );
         message.success("Exam created successfully");
