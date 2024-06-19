@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import { useParams } from "react-router-dom";
-import { formatDateString } from "../../../js/TAROHelper";
+import { formatDateString, getText } from "../../../js/TAROHelper";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ClassMenu from "../../../components/SelectMenus/ClassMenu";
@@ -177,7 +177,7 @@ const AssignmentView = () => {
                       <th
                         scope="col"
                         className="px-6 text-center py-2"
-                        style={{ width: "25%" }}
+                        style={{ width: "30%" }}
                       >
                         Hành động
                       </th>
@@ -194,8 +194,8 @@ const AssignmentView = () => {
                             {assignment?.AssignmentTitle}
                           </span>
                         </td>
-                        <td className="px-6 py-3 truncate ...">
-                          {assignment?.AssignmentDesc}
+                        <td className="px-6 py-3 max-w-96  truncate ...">
+                          {getText(assignment?.AssignmentDesc)}
                         </td>
 
                         <td className="px-6 py-2 truncate">

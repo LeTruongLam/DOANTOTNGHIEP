@@ -24,11 +24,28 @@ export default function TheLesson({
   const [isEditing, setIsEditing] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [lessonTitle, setLessonTitle] = useState("");
+  const [isDrop, setIsDrop] = useState(false);
 
   const onDrop = ({ removedIndex, addedIndex }) => {
     setLessons((items) => arrayMove(items, removedIndex, addedIndex));
+    setIsDrop(true);
   };
-
+  const handleLessonOrder = async () => {
+    const lessonIds = lessons.map((lesson) => lesson.LessonId);
+    try {
+      await axios.put(
+        `http://localhost:8800/api/courses/chapters/${chapterId}/updateOrder`,
+        {
+          lessonOrder: lessonIds,
+        }
+      );
+      setIsDrop(false);
+      message.success("Thay đổi vị trí thành công");
+    } catch (err) {
+      message.error("Lỗi khi thay đổi vị trí");
+      console.log(err);
+    }
+  };
   const fetchLessonData = async () => {
     try {
       if (chapterId) {
@@ -158,6 +175,24 @@ export default function TheLesson({
                 Lưu
               </button>
             </div>
+          )}
+        </div>
+        <div className="course-title-footer ">
+          {isDrop && !isEditing ? (
+            <button
+              onClick={() => {
+                handleLessonOrder();
+              }}
+              className="text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
+            >
+              Thay đổi thứ tự bài học
+            </button>
+          ) : (
+            lessons[0] && (
+              <div className=" text-slate-400	 italic">
+                Bấm vào biểu tượng và kéo thả để thay đổi thứ tự bài học
+              </div>
+            )
           )}
         </div>
       </div>

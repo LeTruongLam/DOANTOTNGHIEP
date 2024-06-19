@@ -37,7 +37,6 @@ const CourseDetails = () => {
     try {
       const course = await fetchCourse(token);
       const chapters = await fetchChapters(token);
-
       setCourse(course);
       setChapterData(chapters);
       setLoading(true);

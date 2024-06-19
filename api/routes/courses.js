@@ -25,6 +25,7 @@ import {
   updateChapterDesc,
   getChapterDocument,
   deleteChapterDocument,
+  updateChapterOrder,
 } from "../controllers/Course/chapter.js";
 
 import {
@@ -37,6 +38,7 @@ import {
   getLessonVideo,
   getLessonDesc,
   updateLessonDesc,
+  updateLessonOrder,
 } from "../controllers/Course/lesson.js";
 import {
   getAssignment,
@@ -99,6 +101,8 @@ router.delete(
   "/chapters/:chapterId/document/:documentId",
   deleteChapterDocument
 );
+// Thay đổi thứ tự chương
+router.put("/chapters/updateOrder", updateChapterOrder);
 
 // lesson
 router.get("/chapters/:chapterId/lessons", getLessons);
@@ -111,7 +115,8 @@ router.post("/chapters/lessons", addLessonTitle);
 router.get("/chapters/:chapterId/lessons/video/:lessonId", getLessonVideo);
 router.get("/chapters/:chapterId/lessons/desc/:lessonId", getLessonDesc);
 router.put("/chapters/:chapterId/lessons/desc/:lessonId", updateLessonDesc);
-
+// Thay đổi thứ tự chương
+router.put("/chapters/:chapterId/updateOrder", updateLessonOrder);
 // assignments
 router.get("/chapters/:chapterId/assignments", getAssignments);
 router.get("/chapters/:chapterId/assignments/:assignmentId", getAssignment);

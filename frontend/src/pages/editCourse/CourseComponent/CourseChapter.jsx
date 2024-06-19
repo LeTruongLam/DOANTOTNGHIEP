@@ -22,14 +22,34 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
     setChapterData((items) => arrayMove(items, removedIndex, addedIndex));
     setIsDrop(true);
   };
+
+  const handleChapterOrder = async () => {
+    const chapterIds = chapterData.map((chapter) => chapter.ChapterId);
+    try {
+      await axios.put(
+        `http://localhost:8800/api/courses/chapters/updateOrder`,
+        {
+          chapterOrder: chapterIds,
+        }
+      );
+      setIsDrop(false);
+      message.success("Thay đổi vị trí thành công");
+    } catch (err) {
+      message.error("Lỗi khi thay đổi vị trí");
+      console.log(err);
+    }
+  };
+
   const fetchData = async () => {
     try {
       const data = await fetchChapter(location.state?.CourseId);
+
       setChapterData(data);
     } catch (error) {
       console.error(error);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -148,7 +168,12 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
         </div>
         <div className="course-title-footer ">
           {isDrop && !isEditing ? (
-            <button className="text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700">
+            <button
+              onClick={() => {
+                handleChapterOrder();
+              }}
+              className="text-white border-none bg-gray-800 mt-3 py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
+            >
               Thay đổi thứ tự chương học
             </button>
           ) : (

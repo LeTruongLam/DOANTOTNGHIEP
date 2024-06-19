@@ -344,7 +344,7 @@ export const updateReviewAssignment = (req, res) => {
     return res.json("Submission review has been updated.");
   });
 };
-
+// Giáo viên nhận xét đánh giá
 export const updatePointAssignment = (req, res) => {
   const submissionId = req.params.submissionId;
   const assignmentPoint = req.body.assignmentPoint;
@@ -408,31 +408,93 @@ export const updateSubmissionStatus = (req, res) => {
     return res.json(data);
   });
 };
+// Nộp bài assignment mà không có file
 export const insertAssignmentSubmission = (req, res) => {
-  const submissionId = uuidv4();
   const { assignmentId, chapterId, userId, courseId } = req.body;
-  const query = `
-    INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate)
-    VALUES (?, ?, ?, ?, ?, NOW());
+
+  // First, check if there is already a submission for this assignment and user
+  const queryCheck = `
+    SELECT * FROM submissions 
+    WHERE AssignmentId = ? AND UserId = ?
   `;
-  const values = [submissionId, assignmentId, userId, chapterId, courseId];
-  db.query(query, values, (err, result) => {
+  const valuesCheck = [assignmentId, userId];
+
+  db.query(queryCheck, valuesCheck, (err, rows) => {
     if (err) {
-      console.error("Error inserting submission data into the database:", err);
-      res.status(500).json({
+      console.error("Error checking submission data in the database:", err);
+      return res.status(500).json({
         success: false,
-        message: "An error occurred",
+        message: "An error occurred while checking submission data",
+      });
+    }
+
+    if (rows.length > 0) {
+      // If there is already a submission, update it instead of inserting new
+      const submissionId = rows[0].SubmissionId;
+      const queryUpdate = `
+        UPDATE submissions 
+        SET ChapterId = ?, CourseId = ?, SubmissionDate = NOW()
+        WHERE SubmissionId = ?
+      `;
+      const valuesUpdate = [chapterId, courseId, submissionId];
+
+      db.query(queryUpdate, valuesUpdate, (errUpdate, resultUpdate) => {
+        if (errUpdate) {
+          console.error(
+            "Error updating submission data in the database:",
+            errUpdate
+          );
+          return res.status(500).json({
+            success: false,
+            message: "An error occurred while updating submission data",
+          });
+        }
+
+        console.log("Submission data has been updated in the database");
+        return res.status(200).json({
+          success: true,
+          message: "Submission data has been updated!",
+          data: resultUpdate,
+        });
       });
     } else {
-      console.log("Submission data has been inserted into the database");
-      res.status(201).json({
-        success: true,
-        message: "fileUrl has been uploaded!",
-        data: result,
+      // If there is no existing submission, insert a new one
+      const submissionId = uuidv4();
+      const queryInsert = `
+        INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate)
+        VALUES (?, ?, ?, ?, ?, NOW());
+      `;
+      const valuesInsert = [
+        submissionId,
+        assignmentId,
+        userId,
+        chapterId,
+        courseId,
+      ];
+
+      db.query(queryInsert, valuesInsert, (errInsert, resultInsert) => {
+        if (errInsert) {
+          console.error(
+            "Error inserting submission data into the database:",
+            errInsert
+          );
+          return res.status(500).json({
+            success: false,
+            message: "An error occurred while inserting submission data",
+          });
+        }
+
+        console.log("Submission data has been inserted into the database");
+        return res.status(201).json({
+          success: true,
+          message: "Submission data has been inserted!",
+          data: resultInsert,
+        });
       });
     }
   });
 };
+
 export const deleteAssignmentFile = (req, res) => {
   const userInfo = req.userInfo;
   const assignmentId = req.params.assignmentId;
