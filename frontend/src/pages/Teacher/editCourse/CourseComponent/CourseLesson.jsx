@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
-import { AuthContext } from "../../../context/authContext";
+import { AuthContext } from "../../../../context/authContext";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable as arrayMove } from "array-move";
 import "../EditWrite.scss";

@@ -1,36 +1,44 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// Auth
 import Login from "./pages/Auth/TheLogin/Login.jsx";
 import TheRegister from "./pages/Auth/TheRegister/TheRegister.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
+// User Page
 import Course from "./pages/course/Course.jsx";
 import CourseDetails from "./pages/CourseDetails/CourseDetails.jsx";
 import TheHeader from "./components/TheHeader.jsx";
 import CourseStepper from "./pages/course/CreateCourse/CourseStepper.jsx";
-import CustomerCourse from "./pages/editCourse/CustomerCourse.jsx";
+import CustomerCourse from "./pages/Teacher/editCourse/CustomerCourse.jsx";
 import TheInfo from "./pages/TheInfo/TheInfo.jsx";
 import CourseVideo from "./pages/course/CourseVideo.jsx";
-import HeaderVideo from "./components/ViewLayout/HeaderView.jsx";
 import TheNews from "./pages/TheNews/TheNews.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
 import CourseAssignment from "./pages/CourseDetails/CourseAssignment/CourseAssignment.jsx";
 
+import ExamDetail from "./pages/CourseDetails/Exam/ExamDetail/ExamDetail.jsx";
+import ExamOverview from "./pages/CourseDetails/Exam/ExamOverview/ExamOverview.jsx";
+// Teacher
 import TheDashboard from "./pages/Teacher/TeacherMode/TheDashboard.jsx";
-import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
-import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
-import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
 import TheAssignment from "./pages/Teacher/TeacherMode/TheAssignment/TheAssignment.jsx";
 import AssignmentDetail from "./pages/Teacher/TeacherMode/TheAssignment/AssignmentDetail.jsx";
-import PrivateRouter from "./utils/PrivateRouter.jsx";
-import TeacherRouter from "./utils/TeacherRouter.jsx";
 import AssignmentView from "./pages/Teacher/TeacherMode/TheAssignment/AssignmentView.jsx";
 import AssignmentListStudent from "./pages/Teacher/TeacherMode/TheAssignment/AssignmentListStudent.jsx";
 import BankQuestions from "./pages/Teacher/TeacherMode/BankQuestions/BankQuestions.jsx";
 import BankQuestionView from "./pages/Teacher/TeacherMode/BankQuestions/BankQuestionView.jsx";
 import ExamView from "./pages/Teacher/TeacherMode/BankQuestions/ExamView/ExamView.jsx";
 import ExamViewDetail from "./pages/Teacher/TeacherMode/BankQuestions/ExamView/ExamViewDetail/ExamViewDetail.jsx";
-import ExamDetail from "./pages/CourseDetails/Exam/ExamDetail/ExamDetail.jsx";
-import ExamOverview from "./pages/CourseDetails/Exam/ExamOverview/ExamOverview.jsx";
+
+// Admin
+import AdminPage from "./pages/Admin/AdminPage.jsx";
+import AdminRouter from "./utils/AdminRouter.jsx";
+// Other
+import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
+import HeaderVideo from "./components/ViewLayout/HeaderView.jsx";
+import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
+import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
+import PrivateRouter from "./utils/PrivateRouter.jsx";
+import TeacherRouter from "./utils/TeacherRouter.jsx";
 import PrivateExamRouter from "./utils/PrivateExamRouter.jsx";
 const Layout = ({ children }) => (
   <>
@@ -75,6 +83,17 @@ function App() {
                 </Layout>
               }
             />
+            <Route element={<AdminRouter />}>
+              <Route
+                path="/admin/home"
+                exact
+                element={
+                  <Layout>
+                    <AdminPage />
+                  </Layout>
+                }
+              />
+            </Route>
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course/:courseTitle"

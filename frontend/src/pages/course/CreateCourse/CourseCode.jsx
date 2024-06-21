@@ -1,6 +1,6 @@
 import TextField from "@mui/material/TextField";
 
-import "../../editCourse/EditWrite.scss";
+import "../../../pages/Teacher/editCourse/EditWrite.scss";
 
 export default function CourseCode({ courseCode, setCourseCode }) {
   return (

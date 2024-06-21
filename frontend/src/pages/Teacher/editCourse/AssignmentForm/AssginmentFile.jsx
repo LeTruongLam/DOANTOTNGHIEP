@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import "../EditWrite.scss";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import "../../../components/DropFile/drop-file-input.css";
+import "../../../../components/DropFile/drop-file-input.css";
 import CloseIcon from "@mui/icons-material/Close";
 import { message } from "antd";
 

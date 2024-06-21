@@ -4,11 +4,10 @@ import axios from "axios";
 import { useLocation, useParams } from "react-router-dom";
 import "../EditWrite.scss";
 import { message } from "antd";
-import DropFileInput from "../../../components/DropFile/DropFileInput";
+import DropFileInput from "../../../../components/DropFile/DropFileInput";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ChecklistOutlinedIcon from "@mui/icons-material/ChecklistOutlined";
 import CourseTitle from "../CourseComponent/CourseTitle";
-import CourseDate from "../CourseComponent/CourseDate";
 import CourseDesc from "../CourseComponent/CourseDesc";
 import CourseChapter from "../CourseComponent/CourseChapter";
 import CourseCode from "../CourseComponent/CourseCode";
@@ -16,7 +15,7 @@ import CourseClass from "../CourseComponent/CourseClass";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
-import Dialog from "../../../components/Dialogs/ShowDialog";
+import Dialog from "../../../../components/Dialogs/ShowDialog";
 
 const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
   const location = useLocation();

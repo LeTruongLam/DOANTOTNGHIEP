@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ClassMenu from "../../../../components/SelectMenus/ClassMenu";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AssginmentForm from "../../../editCourse/AssignmentForm/AssginmentForm";
+
+import AssginmentForm from "../../editCourse/AssignmentForm/AssginmentForm";
 import { message } from "antd";
 import AddAssignmentForm from "../../../../components/Dialogs/AddAssignmentForm";
 
