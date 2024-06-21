@@ -1,7 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
-import { useLocation } from "react-router-dom";
-
 import CastForEducationIcon from "@mui/icons-material/CastForEducation";
 import "../EditWrite.scss";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
@@ -15,10 +12,9 @@ const ChapterStepper = ({
   handleBack,
   handleNext,
   setSelectedLessonId,
+  courseId,
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const courseId = location.state?.CourseId;
   return (
     <div className="grow-[3]">
       <div className="flex justify-between py-3 m-3 items-center	">

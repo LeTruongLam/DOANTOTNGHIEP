@@ -144,10 +144,9 @@ const AssignmentListStudent = () => {
   };
 
   const handleToAssignmentDetail = async (student) => {
-    console.log(student);
     if (student.SubmissionId) {
       navigate(
-        `/course/${courseId}/assignment/${assignmentId}/assignment-detail/${student?.SubmissionId}`,
+        `/teacher/courses/${courseId}/assignments/${assignmentId}/assignment-detail/${student?.SubmissionId}`,
         {
           state: {
             classStudent: classStudent,
@@ -167,7 +166,7 @@ const AssignmentListStudent = () => {
         );
         let newSubmissionId = res.data.data;
         navigate(
-          `/course/${courseId}/assignment/${assignmentId}/assignment-detail/${newSubmissionId}`,
+          `/teacher/courses/${courseId}/assignments/${assignmentId}/assignment-detail/${newSubmissionId}`,
           {
             state: {
               classStudent: classStudent,

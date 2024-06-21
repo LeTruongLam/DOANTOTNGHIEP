@@ -7,13 +7,13 @@ export default function TheDashboard() {
   const { courses, fetchCourses } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleEdit = async (courseId, course) => {
-    navigate(`/course/write?edit=${courseId}`, { state: course });
+    navigate(`/teacher/courses/${courseId}/detail`, { state: course });
   };
   useEffect(() => {
     fetchCourses();
   }, []);
   const handleWrite = () => {
-    navigate("/course/create");
+    navigate("/teacher/courses/create");
   };
 
   return (

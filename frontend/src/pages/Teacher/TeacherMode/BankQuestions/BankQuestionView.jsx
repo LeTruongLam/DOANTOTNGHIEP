@@ -22,6 +22,7 @@ import ClassMenu from "../../../../components/SelectMenus/ClassMenu";
 import QuestionFormEdit from "./QuestionFormEdit/QuestionFormEdit";
 import SpeedDialTooltipOpen from "./Components/SpeedDial";
 import ExamForm from "./ExamForm/ExamForm";
+import { Plus } from "lucide-react";
 const steps = ["Add Question", "Questions Info"];
 
 function BankQuestionView() {
@@ -455,31 +456,18 @@ function BankQuestionView() {
                       </div>
                       <div>
                         <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
-                          There’s no question here
+                          Không có câu hỏi nào
                         </h2>
                         <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
-                          Please update more questions
+                          Vui lòng cập nhật thêm câu hỏi
                         </p>
                         <div className="mx-auto w-full justify-center items-center inline-flex ">
                           <button
                             onClick={() => handleClickOpen()}
                             className=" flex  justify-center gap-2 items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 transition-all duration-500 rounded-full text-white text-xs font-semibold leading-4"
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="1.5"
-                              stroke="currentColor"
-                              className="w-4 h-4"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M12 4.5v15m7.5-7.5h-15"
-                              />
-                            </svg>
-                            <span>New Question</span>
+                            <Plus className="w-4 h-4" />
+                            <span>Câu hỏi mới</span>
                           </button>
                         </div>
                       </div>
@@ -507,7 +495,7 @@ function BankQuestionView() {
               margin: "0 20px 4px 20px",
             }}
           >
-            Quiz
+            Câu hỏi
             <Button style={{ marginLeft: "auto", justifyContent: "flex-end" }}>
               <CloseIcon onClick={handleClose} />
             </Button>
@@ -563,7 +551,7 @@ function BankQuestionView() {
               type="button"
               class="text-black bg-white border border-blue-500 focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-5 py-1.5 me-2 mb-2  "
             >
-              Cancel
+              Hủy
             </button>
             <div className="flex gap-2">
               <button
@@ -571,7 +559,7 @@ function BankQuestionView() {
                 type="button"
                 class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
-                {activeStep === steps.length - 1 ? "Done" : "Save & Next "}
+                {activeStep === steps.length - 1 ? "Hoàn thành" : "Lưu & Tiép tục "}
               </button>
             </div>
           </div>

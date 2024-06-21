@@ -539,7 +539,7 @@ export const getAllStudentAndAssignmentStatus = (req, res) => {
   const q = `
     SELECT s.StudentId, s.StudentName, s.StudentCode, sb.SubmissionId, sb.SubmissionDate, sb.Score,sb.Graded, sb.Status,sb.Review, sb.SubmissionId, sb.SubmissionFiles, s.UserId
     FROM students s
-    JOIN class_student sc ON s.StudentId = sc.StudentId
+    JOIN class_student sc ON s.UserId = sc.UserId
     JOIN classes c ON sc.ClassId = c.ClassId
     JOIN courses cs ON c.CourseId = cs.CourseId
     LEFT JOIN submissions sb ON s.UserId = sb.UserId AND cs.CourseId = sb.CourseId AND sb.AssignmentId = ?

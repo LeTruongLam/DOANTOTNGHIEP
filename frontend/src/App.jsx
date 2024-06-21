@@ -7,12 +7,10 @@ import HomePage from "./pages/HomePage/HomePage.jsx";
 // User Page
 import Course from "./pages/course/Course.jsx";
 import CourseDetails from "./pages/CourseDetails/CourseDetails.jsx";
-import TheHeader from "./components/TheHeader.jsx";
 import CourseStepper from "./pages/course/CreateCourse/CourseStepper.jsx";
 import CustomerCourse from "./pages/Teacher/editCourse/CustomerCourse.jsx";
 import TheInfo from "./pages/TheInfo/TheInfo.jsx";
 import CourseVideo from "./pages/course/CourseVideo.jsx";
-import TheNews from "./pages/TheNews/TheNews.jsx";
 import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
 import CourseAssignment from "./pages/CourseDetails/CourseAssignment/CourseAssignment.jsx";
 
@@ -31,66 +29,83 @@ import ExamViewDetail from "./pages/Teacher/TeacherMode/BankQuestions/ExamView/E
 
 // Admin
 import AdminPage from "./pages/Admin/AdminPage.jsx";
-import AdminRouter from "./utils/AdminRouter.jsx";
 // Other
 import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
-import HeaderVideo from "./components/ViewLayout/HeaderView.jsx";
-import Sidebar from "./components/DashboardLayout/Sidebar.jsx";
-import HeaderLayout from "./components/DashboardLayout/HeaderLayout.jsx";
-import PrivateRouter from "./utils/PrivateRouter.jsx";
-import TeacherRouter from "./utils/TeacherRouter.jsx";
-import PrivateExamRouter from "./utils/PrivateExamRouter.jsx";
-const Layout = ({ children }) => (
-  <>
-    <TheHeader />
-    {children}
-  </>
-);
 
-const LayoutViewer = ({ children }) => (
-  <>
-    <HeaderVideo />
-    <div className="mr-4">{children}</div>
-  </>
-);
+//Router
+import PrivateRouter from "./routers/PrivateRouter.jsx";
+import TeacherPrivateRouter from "./routers/TeacherPrivateRouter.jsx";
+import PrivateExamRouter from "./routers/PrivateExamRouter.jsx";
+import AdminPrivateRouter from "./routers/AdminPrivateRouter.jsx";
+// Layout
+import MainLayout from "@/layout/MainLayout.jsx";
+import TeacherLayout from "./layout/TeacherLayout.jsx";
+import ExamLayout from "./layout/ExamLayout.jsx";
+import ViewerLayout from "./layout/ViewerLayout.jsx";
 
-const LayoutTeacher = ({ children }) => (
-  <div className="flex ">
-    <Sidebar />
-    <div className="w-full ">
-      <HeaderLayout />
-      {children}
-    </div>
-  </div>
-);
-const LayoutExam = ({ children }) => (
-  <div className="w-full ">
-    <HeaderLayout />
-    {children}
-  </div>
-);
+const TeacherRouter = [
+  {
+    path: "/teacher/courses/create",
+    element: <CourseStepper />,
+  },
+  {
+    path: "/teacher/courses/:courseId/assignments",
+    element: <AssignmentView />,
+  },
+  {
+    path: "/teacher/courses/:courseId/assignments/:assignmentId/classrooms",
+    element: <AssignmentListStudent />,
+  },
+  {
+    path: "/teacher/courses/:courseId/assignments/:assignmentId/assignment-detail/:submissionId",
+    element: <AssignmentDetail />,
+  },
+  {
+    path: "/teacher/courses",
+    element: <TheDashboard />,
+  },
+  {
+    path: "/teacher/assignments",
+    element: <TheAssignment />,
+  },
+  {
+    path: "/teacher/bankquestions",
+    element: <BankQuestions />,
+  },
+  {
+    path: "/teacher/courses/:courseId/bankquestions",
+    element: <BankQuestionView />,
+  },
+  {
+    path: "/teacher/courses/:courseId/detail",
+    element: <CustomerCourse />,
+  },
+];
+
 function App() {
   return (
     <div className="app">
       <div className="container">
         <Router>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Layout>
-                  <HomePage />
-                </Layout>
-              }
-            />
-            <Route element={<AdminRouter />}>
+            <Route element={<TeacherPrivateRouter />}>
+              {TeacherRouter.map((route, index) => (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={<TeacherLayout>{route.element}</TeacherLayout>}
+                />
+              ))}
+            </Route>
+
+            <Route element={<AdminPrivateRouter />}>
               <Route
                 path="/admin/home"
                 exact
                 element={
-                  <Layout>
+                  <MainLayout>
                     <AdminPage />
-                  </Layout>
+                  </MainLayout>
                 }
               />
             </Route>
@@ -99,9 +114,9 @@ function App() {
                 path="/course/:courseTitle"
                 exact
                 element={
-                  <Layout>
+                  <MainLayout>
                     <CourseDetails />
-                  </Layout>
+                  </MainLayout>
                 }
               />
 
@@ -109,9 +124,9 @@ function App() {
                 path="/course/:courseId/exams/:examId/overview"
                 exact
                 element={
-                  <Layout>
+                  <MainLayout>
                     <ExamOverview />
-                  </Layout>
+                  </MainLayout>
                 }
               />
             </Route>
@@ -120,9 +135,9 @@ function App() {
                 path="/course/:courseId/exams/:examId"
                 exact
                 element={
-                  <Layout>
+                  <MainLayout>
                     <ExamDetail />
-                  </Layout>
+                  </MainLayout>
                 }
               />
             </Route>
@@ -132,169 +147,32 @@ function App() {
                 path="/course"
                 exact
                 element={
-                  <Layout>
+                  <MainLayout>
                     <Course />
-                  </Layout>
-                }
-              />
-            </Route>
-            <Route element={<TeacherRouter />}>
-              <Route
-                path="/course/create"
-                exact
-                element={
-                  <LayoutTeacher>
-                    <CourseStepper />
-                  </LayoutTeacher>
-                }
-              />
-            </Route>
-            <Route element={<TeacherRouter />}>
-              <Route
-                path="/course/:courseId/assignments"
-                exact
-                element={
-                  <LayoutTeacher>
-                    <AssignmentView />
-                  </LayoutTeacher>
+                  </MainLayout>
                 }
               />
             </Route>
 
-            <Route
-              path="/register"
-              element={
-                <Layout>
-                  <TheRegister />
-                </Layout>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <Layout>
-                  <Login />
-                </Layout>
-              }
-            />
-            <Route element={<TeacherRouter />}>
-              <Route
-                path="/dashboard"
-                exact
-                element={
-                  <LayoutTeacher>
-                    <TheDashboard />
-                  </LayoutTeacher>
-                }
-              />
-            </Route>
-            <Route element={<TeacherRouter />}>
-              <Route
-                path="/assignments"
-                exact
-                element={
-                  <LayoutTeacher>
-                    <TheAssignment />
-                  </LayoutTeacher>
-                }
-              />
-              <Route
-                path="/course/:courseId/assignment/:assignmentId/assignment-detail/:submissionId"
-                exact
-                element={<AssignmentDetail />}
-              />
-              <Route
-                path="/course/:courseId/assignment/:assignmentId/classrooms"
-                exact
-                element={
-                  <LayoutTeacher>
-                    <AssignmentListStudent />
-                  </LayoutTeacher>
-                }
-              />
-            </Route>
-            <Route element={<TeacherRouter />}>
-              <Route
-                path="/bankquestion"
-                exact
-                element={
-                  <LayoutTeacher>
-                    <BankQuestions />
-                  </LayoutTeacher>
-                }
-              />
-              <Route element={<TeacherRouter />}>
-                <Route
-                  path="/bankquestion/course/:courseId"
-                  exact
-                  element={
-                    <LayoutTeacher>
-                      <BankQuestionView />
-                    </LayoutTeacher>
-                  }
-                />
-              </Route>
-              <Route element={<TeacherRouter />}>
-                <Route
-                  path="/bankquestion/course/:courseId/Exams"
-                  exact
-                  element={
-                    <LayoutTeacher>
-                      <ExamView />
-                    </LayoutTeacher>
-                  }
-                />
-              </Route>
-              <Route element={<TeacherRouter />}>
-                <Route
-                  path="/bankquestion/course/:courseId/ExamDetail/:examId"
-                  exact
-                  element={
-                    <LayoutExam>
-                      <ExamViewDetail />
-                    </LayoutExam>
-                  }
-                />
-              </Route>
-            </Route>
-            <Route element={<TeacherRouter />}>
-              <Route
-                path="/course/write"
-                element={
-                  <LayoutTeacher>
-                    <CustomerCourse />
-                  </LayoutTeacher>
-                }
-              />
-            </Route>
             <Route element={<PrivateRouter />}>
               <Route
                 path="/info"
                 element={
-                  <Layout>
+                  <MainLayout>
                     <TheInfo />
-                  </Layout>
+                  </MainLayout>
                 }
               />
             </Route>
-
-            <Route
-              path="/news"
-              element={
-                <Layout>
-                  <TheNews />
-                </Layout>
-              }
-            />
 
             <Route element={<PrivateRouter />}>
               <Route
                 path="/course/:courseTitle/document/:chapterId"
                 exact
                 element={
-                  <LayoutViewer>
+                  <ViewerLayout>
                     <CourseFileViewer />
-                  </LayoutViewer>
+                  </ViewerLayout>
                 }
               />
             </Route>
@@ -303,9 +181,9 @@ function App() {
                 path="/course/:courseTitle/assignment/:chapterId"
                 exact
                 element={
-                  <LayoutViewer>
+                  <ViewerLayout>
                     <CourseAssignment />
-                  </LayoutViewer>
+                  </ViewerLayout>
                 }
               />
             </Route>
@@ -314,13 +192,37 @@ function App() {
                 path="/course/:courseTitle/lecture/:lessonId"
                 exact
                 element={
-                  <LayoutViewer>
+                  <ViewerLayout>
                     <CourseVideo />
-                  </LayoutViewer>
+                  </ViewerLayout>
                 }
               />
             </Route>
             <Route path="/*" element={<PageNotFound />} />
+            <Route
+              path="/"
+              element={
+                <MainLayout>
+                  <HomePage />
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <MainLayout>
+                  <TheRegister />
+                </MainLayout>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <MainLayout>
+                  <Login />
+                </MainLayout>
+              }
+            />
           </Routes>
         </Router>
       </div>

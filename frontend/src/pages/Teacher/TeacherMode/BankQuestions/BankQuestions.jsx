@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function BankQuestions() {
   const { courses, fetchCourses } = useContext(AuthContext);
   const navigate = useNavigate();
-  const handleEdit = async (courseId, course) => {
-    navigate(`/bankquestion/course/${courseId}`, { state: course });
+  const handleEdit = async (courseId) => {
+    navigate(`/teacher/courses/${courseId}/bankquestions`);
   };
   useEffect(() => {
     fetchCourses();
@@ -31,7 +31,7 @@ export default function BankQuestions() {
           <div
             key={course?.CourseId}
             className="bg-slate-50 hover:cursor-pointer h-20 flex border border-gray-50 rounded-lg overflow-hidden shadow"
-            onClick={() => handleEdit(course?.CourseId, course)}
+            onClick={() => handleEdit(course?.CourseId)}
           >
             <div className=" flex items-center justify-center bg-slate-500 flex-shrink-0">
               <img className="w-20 h-full object-cover" src={course?.img} />

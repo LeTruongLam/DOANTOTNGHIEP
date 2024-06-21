@@ -1,6 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
-import CastForEducationIcon from "@mui/icons-material/CastForEducation";
 import "../EditWrite.scss";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import LessonTitle from "../CustomerLesson/LessonTitle";

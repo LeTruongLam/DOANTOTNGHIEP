@@ -51,7 +51,7 @@ const TheHeader = () => {
   const handleChecked = (event) => {
     setChecked(event.target.checked);
     if (event.target.checked) {
-      navigate("/dashboard");
+      navigate("/teacher/courses");
     } else {
       navigate("/course");
     }
@@ -84,11 +84,6 @@ const TheHeader = () => {
               <Item exact activeClassName="active" to="/">
                 <span className="py-4 mx-2 font-semibold" clicked={click}>
                   Trang chủ
-                </span>
-              </Item>
-              <Item activeClassName="active" to="/news">
-                <span className="py-4 mx-2 font-semibold" clicked={click}>
-                  Tin tức
                 </span>
               </Item>
               <Item activeClassName="active" to="/course">

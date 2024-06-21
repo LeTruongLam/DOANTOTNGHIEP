@@ -5,10 +5,8 @@ import { useNavigate } from "react-router-dom";
 const TheAssignment = () => {
   const { courses, fetchCourses } = useContext(AuthContext);
   const navigate = useNavigate();
-  const handleEdit = async (courseTitle, courseId) => {
-    navigate(`/course/${courseId}/assignments`, {
-      state: { courseId: courseId, courseTitle: courseTitle },
-    });
+  const handleEdit = async (courseId) => {
+    navigate(`/teacher/courses/${courseId}/assignments`);
   };
 
   useEffect(() => {
@@ -26,7 +24,7 @@ const TheAssignment = () => {
           <div
             key={index}
             className="bg-slate-50 hover:cursor-pointer h-20 flex border border-gray-50 rounded-lg overflow-hidden shadow"
-            onClick={() => handleEdit(course.title, course.CourseId)}
+            onClick={() => handleEdit(course.CourseId)}
           >
             <div className=" flex items-center justify-center bg-slate-500 flex-shrink-0">
               <img
@@ -40,7 +38,9 @@ const TheAssignment = () => {
                 <p className="text-gray-800 font-medium line-clamp-1">
                   {course.title}
                 </p>
-                <p className="text-gray-700 font-semibold text-sm">{course.CourseCode}</p>
+                <p className="text-gray-700 font-semibold text-sm">
+                  {course.CourseCode}
+                </p>
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { scroller } from "react-scroll";
-import { AuthContext } from "../../../../../../context/authContext";
+import { AuthContext } from "@/context/authContext";
 import ExamTabs from "./ExamTabs";
 import ExamQuestions from "./ExamQuestions";
 

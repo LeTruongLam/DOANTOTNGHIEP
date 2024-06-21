@@ -1,15 +1,15 @@
 import React, { useEffect, useContext, useState } from "react";
-import { AuthContext } from "../../../../context/authContext";
+import { AuthContext } from "@/context/authContext";
 import { useParams } from "react-router-dom";
 import { formatDateString, getText } from "../../../../js/TAROHelper";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import ClassMenu from "../../../../components/SelectMenus/ClassMenu";
+import ClassMenu from "@/components/SelectMenus/ClassMenu";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import AssginmentForm from "../../editCourse/AssignmentForm/AssginmentForm";
 import { message } from "antd";
-import AddAssignmentForm from "../../../../components/Dialogs/AddAssignmentForm";
+import AddAssignmentForm from "@/components/Dialogs/AddAssignmentForm";
 
 const AssignmentView = () => {
   const [course, setCourse] = useState();
@@ -27,7 +27,7 @@ const AssignmentView = () => {
   const navigate = useNavigate();
   const handleToAssignment = (assignment) => {
     navigate(
-      `/course/${courseId}/assignment/${assignment.AssignmentId}/classrooms`
+      `/teacher/courses/${courseId}/assignments/${assignment.AssignmentId}/classrooms`
     );
   };
   const fetchAssignmentsByChapter = async () => {

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "../EditWrite.scss";
 import { message } from "antd";
-import DropFileInput from "../../../../components/DropFile/DropFileInput";
+import DropFileInput from "@/components/DropFile/DropFileInput";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ChecklistOutlinedIcon from "@mui/icons-material/ChecklistOutlined";
 import CourseTitle from "../CourseComponent/CourseTitle";
@@ -15,16 +15,14 @@ import CourseClass from "../CourseComponent/CourseClass";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
-import Dialog from "../../../../components/Dialogs/ShowDialog";
+import Dialog from "@/components/Dialogs/ShowDialog";
 
-const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
+const CourseBodyStepper = ({ courseId, handleNext, setSelectedChapterId }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
   const [open, setOpen] = useState(false);
-  const urlParams = new URLSearchParams(window.location.search);
-  const courseId = urlParams.get("edit");
-
+  console.log("hi", courseId);
   const onFileChange = (files) => {
     const formData = new FormData();
     formData.append("image", files);
@@ -90,7 +88,7 @@ const CourseBodyStepper = ({ handleNext, setSelectedChapterId }) => {
               navigate(-1);
             }}
             className="text-white text-sm border-none bg-gray-800  py-1.5 rounded-md px-3 w-max hover:bg-gray-700"
-            >
+          >
             Quay lại
           </button>
         </p>

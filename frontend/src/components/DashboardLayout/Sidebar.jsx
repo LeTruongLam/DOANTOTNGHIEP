@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import styled from "styled-components";
 import { NavLink, useLocation } from "react-router-dom";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -50,39 +49,45 @@ const Sidebar = () => {
     <div className=" min-w-[250px] border-r h-[100vh] border-slate-300 flex flex-col justify-between ">
       <Container>
         <SlickBar>
-          <Item exact className="mt-10 hover:bg-slate-200 " activeClassName="active" to="/">
+          <Item
+            exact
+            className="mt-10 hover:bg-slate-200 "
+            activeClassName="active"
+            to="/"
+          >
             <HomeIcon />
-            <Text className="inline ">Home</Text>
+            <Text className="inline ">Trang chủ</Text>
           </Item>
           <Item
             activeClassName="active"
-            to="/dashboard"
+            to="/teacher/courses"
             className={`${
-              location.pathname.startsWith("/write") ||
-              location.pathname.startsWith("/course/create")
+              location.pathname.endsWith("/detail") ? "active" : ""
+            } hover:bg-slate-200`}
+          >
+            <ListAltIcon />
+            <Text>Môn học</Text>
+          </Item>
+          <Item
+            activeClassName="active"
+            to="/teacher/assignments"
+            className={`${
+              location.pathname === "/assignments" ||
+              location.pathname.startsWith("/assignments/")
                 ? "active"
                 : ""
             } hover:bg-slate-200`}
           >
-            <ListAltIcon />
-            <Text>Courses</Text>
+            <AssignmentIndIcon />
+            <Text>Bài tập</Text>
           </Item>
           <Item
+            className="hover:bg-slate-200"
             activeClassName="active"
-            to="/assignments"
-            className={`${
-              location.pathname === "/assignment/view" ||
-              location.pathname.startsWith("/assignmentDetail/")
-                ? "active"
-                : ""
-              } hover:bg-slate-200`   }
+            to="/teacher/bankquestions"
           >
-            <AssignmentIndIcon />
-            <Text>Assignments</Text>
-          </Item>
-          <Item className="hover:bg-slate-200" activeClassName="active" to="/bankquestion">
             <AccountBalanceIcon />
-            <Text className="inline">Bank Questions</Text>
+            <Text className="inline">Ngân hàng câu hỏi</Text>
           </Item>
         </SlickBar>
       </Container>

@@ -113,7 +113,7 @@ export default function AssignmentDetail() {
     }
 
     navigate(
-      `/course/${courseId}/assignment/${assignmentId}/assignment-detail/${student?.SubmissionId}`,
+      `/teacher/courses/${courseId}/assignments/${assignmentId}/assignment-detail/${student?.SubmissionId}`,
       {
         state: {
           classStudent: classStudent,
@@ -122,26 +122,12 @@ export default function AssignmentDetail() {
     );
   };
   const handleExit = () => {
-    navigate(`/course/${courseId}/assignment/${assignmentId}/classrooms`);
+    navigate(
+      `/teacher/courses/${courseId}/assignments/${assignmentId}/classrooms`
+    );
   };
   return (
     <div className="flex flex-col">
-      <div className="navbar  mx-5">
-        <div className="navbar-container">
-          <div
-            className="logo"
-            style={{ display: "flex", alignItems: "center", gap: "16px" }}
-          >
-            <span className="font-semibold">
-              {assignment?.StudentName} {assignment?.StudentCode}
-            </span>
-          </div>
-          <div className="links" onClick={handleExit}>
-            <ExitToAppIcon />
-            <span>Thoát</span>
-          </div>
-        </div>
-      </div>
       <div className="body-height flex flex-row gap-5">
         <div className="w-[70%] my-3 px-5 border-r border-slate-300 ">
           <div className="w-full h-full">
@@ -157,6 +143,13 @@ export default function AssignmentDetail() {
         </div>
         <div className="course-file-viewer gap-5 w-[30%]  mr-5">
           <div className="file-container outline-none mt-5  " tabIndex="0">
+            <div
+              className="flex justify-end hover:cursor-pointer mb-3"
+              onClick={handleExit}
+            >
+              <ExitToAppIcon />
+              <span>Thoát</span>
+            </div>
             <Listbox value={selected} onChange={setSelected}>
               {({ open }) => (
                 <div className="relative mt-2">

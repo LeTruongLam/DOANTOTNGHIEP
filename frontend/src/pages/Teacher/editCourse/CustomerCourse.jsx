@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import "./EditWrite.scss";
 import Box from "@mui/material/Box";
@@ -7,9 +7,15 @@ import Typography from "@mui/material/Typography";
 import ChapterStepper from "./Stepper/ChapterStepper";
 import CourseBodyStepper from "./Stepper/CourseBodyStepper";
 import LessonStepper from "./Stepper/LessonStepper";
-const steps = ["Customer Course", "Customer Chapters", "Customer lessons"];
+import { useParams } from "react-router";
+const steps = [
+  "Thiết lập môn học",
+  "Thiết lập chương học",
+  "Thiết lập bài học",
+];
 
 const CustomerCourse = () => {
+  const { courseId } = useParams(); // Lấy courseId từ URL
   const [selectedChapterId, setSelectedChapterId] = useState(null);
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [activeStep, setActiveStep] = React.useState(0);
@@ -31,10 +37,12 @@ const CustomerCourse = () => {
   };
   const CourseContent = [
     <CourseBodyStepper
+      courseId={courseId}
       handleNext={handleNext}
       setSelectedChapterId={setSelectedChapterId}
     />,
     <ChapterStepper
+      courseId={courseId}
       chapterId={selectedChapterId}
       setSelectedLessonId={setSelectedLessonId}
       handleBack={handleBack}
