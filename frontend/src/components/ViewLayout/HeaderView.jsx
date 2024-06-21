@@ -21,7 +21,7 @@ const TheHeader = () => {
   const getChapterTitle = async () => {
     try {
       const response = await axios.get(
-        `/courses/${location.state?.courseId}/chapters/${location.state?.chapterId}`
+        `http://localhost:8800/api/courses/${location.state?.courseId}/chapters/${location.state?.chapterId}`
       );
       setChapterTitle(response.data.ChapterTitle);
     } catch (err) {

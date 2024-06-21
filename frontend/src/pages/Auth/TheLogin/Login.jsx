@@ -1,9 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/authContext";
-import image from "../../img/login_2.jpg";
+import { AuthContext } from "../../../context/authContext";
 import "./login.scss";
-import Button from "@mui/material/Button";
 import { message } from "antd";
 const Login = () => {
   const [inputs, setInputs] = useState({

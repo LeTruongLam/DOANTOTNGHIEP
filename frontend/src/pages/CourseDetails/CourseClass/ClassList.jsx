@@ -7,14 +7,12 @@ import { AuthContext } from "../../../context/authContext";
 import Avatar from "@mui/material/Avatar";
 import axios from "axios";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import AddStudentForm from "./AddStudentForm";
 export default function ClassList({ courseId, classCodeStudent }) {
   const { currentUser } = useContext(AuthContext);
   const [classes, setClasses] = useState([]);
   const [classCode, setClassCode] = useState("");
   const [classId, setClassId] = useState("");
   const [classStudent, setClassStudent] = useState([]);
-  const [openForm, setOpenForm] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
 
   const fetchClasses = async () => {
@@ -25,7 +23,9 @@ export default function ClassList({ courseId, classCodeStudent }) {
         setClasses(res.data);
         setIsTeacher(true);
       } else if (currentUser.Role === "student") {
-        res = await axios.get(`http://localhost:8800/api/classes/${courseId}/class/${classCodeStudent}`);
+        res = await axios.get(
+          `http://localhost:8800/api/classes/${courseId}/class/${classCodeStudent}`
+        );
         setClassStudent(res.data);
       }
     } catch (error) {
@@ -34,7 +34,9 @@ export default function ClassList({ courseId, classCodeStudent }) {
   };
   const fetchClassStudent = async (classCode) => {
     try {
-      const res = await axios.get(`http://localhost:8800/api/classes/${courseId}/class/${classCode}`);
+      const res = await axios.get(
+        `http://localhost:8800/api/classes/${courseId}/class/${classCode}`
+      );
       setClassStudent(res.data);
     } catch (error) {
       console.error(error);
@@ -49,27 +51,15 @@ export default function ClassList({ courseId, classCodeStudent }) {
     fetchClassStudent(event.target.value);
   };
 
-  const onShowForm = () => {
-    setOpenForm(true);
-  };
-  const onCloseForm = () => {
-    setOpenForm(false);
-  };
   return (
     <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="p-5">
-        {openForm && classCode && (
-          <AddStudentForm
-            classCode={classCode}
-            isOpen={openForm}
-            courseId={courseId}
-            isClose={onCloseForm}
-            classId={classId}
-            fetchClassStudent={fetchClassStudent}
-          ></AddStudentForm>
-        )}
         {isTeacher && (
-          <FormControl fullWidth sx={{ m: 1, backgroundColor: "#fff" }} size="medium">
+          <FormControl
+            fullWidth
+            sx={{ m: 1, backgroundColor: "#fff" }}
+            size="medium"
+          >
             <InputLabel id="demo-select-small-label">Class Code</InputLabel>
             <Select
               labelId="demo-select-small-label"
@@ -101,22 +91,6 @@ export default function ClassList({ courseId, classCodeStudent }) {
             </div>
             <div className="class-header font-bold mt-3">
               <p>Danh sách lớp ({classStudent.length})</p>
-              <p
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-                onClick={onShowForm}
-              >
-                {isTeacher && (
-                  <>
-                    <AddCircleOutlineOutlinedIcon fontSize="small" />
-                    <p>Add Student</p>
-                  </>
-                )}
-              </p>
             </div>
 
             {classStudent.map((student, index) => (

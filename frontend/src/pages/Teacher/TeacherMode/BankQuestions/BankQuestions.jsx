@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from "react";
-import { AuthContext } from "../../../context/authContext";
+import { AuthContext } from "../../../../context/authContext";
 import { useNavigate } from "react-router-dom";
 export default function BankQuestions() {
   const { courses, fetchCourses } = useContext(AuthContext);

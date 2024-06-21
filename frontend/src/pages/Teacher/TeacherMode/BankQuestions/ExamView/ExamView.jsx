@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import ViewAEditDropdown from "../../../../components/Dropdowns/ViewAEditDropdown";
-import { formatDateString } from "../../../../js/TAROHelper";
+import ViewAEditDropdown from "../../../../../components/Dropdowns/ViewAEditDropdown";
+import { formatDateString } from "../../../../../js/TAROHelper";
 function ExamView() {
   const navigate = useNavigate();
   const { courseId } = useParams();

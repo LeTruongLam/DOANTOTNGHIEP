@@ -3,18 +3,18 @@ import React, { useEffect, Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import "../../course/course.scss";
+import "../../../course/course.scss";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
-import { formatDateString, getText } from "../../../js/TAROHelper";
+import { formatDateString, getText } from "../../../../js/TAROHelper";
 import ReviewsIcon from "@mui/icons-material/Reviews";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import Button from "@mui/material/Button";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import BlockIcon from "@mui/icons-material/Block";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import NoResultFound from "../../NotFounds/NoResultFound";
+import NoResultFound from "../../../NotFounds/NoResultFound";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }

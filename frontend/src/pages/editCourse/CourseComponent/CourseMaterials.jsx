@@ -78,9 +78,11 @@ export default function CourseMaterials({ title, subTitle, chapterId }) {
             >
               <Button icon={<InboxOutlined />}>Thêm tài liệu</Button>
             </Upload>
-            <Button type="primary" onClick={handleSaveClick}>
-              Lưu
-            </Button>
+            {newDocumentFile && (
+              <Button type="primary" onClick={handleSaveClick}>
+                Lưu
+              </Button>
+            )}
           </div>
         </div>
         <div className="course-title-body">

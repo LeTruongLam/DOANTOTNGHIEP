@@ -10,8 +10,8 @@ import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import axios from "axios";
 import { message } from "antd";
-import ShowDialog from "../../../../components/Dialogs/ShowDialog";
-import Spinner from "../../../../components/Spinners/Spinner";
+import ShowDialog from "../../../../../components/Dialogs/ShowDialog";
+import Spinner from "../../../../../components/Spinners/Spinner";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

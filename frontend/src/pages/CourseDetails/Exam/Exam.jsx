@@ -10,9 +10,16 @@ function Exam() {
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem("token");
+
       try {
         const res = await axios.get(
-          `http://localhost:8800/api/questions/exams/${location.state?.courseId}`
+          `http://localhost:8800/api/questions/exams/${location.state?.courseId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setExams(res.data);
       } catch (err) {

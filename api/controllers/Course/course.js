@@ -29,7 +29,7 @@ export const getCourses = (req, res) => {
       JOIN classes ON courses.CourseId = classes.CourseId
       JOIN teachers ON courses.TeacherId = teachers.TeacherId
       JOIN class_student ON classes.ClassId = class_student.ClassId
-      JOIN students ON class_student.StudentId = students.StudentId
+      JOIN students ON class_student.UserId = students.UserId
       WHERE students.UserId = ? 
      `;
   }
@@ -55,7 +55,7 @@ export const getCourseById = (req, res) => {
       JOIN classes ON courses.CourseId = classes.CourseId
       JOIN teachers ON courses.TeacherId = teachers.TeacherId
       JOIN class_student ON classes.ClassId = class_student.ClassId
-      JOIN students ON class_student.StudentId = students.StudentId
+      JOIN students ON class_student.UserId = students.UserId
       WHERE students.UserId = ?  AND courses.CourseId = ?
      `;
   }

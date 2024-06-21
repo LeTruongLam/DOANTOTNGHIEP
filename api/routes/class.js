@@ -14,7 +14,11 @@ router.delete("/:classId", deleteClass);
 // thêm lớp học
 router.post("/:courseId", addClassCourse);
 // Thêm sinh viên vào lớp học
-router.post("/class/student", addClassStudent);
+// router.post("/classes/:classId", addClassStudent);
+
+// Thêm sinh viên vào lớp học bằng excel
+
+router.post("/:classId/importExcel", addClassStudent);
 
 router.get("/:courseId/class/:classCode", getClassStudentByClassCode);
 // Lấy danh sách lớp của môn học theo mã lớp

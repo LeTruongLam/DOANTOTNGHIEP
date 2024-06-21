@@ -5,7 +5,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import AddIcon from "@mui/icons-material/Add";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { message } from "antd";
-import Spinner from "../../../../components/Spinners/Spinner";
+import Spinner from "../../../../../components/Spinners/Spinner";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

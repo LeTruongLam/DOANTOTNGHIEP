@@ -33,7 +33,6 @@ export const getClassCourse = (req, res) => {
   });
 };
 export const deleteClass = (req, res) => {
-  
   const classId = req.params.classId;
   const query = `
     DELETE FROM classes
@@ -95,105 +94,96 @@ export const addClassCourse = (req, res) => {
     );
   });
 };
-const checkClassStudent = (courseId, studentId) => {
-  return new Promise((resolve, reject) => {
-    const checkQuery = `
-      SELECT * FROM class_student 
-      JOIN classes ON classes.ClassId = class_student.ClassId
-      JOIN students ON class_student.StudentId = students.StudentId
-      WHERE classes.CourseId = ? AND class_student.StudentId = ?
-    `;
-
-    db.query(checkQuery, [courseId, studentId], (err, data) => {
-      if (err) {
-        console.log(err);
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-};
 
 export const addClassStudent = (req, res) => {
-  const { classId, studentIds, classCode, courseId } = req.body;
+  const { studentDatas } = req.body;
+  const studentCodes = studentDatas.map((student) => student.StudentCode);
 
-  // Kiểm tra classId có trùng studentIds hay không
-  const checkQuery = `
-      SELECT *
+  // Lấy ClassId từ request
+  const classId = req.params.classId;
+
+  // Truy vấn SQL để lấy UserId từ bảng students dựa trên StudentCode
+  const getUserIdsQuery = `
+    SELECT UserId, StudentCode
+    FROM students
+    WHERE StudentCode IN (?)
+  `;
+
+  // Thực hiện truy vấn để lấy UserId từ StudentCode
+  db.query(getUserIdsQuery, [studentCodes], (queryErr, queryResult) => {
+    if (queryErr) {
+      console.error("Error querying database:", queryErr);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    // Mảng mới gồm các đối tượng UserId và StudentCode
+    const userIdsWithCodes = queryResult.map((row) => ({
+      UserId: row.UserId,
+      StudentCode: row.StudentCode,
+    }));
+
+    // Lấy danh sách UserId hiện có trong lớp học
+    const checkExistingStudentsQuery = `
+      SELECT UserId
       FROM class_student
-      WHERE ClassId = ? AND StudentId IN (?)
+      WHERE ClassId = ?
     `;
 
-  db.query(checkQuery, [classId, studentIds], (checkErr, checkResult) => {
-    if (checkErr) {
-      return res.status(500).json({ error: checkErr.message });
-    }
+    // Thực hiện truy vấn để lấy danh sách UserId đã có trong lớp học
+    db.query(checkExistingStudentsQuery, [classId], (checkErr, checkResult) => {
+      if (checkErr) {
+        console.error("Error querying database:", checkErr);
+        return res.status(500).json({ error: "Database query error" });
+      }
 
-    // Lấy danh sách sinh viên đã tồn tại trong lớp
-    const existingStudentIds = checkResult.map((row) => row.StudentId);
+      const existingUserIds = checkResult.map((row) => row.UserId);
 
-    // Lọc ra studentIds không trùng
-    const uniqueStudentIds = studentIds.filter((studentId) => {
-      return !existingStudentIds.includes(studentId);
-    });
+      // Lọc ra các UserId chưa có trong lớp học
+      const newUserIds = userIdsWithCodes.filter(
+        (student) => !existingUserIds.includes(student.UserId)
+      );
 
-    // Kiểm tra nếu không có sinh viên mới để thêm
-    if (uniqueStudentIds.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "Không có sinh viên mới để thêm" });
-    }
+      // Nếu không có sinh viên mới để thêm vào lớp học
+      if (newUserIds.length === 0) {
+        return res
+          .status(200)
+          .json({ message: "Không có sinh viên mới để thêm vào lớp học" });
+      }
 
-    // Kiểm tra xem sinh viên đã được thêm vào lớp trong khóa học này chưa
-    const checkPromises = studentIds.map((studentId) => {
-      return checkClassStudent(courseId, studentId);
-    });
-
-    Promise.all(checkPromises)
-      .then((checkResults) => {
-        const alreadyAddedStudents = checkResults.filter(
-          (result) => result.length > 0
-        );
-
-        if (alreadyAddedStudents.length > 0) {
-          return res.status(200).json({
-            message: "Sinh viên đã có tên trong khóa học này",
-          });
-        }
-
-        // Chèn dữ liệu vào bảng class_student
-        const insertQuery = `
-            INSERT INTO class_student (ClassId, StudentId)
+      // Thực hiện thêm sinh viên vào lớp học
+      const insertPromises = newUserIds.map(({ UserId }) => {
+        return new Promise((resolve, reject) => {
+          const insertClassStudentQuery = `
+            INSERT INTO class_student (ClassId, UserId)
             VALUES (?, ?)
           `;
-
-        const insertPromises = uniqueStudentIds.map((studentId) => {
-          return new Promise((resolve, reject) => {
-            db.query(
-              insertQuery,
-              [classId, studentId],
-              (insertErr, insertData) => {
-                if (insertErr) reject(insertErr);
-                else resolve(insertData);
+          db.query(
+            insertClassStudentQuery,
+            [classId, UserId],
+            (insertErr, insertResult) => {
+              if (insertErr) {
+                console.error("Error inserting into class_student:", insertErr);
+                reject(insertErr);
+              } else {
+                resolve(insertResult);
               }
-            );
-          });
+            }
+          );
         });
-
-        Promise.all(insertPromises)
-          .then((results) => {
-            return res
-              .status(201)
-              .json({ message: "Thêm sinh viên thành công" });
-          })
-          .catch((insertErr) => {
-            return res.status(500).json({ error: insertErr.message });
-          });
-      })
-      .catch((checkErr) => {
-        return res.status(500).json({ error: checkErr.message });
       });
+
+      // Chờ tất cả các Promise thực hiện xong
+      Promise.all(insertPromises)
+        .then(() => {
+          res
+            .status(201)
+            .json({ message: "Thêm sinh viên vào lớp học thành công" });
+        })
+        .catch((error) => {
+          console.error("Error adding class student:", error);
+          res.status(500).json({ error: "Error adding class student" });
+        });
+    });
   });
 };
 
@@ -203,7 +193,7 @@ export const getClassStudent = (req, res) => {
   const q = `
       SELECT students.StudentName, students.StudentCode,students.UserId, classes.*
       FROM class_student
-      JOIN students ON class_student.StudentId =  students.StudentId
+      JOIN students ON class_student.UserId =  students.UserId
       JOIN classes ON class_student.ClassId = classes.ClassId
       WHERE classes.CourseId = ? AND classes.ClassId = ?
     `;
@@ -219,7 +209,7 @@ export const getClassStudentByClassCode = (req, res) => {
   const q = `
       SELECT students.StudentName, students.StudentCode,students.UserId, classes.*
       FROM class_student
-      JOIN students ON class_student.StudentId =  students.StudentId
+      JOIN students ON class_student.UserId =  students.UserId
       JOIN classes ON class_student.ClassId = classes.ClassId
       WHERE classes.CourseId = ? AND classes.ClassCode = ?
     `;

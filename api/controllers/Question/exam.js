@@ -65,25 +65,31 @@ export const addExam = (req, res) => {
     }
   );
 };
-
+// Lay danh sach bai thi
 export const getExams = (req, res) => {
+  const userInfo = req.userInfo;
   const courseId = req.params.courseId;
+
   let q = `
-    SELECT C.title, E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status,E.ConfirmAccess, COUNT(EQ.ExamQuestionId) AS QuestionCount
+    SELECT C.title, E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status, E.ConfirmAccess, 
+           COUNT(EQ.ExamQuestionId) AS QuestionCount
     FROM Exams E
-     JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
-     JOIN Courses C ON C.CourseId = E.CourseId
-    WHERE E.CourseId = ?
+    JOIN ExamClasses EC ON E.ExamId = EC.ExamId
+    JOIN Classes CL ON EC.ClassId = CL.ClassId
+    JOIN Class_Student CS ON CL.ClassId = CS.ClassId
+    LEFT JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+    JOIN Courses C ON C.CourseId = E.CourseId
+    WHERE E.CourseId = ? AND CS.UserId = ?
     GROUP BY E.ExamId
   `;
-  // JOIN ExamClassses EQ ON E.ExamId = EQ.ExamId
 
-  db.query(q, [courseId], (err, data) => {
+  db.query(q, [courseId, userInfo.id], (err, data) => {
     if (err) {
-      res.status(500).json(err);
-    } else {
-      res.status(200).json(data);
+      return res
+        .status(500)
+        .json({ error: "Database query error", details: err });
     }
+    res.status(200).json(data);
   });
 };
 
@@ -151,7 +157,6 @@ export const createResultExams = (req, res) => {
         // Lấy câu trả lời chính xác từ bài thi
         const correctAnswers = examResults.map((question) => {
           const options = question.QuestionOptions;
-          // console.log(correctOption);
           const correctOptions = options.filter((option) => option.isAnswer);
           const correctAnswerIds = correctOptions.map((option) => option.id);
           return {
@@ -160,8 +165,6 @@ export const createResultExams = (req, res) => {
               correctAnswerIds.length > 0 ? correctAnswerIds : null,
           };
         });
-
-        console.log(correctAnswers);
 
         let score = 0;
 
@@ -237,8 +240,6 @@ export const getResultExamById = (req, res) => {
 
       res.status(500).json(err);
     } else {
-      // console.log(data);
-      console.log(data[0]);
       res.status(200).json(data[0]);
     }
   });

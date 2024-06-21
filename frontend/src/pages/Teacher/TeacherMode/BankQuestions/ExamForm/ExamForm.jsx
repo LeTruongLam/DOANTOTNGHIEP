@@ -4,13 +4,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
-
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-
 import {
   generateAccessCode,
   formattedDateTime,
-} from "../../../../js/TAROHelper";
+} from "../../../../../js/TAROHelper";
 import React, { useState, Fragment, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
