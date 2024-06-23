@@ -1,31 +1,30 @@
-import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // Auth
 import Login from "./pages/Auth/TheLogin/Login.jsx";
 import TheRegister from "./pages/Auth/TheRegister/TheRegister.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
 // User Page
-import Course from "./pages/course/Course.jsx";
+import Course from "./pages/Courses/CoursesPage.jsx";
 import CourseDetails from "./pages/CourseDetails/CourseDetails.jsx";
-import CourseStepper from "./pages/course/CreateCourse/CourseStepper.jsx";
-import CustomerCourse from "./pages/Teacher/editCourse/CustomerCourse.jsx";
+import CourseStepper from "./pages/Teacher/CourseDetails/CreateCourse/CourseStepper.jsx";
+import CustomerCourse from "./pages/Teacher/CourseDetails/CustomerCourse.jsx";
 import TheInfo from "./pages/TheInfo/TheInfo.jsx";
-import CourseVideo from "./pages/course/CourseVideo.jsx";
-import CourseFileViewer from "./pages/course/CourseFileViewer.jsx";
+import CourseVideo from "./pages/CourseDetails/CourseChapter/CourseVideo.jsx";
+import CourseFileViewer from "./pages/CourseDetails/CourseChapter/CourseFileViewer.jsx";
 import CourseAssignment from "./pages/CourseDetails/CourseAssignment/CourseAssignment.jsx";
 
 import ExamDetail from "./pages/CourseDetails/Exam/ExamDetail/ExamDetail.jsx";
 import ExamOverview from "./pages/CourseDetails/Exam/ExamOverview/ExamOverview.jsx";
 // Teacher
-import TheDashboard from "./pages/Teacher/TeacherMode/TheDashboard.jsx";
-import TheAssignment from "./pages/Teacher/TeacherMode/TheAssignment/TheAssignment.jsx";
-import AssignmentDetail from "./pages/Teacher/TeacherMode/TheAssignment/AssignmentDetail.jsx";
-import AssignmentView from "./pages/Teacher/TeacherMode/TheAssignment/AssignmentView.jsx";
-import AssignmentListStudent from "./pages/Teacher/TeacherMode/TheAssignment/AssignmentListStudent.jsx";
-import BankQuestions from "./pages/Teacher/TeacherMode/BankQuestions/BankQuestions.jsx";
-import BankQuestionView from "./pages/Teacher/TeacherMode/BankQuestions/BankQuestionView.jsx";
-import ExamView from "./pages/Teacher/TeacherMode/BankQuestions/ExamView/ExamView.jsx";
-import ExamViewDetail from "./pages/Teacher/TeacherMode/BankQuestions/ExamView/ExamViewDetail/ExamViewDetail.jsx";
+import TheDashboard from "./pages/Teacher/TheDashboard.jsx";
+import TheAssignment from "./pages/Teacher/TheAssignment/AssignmentPage.jsx";
+import AssignmentDetail from "./pages/Teacher/TheAssignment/AssignmentDetail.jsx";
+import AssignmentView from "./pages/Teacher/TheAssignment/AssignmentsViewPage.jsx";
+import AssignmentListStudent from "./pages/Teacher/TheAssignment/AssignmentClassPage.jsx";
+import BankQuestions from "./pages/Teacher/BankQuestions/BankQuestions.jsx";
+import BankQuestionView from "./pages/Teacher/BankQuestions/BankQuestionView.jsx";
+import ExamView from "./pages/Teacher/BankQuestions/ExamView/ExamView.jsx";
+import ExamViewDetail from "./pages/Teacher/BankQuestions/ExamView/ExamViewDetail/ExamViewDetail.jsx";
 
 // Admin
 import AdminPage from "./pages/Admin/AdminPage.jsx";

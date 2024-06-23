@@ -22,7 +22,7 @@ const ChapterList = ({
   return (
     <div className="rounded-b-lg" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="p-5">
-        {chapterData.map((item, index) => (
+        {chapterData?.map((item, index) => (
           <List
             key={index}
             sx={{

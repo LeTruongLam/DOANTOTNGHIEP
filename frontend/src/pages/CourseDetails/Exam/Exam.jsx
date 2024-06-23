@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, CalendarClock } from "lucide-react";
+import { ChevronRight,  } from "lucide-react";
 
 function Exam() {
   const location = useLocation();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../../context/authContext";
+import { AuthContext } from "@/context/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
@@ -12,7 +12,7 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import ClassList from "./CourseClass/ClassList";
-import TheBreadcrumbs from "../../components/Breadcrumbs";
+import TheBreadcrumbs from "@/components/Breadcrumbs";
 import ChapterList from "./CourseChapter/ChapterList";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
