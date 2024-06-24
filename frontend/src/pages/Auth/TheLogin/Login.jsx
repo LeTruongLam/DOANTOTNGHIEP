@@ -27,26 +27,25 @@ const Login = () => {
     }
 
     try {
-      await login(inputs);
-      navigate("/course");
+      const user = await login(inputs);
+      if (user.Role !== "admin") {
+        navigate("/courses");
+      } else {
+        navigate("/admin/manage-accounts");
+      }
       message.success("Đăng nhập thành công!");
     } catch (err) {
-      message.error(err.response.data);
+      message.error(err);
 
-      setError(err.response.data);
+      setError(err);
     }
   };
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        {/* <img
-          className="mx-auto h-10 w-auto"
-          src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-          alt="Your Company"
-        /> */}
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Sign in to your account
+          Đăng nhập tài khoản của bạn
         </h2>
       </div>
 
@@ -57,7 +56,7 @@ const Login = () => {
               htmlFor="email"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
-              Email address
+              Tên tài khoản
             </label>
             <div className="mt-2">
               <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
@@ -79,14 +78,14 @@ const Login = () => {
                 htmlFor="password"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
-                Password
+                Mật khẩu
               </label>
               <div className="text-sm">
                 <a
                   href="#"
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
-                  Forgot password?
+                  Quên mật khẩu
                 </a>
               </div>
             </div>
@@ -110,20 +109,10 @@ const Login = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              Sign in
+              Đăng nhập
             </button>
           </div>
         </form>
-
-        <p className="mt-10 text-center text-sm text-gray-500">
-          Not a member?{" "}
-          <a
-            href="/register"
-            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-          >
-            Sign up
-          </a>
-        </p>
       </div>
     </div>
   );

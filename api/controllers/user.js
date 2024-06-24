@@ -37,3 +37,28 @@ export const updateInfo = (req, res) => {
     });
   });
 };
+export const getAccountStudent = (req, res) => {
+  const q = `
+    SELECT *
+    FROM users
+    JOIN students ON students.UserId = users.UserId
+    ORDER BY students.StudentCode
+  `;
+
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+};
+export const getAccountTeacher = (req, res) => {
+  const q = `
+    SELECT *
+    FROM users
+    JOIN teachers ON teachers.UserId = users.UserId
+  `;
+
+  db.query(q, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+};

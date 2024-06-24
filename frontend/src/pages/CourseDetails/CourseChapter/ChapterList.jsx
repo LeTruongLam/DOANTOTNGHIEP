@@ -38,17 +38,17 @@ const ChapterList = ({
               {openIndex === index ? <ExpandLess /> : <ExpandMore />}
               <ListItemText
                 className="ml-3"
-                primary={`Chương ${index + 1}: ${item.ChapterTitle}`}
+                primary={`Chương ${index + 1}: ${item?.ChapterTitle}`}
               />
             </ListItemButton>
             <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {lessons.map((lesson, lessonIndex) => (
+                {lessons?.map((lesson, lessonIndex) => (
                   <ListItemButton
                     key={lessonIndex}
                     sx={{ pl: 4 }}
                     onClick={() =>
-                      handleToVideo(item.ChapterId, lesson.LessonId)
+                      handleToVideo(item?.ChapterId, lesson?.LessonId)
                     }
                   >
                     <ListItemIcon>

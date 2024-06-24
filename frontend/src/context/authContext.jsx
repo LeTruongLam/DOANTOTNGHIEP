@@ -19,12 +19,12 @@ export const AuthContexProvider = ({ children }) => {
       inputs
     );
     setCurrentUser(res.data.userData);
-    console.log(res.data.userData);
 
     localStorage.setItem("token", res.data.token);
     // Lưu thời gian hết hạn của phiên đăng nhập vào localStorage
     const expirationTime = Date.now() + SESSIONTIMEOUT;
     localStorage.setItem("expirationTime", expirationTime);
+    return res.data.userData;
   };
   // Lấy danh sách câu hỏi của bài thi
   const [questions, setQuestions] = useState([]);

@@ -25,7 +25,7 @@ const HeaderLayout = () => {
     const initialChecked = localStorage.getItem("teacherMode");
     return initialChecked;
   });
-  
+
   React.useEffect(() => {
     localStorage.setItem("teacherMode", true);
   }, [checked]);
@@ -35,7 +35,7 @@ const HeaderLayout = () => {
     if (event.target.checked) {
       navigate("/dashboard");
     } else {
-      navigate("/course");
+      navigate("/courses");
     }
   };
 
@@ -53,15 +53,17 @@ const HeaderLayout = () => {
     navigate("/info");
   };
   const handleExit = () => {
-    navigate("/course");
+    navigate("/courses");
   };
   return (
     <div className="pr-6 navbar flex justify-end">
       <div className="navbar-container ">
-        <div className="links " onClick={handleExit}>
-          <ExitToAppIcon />
-          <span>Exit Mode</span>
-        </div>
+        {currentUser.Role === "teacher" && (
+          <div className="links " onClick={handleExit}>
+            <ExitToAppIcon />
+            <span>Thoát chế độ</span>
+          </div>
+        )}
 
         <div className="links ">
           {currentUser ? (
@@ -137,14 +139,14 @@ const HeaderLayout = () => {
                         inputProps={{ "aria-label": "controlled" }}
                       />
                     </ListItemIcon>
-                    Teacher mode
+                    Chế độ giáo viên
                   </MenuItem>
                 )}
                 <MenuItem onClick={handleLogout}>
                   <ListItemIcon>
                     <Logout fontSize="small" />
                   </ListItemIcon>
-                  Logout
+                  Đăng xuất
                 </MenuItem>
               </Menu>
             </>

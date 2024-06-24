@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import HomeIcon from "@mui/icons-material/Home";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import styled from "styled-components";
 import { NavLink, useLocation } from "react-router-dom";
-import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import { AdminLinks, TeacherLinks } from "@/constants";
+import { AuthContext } from "@/context/authContext";
 const Container = styled.div`
   .active {
     border-right-width: 2px;
@@ -44,51 +43,35 @@ const Text = styled.span`
 `;
 
 const Sidebar = () => {
+  const { currentUser } = useContext(AuthContext);
   const location = useLocation();
+  const links = currentUser?.Role === "admin" ? AdminLinks : TeacherLinks; // Determine links based on role
   return (
-    <div className=" min-w-[250px] border-r h-[100vh] border-slate-300 flex flex-col justify-between ">
+    <div className="min-w-[250px] border-r h-[100vh] border-slate-300 flex flex-col justify-between">
       <Container>
         <SlickBar>
           <Item
             exact
-            className="mt-10 hover:bg-slate-200 "
+            className="mt-10 hover:bg-slate-200"
             activeClassName="active"
             to="/"
           >
             <HomeIcon />
-            <Text className="inline ">Trang chủ</Text>
+            <Text className="inline">Trang chủ</Text>
           </Item>
-          <Item
-            activeClassName="active"
-            to="/teacher/courses"
-            className={`${
-              location.pathname.endsWith("/detail") ? "active" : ""
-            } hover:bg-slate-200`}
-          >
-            <ListAltIcon />
-            <Text>Môn học</Text>
-          </Item>
-          <Item
-            activeClassName="active"
-            to="/teacher/assignments"
-            className={`${
-              location.pathname === "/assignments" ||
-              location.pathname.startsWith("/assignments/")
-                ? "active"
-                : ""
-            } hover:bg-slate-200`}
-          >
-            <AssignmentIndIcon />
-            <Text>Bài tập</Text>
-          </Item>
-          <Item
-            className="hover:bg-slate-200"
-            activeClassName="active"
-            to="/teacher/bankquestions"
-          >
-            <AccountBalanceIcon />
-            <Text className="inline">Ngân hàng câu hỏi</Text>
-          </Item>
+          {links.map((link, index) => (
+            <Item
+              key={index}
+              activeClassName="active"
+              to={link.route}
+              className={`${
+                location.pathname === link.route ? "active" : ""
+              } hover:bg-slate-200`}
+            >
+              {link.icon}
+              <Text>{link.label}</Text>
+            </Item>
+          ))}
         </SlickBar>
       </Container>
     </div>

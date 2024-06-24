@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import { useLocation } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import axios from "axios";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -11,11 +11,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 
 export default function CourseFileViewer() {
-  const location = useLocation();
   const [docs, setDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [selectedDocIndex, setSelectedDocIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { courseId, chapterId } = useParams();
 
   const listRef = useRef(null);
 
@@ -23,7 +23,7 @@ export default function CourseFileViewer() {
     const fetchCourseFiles = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8800/api/courses/chapters/document/${location.state?.chapterId}`
+          `http://localhost:8800/api/courses/chapters/document/${chapterId}`
         );
         setLoading(false);
 
@@ -39,7 +39,7 @@ export default function CourseFileViewer() {
     };
 
     fetchCourseFiles();
-  }, [location.state?.chapterId]);
+  }, [chapterId]);
 
   useEffect(() => {
     if (listRef.current) {

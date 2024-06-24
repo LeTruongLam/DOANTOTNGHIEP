@@ -13,17 +13,17 @@ import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
-import { AuthContext } from "../../../context/authContext";
-import { formatDateString } from "../../../js/TAROHelper";
+import { AuthContext } from "@/context/authContext";
+import { formatDateString } from "@/js/TAROHelper";
 import { message } from "antd";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ClassMenu from "../../../components/SelectMenus/ClassMenu";
+import ClassMenu from "@/components/SelectMenus/ClassMenu";
 import QuestionFormEdit from "./QuestionFormEdit/QuestionFormEdit";
 import SpeedDialTooltipOpen from "./Components/SpeedDial";
 import ExamForm from "./ExamForm/ExamForm";
 import { Plus } from "lucide-react";
-const steps = ["Add Question", "Questions Info"];
+const steps = ["Thêm câu hỏi", "Danh sách câu hỏi"];
 
 function BankQuestionView() {
   const [course, setCourse] = useState();

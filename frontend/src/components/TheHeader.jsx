@@ -53,7 +53,7 @@ const TheHeader = () => {
     if (event.target.checked) {
       navigate("/teacher/courses");
     } else {
-      navigate("/course");
+      navigate("/courses");
     }
   };
 
@@ -86,7 +86,7 @@ const TheHeader = () => {
                   Trang chủ
                 </span>
               </Item>
-              <Item activeClassName="active" to="/course">
+              <Item activeClassName="active" to="/courses">
                 <span className="py-4 mx-2 font-semibold" clicked={click}>
                   Môn học
                 </span>
@@ -181,9 +181,6 @@ const TheHeader = () => {
             <div className="content ml-5">
               <Link to="/login">
                 <Button variant="contained">Đăng nhập</Button>
-              </Link>
-              <Link to="/register">
-                <Button variant="contained">Đăng ký</Button>
               </Link>
             </div>
           )}

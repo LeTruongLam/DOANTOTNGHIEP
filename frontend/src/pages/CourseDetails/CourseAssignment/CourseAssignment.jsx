@@ -1,16 +1,10 @@
 /* eslint-disable jsx-a11y/no-redundant-roles */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {
-  useEffect,
-  Fragment,
-  useState,
-  useRef,
-  useContext,
-} from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import Confetti from "react-confetti";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import ReviewsIcon from "@mui/icons-material/Reviews";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "@/context/authContext";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -23,8 +17,6 @@ import NoResultFound from "@/pages/NotFounds/NoResultFound";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import AssignmentList from "./AssignmentList";
 import PropTypes from "prop-types";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 function CustomTabPanel(props) {
@@ -60,7 +52,6 @@ function a11yProps(index) {
 
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
-  const location = useLocation();
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [assignment, setAssignment] = useState();
@@ -73,6 +64,7 @@ export default function CourseAssignment() {
   const [congratulation, setCongratulation] = useState(false);
   const [value, setValue] = useState(0);
   const [selectedDoc, setSelectedDoc] = useState({});
+  const { courseId, chapterId } = useParams();
 
   const [loading, setLoading] = useState(true);
 
@@ -97,7 +89,7 @@ export default function CourseAssignment() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/assignments`
+        `http://localhost:8800/api/courses/chapters/${chapterId}/assignments`
       );
       setAssignment(response.data[0]);
       fetchAssignmentFiles(response.data[0].AssignmentId);
@@ -113,7 +105,7 @@ export default function CourseAssignment() {
   const fetchAssignmentFiles = async (assignmentId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/assignmentfile/${assignmentId}`
+        `http://localhost:8800/api/courses/chapters/${chapterId}/assignmentfile/${assignmentId}`
       );
       setAttachFile(response.data);
       setSelectedDoc(response.data[0]);
@@ -175,9 +167,9 @@ export default function CourseAssignment() {
             fileData.append("documentSubmit", selectedFiles[i]);
           }
           fileData.append("assignmentId", assignment.AssignmentId);
-          fileData.append("chapterId", location.state?.chapterId);
+          fileData.append("chapterId", chapterId);
           fileData.append("userId", currentUser.UserId);
-          fileData.append("courseId", location.state?.courseId);
+          fileData.append("courseId", courseId);
           fileData.append("submissionFiles", JSON.stringify(submissionFiles));
 
           await axios.post(
@@ -197,9 +189,9 @@ export default function CourseAssignment() {
         try {
           const submissionData = {
             assignmentId: assignment.AssignmentId,
-            chapterId: location.state?.chapterId,
+            chapterId: chapterId,
             userId: currentUser.UserId,
-            courseId: location.state?.courseId,
+            courseId: courseId,
           };
           await axios.post(
             `http://localhost:8800/api/courses/chapters/${assignment.ChapterId}/submission`,
@@ -221,7 +213,7 @@ export default function CourseAssignment() {
   const handleDeleteFile = async (assignmentFileId) => {
     try {
       await axios.delete(
-        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/assignments/${assignmentId}/submission/assignmentfile/${assignmentFileId}`,
+        `http://localhost:8800/api/courses/chapters/${chapterId}/assignments/${assignmentId}/submission/assignmentfile/${assignmentFileId}`,
         {
           userId: currentUser.UserId,
         }
@@ -230,9 +222,7 @@ export default function CourseAssignment() {
       console.error("Error fetching assignment files:", error);
     }
   };
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+
   return (
     <>
       {loading ? (
@@ -255,30 +245,6 @@ export default function CourseAssignment() {
               {congratulation && <Confetti />}
               <div className="body-height flex flex-row gap-5">
                 <div className="w-[70%] h-full px-5 border-r border-slate-300 ">
-                  <Box>
-                    <Box>
-                      <div className="flex justify-between items-center">
-                        <Tabs value={value} onChange={handleChange}>
-                          <Tab
-                            label="Sắp tới"
-                            {...a11yProps(0)}
-                            sx={{ textTransform: "none" }}
-                          />
-                          <Tab
-                            label="Đã qua"
-                            {...a11yProps(1)}
-                            sx={{ textTransform: "none" }}
-                          />
-                          <Tab
-                            label="Hoàn thành"
-                            {...a11yProps(3)}
-                            sx={{ textTransform: "none" }}
-                          />
-                        </Tabs>
-                      </div>
-                    </Box>
-                    <CustomTabPanel value={value} index={0}></CustomTabPanel>
-                  </Box>
                   <div className="w-full h-full">
                     <DocViewer
                       documents={docs}

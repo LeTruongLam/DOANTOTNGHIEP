@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "@/context/authContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import DOMPurify from "dompurify";
 import "./single.scss";
@@ -20,7 +20,7 @@ import Exam from "./Exam/Exam";
 const CourseDetails = () => {
   const { fetchLesson } = useContext(AuthContext);
   const location = useLocation();
-  const [courseId, setCourseId] = useState(location.state?.courseId);
+  const { courseId } = useParams();
   const navigate = useNavigate();
   const [chapterData, setChapterData] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
@@ -42,7 +42,6 @@ const CourseDetails = () => {
       setLoading(true);
     } catch (error) {
       console.error(error);
-      // Handle error, display error message, or perform other actions
     }
   };
 
@@ -72,32 +71,13 @@ const CourseDetails = () => {
     return response.data;
   };
   const handleToVideo = async (chapterId, lessonId) => {
-    navigate(`/course/${location.state?.courseTitle}/lecture/${lessonId}`, {
-      state: {
-        chapterId: chapterId,
-        lessonId: lessonId,
-        courseId: courseId,
-        courseTitle: location.state?.courseTitle,
-      },
-    });
+    navigate(`/courses/${courseId}/chapters/${chapterId}/lectures/${lessonId}`);
   };
-  const handleToFile = async (ChapterId) => {
-    navigate(`/course/${location.state?.courseTitle}/document/${ChapterId}`, {
-      state: {
-        chapterId: ChapterId,
-        courseId: courseId,
-        courseTitle: location.state?.courseTitle,
-      },
-    });
+  const handleToDocuments = async (ChapterId) => {
+    navigate(`/courses/${courseId}/chapters/${ChapterId}/documents`);
   };
   const handleToAssignment = async (chapterId) => {
-    navigate(`/course/${location.state?.courseTitle}/assignment/${chapterId}`, {
-      state: {
-        chapterId: chapterId,
-        courseId: courseId,
-        courseTitle: location.state?.courseTitle,
-      },
-    });
+    navigate(`/courses/${courseId}/chapters/${chapterId}/assignments`);
   };
 
   const handleClick = async (index, item) => {
@@ -173,30 +153,30 @@ const CourseDetails = () => {
                       Tạo bởi
                     </span>
                     <span className="font-medium text-white	">
-                      {course.TeacherName}
+                      {course?.TeacherName}
                     </span>
                   </div>
                   <div className="text-white text-4xl my-5 font-medium	">
-                    {course.title}
+                    {course?.title}
                   </div>
                 </div>
                 <div className="bg-white rounded-2xl absolute top-8 right-8 drop-shadow-2xl">
                   <div className="p-5">
-                    {course.img && (
+                    {course?.img && (
                       <img
                         className="max-h-40 rounded-xl"
-                        src={`${course.img}`}
+                        src={`${course?.img}`}
                         alt=""
                       />
                     )}
                     <div className=" flex flex-col gap-3  mt-3 text-gray font-semibold  w-full">
                       <ul className="flex gap-2 items-center">
                         <SchoolIcon className="text-green-500" />
-                        <span>Mã môn học {course.CourseCode}</span>
+                        <span>Mã môn học {course?.CourseCode}</span>
                       </ul>
                       <ul className="flex gap-2 items-center">
                         <InsertDriveFileIcon className="text-green-500" />
-                        <span>{chapterData.length} Chương học</span>
+                        <span>{chapterData?.length} Chương học</span>
                       </ul>
                     </div>
                   </div>
@@ -285,7 +265,7 @@ const CourseDetails = () => {
                   handleClick={handleClick}
                   handleToVideo={handleToVideo}
                   handleToAssignment={handleToAssignment}
-                  handleToFile={handleToFile}
+                  handleToFile={handleToDocuments}
                 />
               </CustomTabPanel>
               <CustomTabPanel value={value} index={2}>

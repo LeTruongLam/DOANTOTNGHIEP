@@ -94,7 +94,7 @@ app.get("/api/chapters/:chapterId/document", function (req, res) {
 });
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
+app.use("/api/accounts", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/infor", userRoutes);
 app.use("/api/students", studentRoutes);

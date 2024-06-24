@@ -9,9 +9,7 @@ const CoursesPage = () => {
   const { courses, fetchCourses } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleCourseClick = (course) => {
-    navigate(`/course/${course.title}`, {
-      state: { courseTitle: course.title, courseId: course.CourseId },
-    });
+    navigate(`/courses/${course.CourseId}`);
   };
   useEffect(() => {
     fetchCourses();
@@ -22,7 +20,7 @@ const CoursesPage = () => {
         <h1 className="font-bold text-3xl ml-3">Danh sách môn học</h1>
       </div>
       <div className="section-items">
-        {courses.map((course) => (
+        {courses?.map((course) => (
           <div
             className="course-glimpse  hover:cursor-pointer "
             key={course.CourseId}

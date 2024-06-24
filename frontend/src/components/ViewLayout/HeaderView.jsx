@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
@@ -8,20 +8,16 @@ const TheHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [chapterTitle, setChapterTitle] = useState("");
+  const { courseId, chapterId } = useParams();
 
   const handleExit = () => {
-    navigate(`/course/${location.state?.courseTitle}`, {
-      state: {
-        courseTitle: location.state?.courseTitle,
-        courseId: location.state?.courseId,
-      },
-    }); // Redirect to "/" after logout
+    navigate(`/courses/${courseId}`); // Redirect to "/" after logout
   };
 
   const getChapterTitle = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8800/api/courses/${location.state?.courseId}/chapters/${location.state?.chapterId}`
+        `http://localhost:8800/api/courses/${courseId}/chapters/${chapterId}`
       );
       setChapterTitle(response.data.ChapterTitle);
     } catch (err) {

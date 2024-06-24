@@ -27,7 +27,7 @@ import ExamView from "./pages/Teacher/BankQuestions/ExamView/ExamView.jsx";
 import ExamViewDetail from "./pages/Teacher/BankQuestions/ExamView/ExamViewDetail/ExamViewDetail.jsx";
 
 // Admin
-import AdminPage from "./pages/Admin/AdminPage.jsx";
+import ManageAccountsPage from "./pages/Admin/ManageAccounts/ManageAccountsPage.jsx";
 // Other
 import PageNotFound from "./pages/NotFounds/PageNotFound.jsx";
 
@@ -41,7 +41,12 @@ import MainLayout from "@/layout/MainLayout.jsx";
 import TeacherLayout from "./layout/TeacherLayout.jsx";
 import ExamLayout from "./layout/ExamLayout.jsx";
 import ViewerLayout from "./layout/ViewerLayout.jsx";
-
+const AdminRouter = [
+  {
+    path: "/admin/manage-accounts",
+    element: <ManageAccountsPage />,
+  },
+];
 const TeacherRouter = [
   {
     path: "/teacher/courses/create",
@@ -96,21 +101,18 @@ function App() {
                 />
               ))}
             </Route>
-
             <Route element={<AdminPrivateRouter />}>
-              <Route
-                path="/admin/home"
-                exact
-                element={
-                  <MainLayout>
-                    <AdminPage />
-                  </MainLayout>
-                }
-              />
+              {AdminRouter.map((route, index) => (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={<TeacherLayout>{route.element}</TeacherLayout>}
+                />
+              ))}
             </Route>
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseTitle"
+                path="/courses/:courseId"
                 exact
                 element={
                   <MainLayout>
@@ -143,7 +145,7 @@ function App() {
 
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course"
+                path="/courses"
                 exact
                 element={
                   <MainLayout>
@@ -166,7 +168,7 @@ function App() {
 
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseTitle/document/:chapterId"
+                path="/courses/:courseId/chapters/:chapterId/documents"
                 exact
                 element={
                   <ViewerLayout>
@@ -177,7 +179,7 @@ function App() {
             </Route>
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseTitle/assignment/:chapterId"
+                path="/courses/:courseId/chapters/:chapterId/assignments"
                 exact
                 element={
                   <ViewerLayout>
@@ -188,7 +190,7 @@ function App() {
             </Route>
             <Route element={<PrivateRouter />}>
               <Route
-                path="/course/:courseTitle/lecture/:lessonId"
+                path="/courses/:courseId/chapters/:chapterId/lectures/:lessonId"
                 exact
                 element={
                   <ViewerLayout>

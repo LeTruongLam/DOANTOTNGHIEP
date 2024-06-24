@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import PauseCircleOutlineSharpIcon from "@mui/icons-material/PauseCircleOutlineSharp";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -16,12 +16,14 @@ const CourseVideo = () => {
   const [lessonList, setLessonList] = useState([]);
   const videoRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const { courseId, chapterId, lessonId } = useParams();
 
   const fetchLessonData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/lessons/${location.state?.lessonId}`
+        `http://localhost:8800/api/courses/chapters/${chapterId}/lessons/${lessonId}`
       );
+      console.log(response.data);
       setLesson(response.data[0]);
       setLoading(false);
     } catch (err) {
@@ -32,7 +34,7 @@ const CourseVideo = () => {
   const fetchLessonList = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8800/api/courses/chapters/${location.state?.chapterId}/lessons`
+        `http://localhost:8800/api/courses/chapters/${chapterId}/lessons`
       );
       setLessonList(response.data);
     } catch (err) {
@@ -42,18 +44,13 @@ const CourseVideo = () => {
   useEffect(() => {
     fetchLessonData();
     fetchLessonList();
-  }, [location.state?.lessonId]);
+  }, []);
+  useEffect(() => {
+    fetchLessonData();
+  }, [lessonId]);
 
   const handleToVideo = async (lessonId) => {
-    const chapterId = location.state.chapterId;
-    navigate(`/course/${location.state?.courseTitle}/lecture/${lessonId}`, {
-      state: {
-        chapterId: chapterId,
-        lessonId: lessonId,
-        courseId: location.state?.courseId,
-        courseTitle: location.state?.courseTitle,
-      },
-    });
+    navigate(`/courses/${courseId}/chapters/${chapterId}/lectures/${lessonId}`);
   };
 
   return (
@@ -79,9 +76,9 @@ const CourseVideo = () => {
               component="nav"
               aria-labelledby="nested-list-subheader"
             >
-              {lessonList.map((lesson, lessonIndex) => (
+              {lessonList?.map((lesson, lessonIndex) => (
                 <ListItemButton
-                  key={lessonIndex}
+                  key={lesson.LessonId}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -89,13 +86,13 @@ const CourseVideo = () => {
                     gap: "16px",
                     marginTop: lesson.LessonId === 0 ? 0 : 2,
                     borderRight:
-                      location.state?.lessonId === lesson.LessonId
+                      lessonId === lesson.LessonId
                         ? "2px solid rgb(147 51 234)"
                         : "none",
                   }}
                   onClick={() => handleToVideo(lesson.LessonId)}
                 >
-                  {location.state.lessonId === lesson.LessonId ? (
+                  {lessonId === lesson.LessonId ? (
                     <>
                       <PauseCircleOutlineSharpIcon
                         style={{
