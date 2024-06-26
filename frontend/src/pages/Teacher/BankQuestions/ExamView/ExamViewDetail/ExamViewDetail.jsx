@@ -65,16 +65,8 @@ function ExamViewDetail() {
               />
             </svg>
             <span className="text-gray-900 text-sm font-medium opacity-85">
-              Back
+              Quay lại
             </span>
-          </div>
-          <div className="flex justify-center items-center gap-4">
-            <button
-              className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3"
-              onClick={handleFormSubmit}
-            >
-              Submit
-            </button>
           </div>
         </div>
       </div>

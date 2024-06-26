@@ -81,6 +81,14 @@ const TeacherRouter = [
     element: <BankQuestionView />,
   },
   {
+    path: "/teacher/courses/:courseId/exams",
+    element: <ExamView />,
+  },
+  {
+    path: "/teacher/courses/:courseId/exams/:examId",
+    element: <ExamViewDetail />,
+  },
+  {
     path: "/teacher/courses/:courseId/detail",
     element: <CustomerCourse />,
   },

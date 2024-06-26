@@ -1,3 +1,5 @@
+import { formatDate } from "@/js/TAROHelper";
+
 const StudentTableRow = ({ student, handleCheckboxChange }) => (
   <tr
     key={student.UserId}
@@ -24,10 +26,10 @@ const StudentTableRow = ({ student, handleCheckboxChange }) => (
       <span title={student.Password}>{student.Password}</span>
     </td>
     <td className="px-6 py-3 w-[20%] truncate">
-      <span title={student.StudentName}>{student.StudentName}</span>
+      <span title={student.TeacherName}>{student.TeacherName}</span>
     </td>
     <td className="px-6 py-3 w-[20%] truncate">
-      <span title={student.StudentCode}>{student.StudentCode}</span>
+      <span title={formatDate(student.BirthDate)}>{formatDate(student.BirthDate)}</span>
     </td>
     <td className="px-6 py-3 w-[10%] text-center">
       <button className="font-medium text-blue-600 hover:underline">Sửa</button>

@@ -14,7 +14,7 @@ export default function SpeedDialTooltipOpen() {
   const handleClose = () => setOpen(false);
   const handleRedirect = () => {
     setOpen(false);
-    navigate(`/bankquestion/course/${courseId}/Exams`); // Thay thế "/your-page-url" bằng URL của trang bạn muốn chuyển đến
+    navigate(`/teacher/courses/${courseId}/exams`); // Thay thế "/your-page-url" bằng URL của trang bạn muốn chuyển đến
   };
 
   return (

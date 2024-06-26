@@ -16,7 +16,7 @@ export default function ViewAEditDropdown({ examId }) {
 
   const handleViewExam = () => {
     fetchExamById(examId);
-    navigate(`/bankquestion/course/${courseId}/ExamDetail/${examId}`);
+    navigate(`/teacher/courses/${courseId}/exams/${examId}`);
   };
 
   const handleEditExam = () => {

@@ -10,14 +10,21 @@ function ExamView() {
   const [exams, setExams] = useState([]);
 
   const fetchData = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const response = await axios.get(`http://localhost:8800/api/questions/exams/${courseId}`);
+      const response = await axios.get(
+        `http://localhost:8800/api/questions/exams/${courseId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+          },
+        }
+      );
       setExams(response.data);
     } catch (error) {
       console.error(error);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -27,7 +34,7 @@ function ExamView() {
   };
 
   return (
-    <div className="py-3 px-5 h-full flex flex-col">
+    <div className="py-3 px-5 bg-[#F5F5F5] h-full flex flex-col">
       <div className="flex justify-between items-center">
         <div
           className="flex items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:cursor-pointer opacity-85 hover:opacity-100 rounded-md"
@@ -48,29 +55,24 @@ function ExamView() {
             />
           </svg>
           <span className="text-gray-900 text-sm font-medium opacity-85">
-            Back
+            Quay lại
           </span>
         </div>
         <button className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3">
-          Add Exam
+          Tạo bài thi
         </button>
       </div>
       <div className="flex-grow mt-3">
         <div>
           <div className="grid grid-cols-3 gap-8">
-            {exams.map((exam, index) => (
+            {exams?.map((exam, index) => (
               <div
                 key={index}
-                className="h-max border border-slate-200 rounded-md"
+                className="h-max border border-slate-200 bg-white shadow-sm rounded-md"
               >
                 <div className="h-[40%] border-b border-slate-200 rounded-t-md bg-slate-50 px-3">
                   <div className="h-full py-3 flex justify-between items-center">
                     <div className="flex justify-center items-center gap-6">
-                      <img
-                        className="w-12 h-12 cover-fill rounded-xl"
-                        src="https://res.cloudinary.com/ddwapzxdc/image/upload/v1712303849/CourseImage/llsmb5ccnjtjnf60zwbr.jpg"
-                        alt=""
-                      />
                       <span className="truncate font-semibold text-gray-900">
                         {exam?.ExamTitle}
                       </span>
@@ -82,31 +84,18 @@ function ExamView() {
                 </div>
                 <div className="h-[60%] px-3">
                   <div className="flex justify-between items-center py-3 border-b border-slate-200">
-                    <span>Start time</span>
+                    <span>Thời gian bắt đầu</span>
                     <span>{formatDateString(exam?.TimeStart)}</span>
                   </div>
                   <div className="flex justify-between items-center py-3 border-b border-slate-200">
-                    <span>Time limit</span>
-                    <span>{exam?.TimeLimit} Minutes</span>
+                    <span>Thời gian làm bài</span>
+                    <span>{exam?.TimeLimit} Phút</span>
                   </div>
                   <div className="flex justify-between items-center py-3 border-b border-slate-200">
-                    <span>Question number</span>
+                    <span>Số câu hỏi</span>
                     <span>{exam?.QuestionCount} </span>
                   </div>
-                  <div className="flex justify-between items-center py-3 border-b border-slate-200">
-                    <span>Status</span>
-                    <div>
-                      {exam?.Status ? (
-                        <span className="ml-2 inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">
-                          Is Active
-                        </span>
-                      ) : (
-                        <span className="ml-2 inline-flex items-center rounded-md bg-red-500 px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-yellow-600/20">
-                          Inactive
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                
                 </div>
               </div>
             ))}

@@ -21,10 +21,10 @@ const TeacherTable = ({ students, handleCheckboxChange }) => (
                   Mật khẩu
                 </th>
                 <th scope="col" className="px-6 py-2 w-[20%]">
-                  Họ tên sinh viên
+                  Họ tên giáo viên
                 </th>
                 <th scope="col" className="px-6 py-2 w-[20%]">
-                  Mã số sinh viên
+                  Ngày sinh
                 </th>
                 <th scope="col" className="px-6 py-2 w-[10%]">
                   Hành động
@@ -43,7 +43,7 @@ const TeacherTable = ({ students, handleCheckboxChange }) => (
           </table>
         ) : (
           <div className="flex gap-6 flex-col justify-center items-center w-full min-h-[480px] max-h-[500px]">
-            No student accounts found.
+            Không tìm thấy tài khoản giáo viên.
           </div>
         )}
       </div>

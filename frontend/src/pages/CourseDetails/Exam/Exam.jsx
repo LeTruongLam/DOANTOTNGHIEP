@@ -1,20 +1,20 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight,  } from "lucide-react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 
 function Exam() {
   const location = useLocation();
   const navigate = useNavigate();
   const [exams, setExams] = useState([]);
-
+  const { courseId } = useParams();
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
 
       try {
         const res = await axios.get(
-          `http://localhost:8800/api/questions/exams/${location.state?.courseId}`,
+          `http://localhost:8800/api/questions/exams/${courseId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -27,10 +27,10 @@ function Exam() {
       }
     };
     fetchData();
-  }, [location.state?.courseId]);
+  }, [courseId]);
 
   const handleExamClick = (examId) => {
-    navigate(`/course/${location.state?.courseId}/exams/${examId}/overview`);
+    navigate(`/course/${courseId}/exams/${examId}/overview`);
   };
 
   return (

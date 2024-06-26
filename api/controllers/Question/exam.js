@@ -69,21 +69,33 @@ export const addExam = (req, res) => {
 export const getExams = (req, res) => {
   const userInfo = req.userInfo;
   const courseId = req.params.courseId;
+  let q;
+  if (userInfo.role === "teacher") {
+    q = `
+      SELECT C.title,  E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status, E.ConfirmAccess, 
+             COUNT(EQ.ExamQuestionId) AS QuestionCount
+      FROM Exams E
+      LEFT JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+      JOIN Courses C ON C.CourseId = E.CourseId
+      WHERE E.CourseId = ?
+      GROUP BY E.ExamId
+    `;
+  } else {
+    q = `
+      SELECT C.title, E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status, E.ConfirmAccess, 
+             COUNT(EQ.ExamQuestionId) AS QuestionCount
+      FROM Exams E
+      JOIN ExamClasses EC ON E.ExamId = EC.ExamId
+      JOIN Classes CL ON EC.ClassId = CL.ClassId
+      JOIN Class_Student CS ON CL.ClassId = CS.ClassId
+      LEFT JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
+      JOIN Courses C ON C.CourseId = E.CourseId
+      WHERE E.CourseId = ? AND CS.UserId = ?
+      GROUP BY E.ExamId
+    `;
+  }
 
-  let q = `
-    SELECT C.title, E.ExamId, E.ExamTitle, E.ExamDescription, E.TimeStart, E.TimeLimit, E.AccessCode, E.Status, E.ConfirmAccess, 
-           COUNT(EQ.ExamQuestionId) AS QuestionCount
-    FROM Exams E
-    JOIN ExamClasses EC ON E.ExamId = EC.ExamId
-    JOIN Classes CL ON EC.ClassId = CL.ClassId
-    JOIN Class_Student CS ON CL.ClassId = CS.ClassId
-    LEFT JOIN ExamQuestions EQ ON E.ExamId = EQ.ExamId
-    JOIN Courses C ON C.CourseId = E.CourseId
-    WHERE E.CourseId = ? AND CS.UserId = ?
-    GROUP BY E.ExamId
-  `;
-
-  db.query(q, [courseId, userInfo.id], (err, data) => {
+  db.query(q, userInfo.role === "teacher" ? [courseId] : [courseId, userInfo.id], (err, data) => {
     if (err) {
       return res
         .status(500)

@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import styled from "styled-components";
 import { NavLink, useLocation } from "react-router-dom";
 import { AdminLinks, TeacherLinks } from "@/constants";
 import { AuthContext } from "@/context/authContext";
+
 const Container = styled.div`
   .active {
     border-right-width: 2px;
@@ -12,6 +13,7 @@ const Container = styled.div`
     color: rgb(147 51 234);
   }
 `;
+
 const SlickBar = styled.ul`
   color: var(--white);
   list-style: none;
@@ -21,6 +23,7 @@ const SlickBar = styled.ul`
   background-color: var(--white);
   transition: all 0.5s ease;
 `;
+
 const Item = styled(NavLink)`
   text-decoration: none;
   color: var(--black);
@@ -45,7 +48,18 @@ const Text = styled.span`
 const Sidebar = () => {
   const { currentUser } = useContext(AuthContext);
   const location = useLocation();
-  const links = currentUser?.Role === "admin" ? AdminLinks : TeacherLinks; // Determine links based on role
+  const links = currentUser?.Role === "admin" ? AdminLinks : TeacherLinks;
+
+  const isActiveLink = (linkRoute) => {
+    if (linkRoute.includes("assignments") && location.pathname.includes("assignments")) {
+      return true;
+    }
+    if (linkRoute.includes("bankquestions") && location.pathname.includes("bankquestions")) {
+      return true;
+    }
+    return location.pathname === linkRoute;
+  };
+
   return (
     <div className="min-w-[250px] border-r h-[100vh] border-slate-300 flex flex-col justify-between">
       <Container>
@@ -62,11 +76,8 @@ const Sidebar = () => {
           {links.map((link, index) => (
             <Item
               key={index}
-              activeClassName="active"
               to={link.route}
-              className={`${
-                location.pathname === link.route ? "active" : ""
-              } hover:bg-slate-200`}
+              className={`hover:bg-slate-200 ${isActiveLink(link.route) ? "active" : ""}`}
             >
               {link.icon}
               <Text>{link.label}</Text>

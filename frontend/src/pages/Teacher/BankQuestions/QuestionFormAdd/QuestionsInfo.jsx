@@ -19,7 +19,6 @@ const choice = [
     id: 2,
     value: "Multiple Choice",
   },
- 
 ];
 function QuestionsInfo({
   questionTitle,
@@ -146,7 +145,7 @@ function QuestionsInfo({
             onClick={() => handleDeleteOption(option.id)}
             className="ml-2 text-sm font-medium text-red-600"
           >
-            Delete
+            Xóa
           </button>
         </div>
       );
@@ -160,7 +159,7 @@ function QuestionsInfo({
           htmlFor="about"
           className="block text-sm font-medium leading-6 text-gray-900"
         >
-          Write your question here{" "}
+          Viết câu hỏi của bạn ở đây{" "}
           <span className="text-red-800 text-xl	">*</span>
         </label>
         <div className="mt-2">
@@ -180,7 +179,7 @@ function QuestionsInfo({
           htmlFor="about"
           className="block text-sm font-medium leading-6 text-gray-900 mb-2"
         >
-          Upload img
+          Tải lên hình ảnh
         </label>
         <div className="bg-white rounded-md flex items-center  	 ">
           <div className=" bg-slate-200 opacity-50 flex-6 m-4  rounded-md cursor-pointer hover:opacity-100">
@@ -200,8 +199,10 @@ function QuestionsInfo({
                 <div className="flex flex-col justify-center py-10 items-center mx-6">
                   <CloudUploadIcon fontSize="medium" />
                   <p className="text-sm mt-1	">
-                    <span className="text-purple-600	">Upload a img</span>
-                    <span> or drag and drop </span>
+                    <span className="text-purple-600 ">
+                      Tải lên một hình ảnh
+                    </span>
+                    <span> hoặc kéo và thả </span>
                   </p>
                 </div>
               )}
@@ -214,7 +215,7 @@ function QuestionsInfo({
             </div>
           </div>
           <div className="flex-4 flex-grow m-4">
-            <span className="text-sm">Maximum image file size: </span>
+            <span className="text-sm">Kích thước tệp hình ảnh tối đa:</span>
             <span className="text-sm font-semibold">10MB </span>
           </div>
         </div>
@@ -224,7 +225,7 @@ function QuestionsInfo({
           htmlFor="questionType"
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          Select your question type
+          Chọn loại câu hỏi của bạn
         </label>
         <Listbox value={selectedType} onChange={setSelectedType}>
           {({ open }) => (
@@ -306,7 +307,7 @@ function QuestionsInfo({
           htmlFor="question"
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          Input options for the question and select the correct{" "}
+          Nhập các tùy chọn cho câu hỏi và chọn đáp án đúng
           <span className="text-red-800 text-xl	">*</span>
         </label>
         <div>
@@ -319,7 +320,7 @@ function QuestionsInfo({
                 value={newOptionValue}
                 onChange={handleNewOptionValueChange}
                 className="min-h-10 border flex-grow  border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                placeholder="Enter option content"
+                placeholder="Nhập nội dung tùy chọn"
               />
 
               {questionType !== "Text Input" && (
@@ -365,7 +366,7 @@ function QuestionsInfo({
               className="flex items-center justify-center gap-1 text-sm font-medium text-blue-600"
             >
               <AddIcon style={{ color: "rgb(37 99 235)" }} />
-              <span>Add An Option</span>
+              <span>Thêm một tùy chọn</span>
             </button>
           </div>
         </div>
