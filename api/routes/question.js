@@ -13,6 +13,7 @@ import {
   getResultExamById,
   getExamOverview,
   getExams,
+  deleteExam,
 } from "../controllers/Question/exam.js";
 import { authorize } from "../middlewares/authorize.js";
 const router = express.Router();
@@ -26,6 +27,8 @@ router.get("/:questionId", authorize, getQuestionById);
 router.post("/exam/:courseId", addExam);
 router.get("/exams/:courseId", authorize, getExams);
 router.get("/exam/:examId", getExamById);
+router.delete("/exam/:examId", deleteExam);
+
 router.post("/exam/:examId/results", authorize, createResultExams);
 router.get("/exam/:examId/results", authorize, getResultExamById);
 router.get("/exam/:examId/overview", authorize, getExamOverview);

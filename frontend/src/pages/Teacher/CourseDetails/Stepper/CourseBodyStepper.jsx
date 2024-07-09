@@ -7,11 +7,11 @@ import { message } from "antd";
 import DropFileInput from "@/components/DropFile/DropFileInput";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ChecklistOutlinedIcon from "@mui/icons-material/ChecklistOutlined";
-import CourseTitle from "../../../../components/Course/CourseTitle";
-import CourseDesc from "../../../../components/Course/CourseDesc";
-import CourseChapter from "../../../../components/Course/CourseChapter";
-import CourseCode from "../../../../components/Course/CourseCode";
-import CourseClass from "../../../../components/Course/CourseClass";
+import CourseTitle from "@/components/Course/CourseTitle";
+import CourseDesc from "@/components/Course/CourseDesc";
+import CourseChapter from "@/components/Course/CourseChapter";
+import CourseCode from "@/components/Course/CourseCode";
+import CourseClass from "@/components/Course/CourseClass";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
@@ -55,7 +55,7 @@ const CourseBodyStepper = ({ courseId, handleNext, setSelectedChapterId }) => {
         }
       );
       message.success("Xóa thành công");
-      navigate("/dashboard");
+      navigate("/teacher/courses");
     } catch (err) {
       message.error(err.message);
       console.log(err);

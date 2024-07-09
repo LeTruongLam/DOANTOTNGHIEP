@@ -95,14 +95,18 @@ export const getExams = (req, res) => {
     `;
   }
 
-  db.query(q, userInfo.role === "teacher" ? [courseId] : [courseId, userInfo.id], (err, data) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ error: "Database query error", details: err });
+  db.query(
+    q,
+    userInfo.role === "teacher" ? [courseId] : [courseId, userInfo.id],
+    (err, data) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ error: "Database query error", details: err });
+      }
+      res.status(200).json(data);
     }
-    res.status(200).json(data);
-  });
+  );
 };
 
 export const getExamById = (req, res) => {
@@ -143,6 +147,19 @@ export const getExamById = (req, res) => {
     }
   });
 };
+
+export const deleteExam = (req, res) => {
+  const examId = req.params.examId;
+  const query = `
+    DELETE FROM Exams
+    WHERE ExamId = ?
+  `;
+  db.query(query, [examId], (err, result) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json({ message: "Exam deleted successfully" });
+  });
+};
+
 export const createResultExams = (req, res) => {
   const resultExamId = uuidv4();
   const userInfo = req.userInfo;

@@ -334,15 +334,15 @@ export default function AssignmentDetail() {
                         <p className="font-semibold gap-4 py-2 pl-4 pr-5   flex items-center justify-between ">
                           <div className="flex items-center justify-center gap-1">
                             <CreditScoreIcon />
-                            <span>Points</span>
+                            <span className="mr-4">Points</span>
                             <input
                               type="number"
                               id="number-input"
                               aria-describedby="helper-text-explanation"
-                              className={`border${
-                                isEditPoint ? "" : " disabled"
+                              className={` ${
+                                isEditPoint ? "outline" : " disabled"
                               } border-gray-50 text-gray-900 text-sm outline-blue-500
-                              rounded-lg block w-full my-2 py-1 px-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-center`}
+                              rounded-lg block w-full my-2 py-1 px-2  text-center`}
                               required
                               min={0}
                               max={10}

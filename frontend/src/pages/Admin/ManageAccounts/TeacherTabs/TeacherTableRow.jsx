@@ -32,7 +32,7 @@ const StudentTableRow = ({ student, handleCheckboxChange }) => (
       <span title={formatDate(student.BirthDate)}>{formatDate(student.BirthDate)}</span>
     </td>
     <td className="px-6 py-3 w-[10%] text-center">
-      <button className="font-medium text-blue-600 hover:underline">Sửa</button>
+      {/* <button className="font-medium text-blue-600 hover:underline">Sửa</button> */}
     </td>
   </tr>
 );

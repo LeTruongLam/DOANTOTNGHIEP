@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import ViewAEditDropdown from "../../../../components/Dropdowns/ViewAEditDropdown";
-import { formatDateString } from "../../../../js/TAROHelper";
+import ViewAEditDropdown from "@/components/Dropdowns/ViewAEditDropdown";
+import { formatDateString } from "@/js/TAROHelper";
+import { Undo2 } from "lucide-react";
 function ExamView() {
   const navigate = useNavigate();
   const { courseId } = useParams();
@@ -30,7 +31,7 @@ function ExamView() {
   }, []);
 
   const goBack = () => {
-    navigate(-1);
+    navigate(`/teacher/courses/${courseId}/bankquestions`);
   };
 
   return (
@@ -40,27 +41,12 @@ function ExamView() {
           className="flex items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:cursor-pointer opacity-85 hover:opacity-100 rounded-md"
           onClick={goBack}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="black"
-            className="w-5 h-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
-            />
-          </svg>
+          <Undo2 className="w-5 h-5" />
+
           <span className="text-gray-900 text-sm font-medium opacity-85">
             Quay lại
           </span>
         </div>
-        <button className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3">
-          Tạo bài thi
-        </button>
       </div>
       <div className="flex-grow mt-3">
         <div>
@@ -78,7 +64,7 @@ function ExamView() {
                       </span>
                     </div>
                     <div>
-                      <ViewAEditDropdown examId={exam.ExamId} />
+                      <ViewAEditDropdown examId={exam.ExamId} fetchData={fetchData} />
                     </div>
                   </div>
                 </div>
@@ -95,7 +81,6 @@ function ExamView() {
                     <span>Số câu hỏi</span>
                     <span>{exam?.QuestionCount} </span>
                   </div>
-                
                 </div>
               </div>
             ))}

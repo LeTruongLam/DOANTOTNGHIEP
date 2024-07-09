@@ -77,7 +77,7 @@ export default function CourseStepper() {
     }
   };
   const handleEdit = async () => {
-    navigate(`/course/write?edit=${course.CourseId}`, { state: course });
+    navigate(`/teacher/courses/${course.CourseId}/detail`, { state: course });
   };
   return (
     <div className="px-5">

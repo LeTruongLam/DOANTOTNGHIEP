@@ -61,16 +61,26 @@ function TeacherTab() {
   useEffect(() => {
     fetchStudentAccounts();
   }, []);
-  const handleDataUpload = () => {
-    console.log(data);
-    axios
-      .post("http://localhost:8800/api/students", data)
-      .then((response) => {
-        console.log("Data uploaded successfully:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error uploading data:", error);
-      });
+  const handleDataUpload = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8800/api/teachers",
+        data
+      );
+      fetchStudentAccounts(); // Refresh the student list after deletion
+    } catch (error) {
+      if (error.response) {
+        // Server responded with a status other than 200 range
+        console.error("Error response:", error.response.data);
+        console.error("Error status:", error.response.status);
+      } else if (error.request) {
+        // Request was made but no response was received
+        console.error("Error request:", error.request);
+      } else {
+        // Something else happened while setting up the request
+        console.error("Error message:", error.message);
+      }
+    }
   };
   return (
     <div className="rounded-b-lg min-h-[620px] -mx-6 -my-6 bg-[#F5F5F5]">
@@ -84,11 +94,6 @@ function TeacherTab() {
           </div>
           <span className="mx-2 text-slate-500">|</span>
           <span className=" ">Đã chọn {selectedIds.length} mục </span>
-          {selectedIds.length !== 0 && (
-            <span className="ml-4 px-3 py-2 hover:bg-slate-200  hover:cursor-pointer hover:rounded-md text-blue-700 text-sm">
-              Bỏ chọn
-            </span>
-          )}
         </div>
         <div className="flex justify-between items-center gap-3">
           {selectedIds.length === 0 ? (
@@ -104,7 +109,7 @@ function TeacherTab() {
                 <ImportData data={data} setData={setData} />
               </Button>
               {data.length > 0 && (
-                <button onClick={handleDataUpload}>Upload Data</button>
+                <button onClick={handleDataUpload}>Xác nhận</button>
               )}
             </>
           ) : (

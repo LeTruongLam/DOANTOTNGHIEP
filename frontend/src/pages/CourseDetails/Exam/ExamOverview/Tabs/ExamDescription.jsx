@@ -3,10 +3,7 @@ import { PaperClipIcon } from "@heroicons/react/20/solid";
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { message } from "antd";
-import {
-  formatDateFull,
-  formattedDateTime,
-} from "../../../../../js/TAROHelper";
+import { formatDateFull, formattedDateTime } from "@/js/TAROHelper";
 import Completed from "../../../../../img/completed.png";
 import { useNavigate, useParams } from "react-router-dom";
 function ShowDialog({
@@ -121,6 +118,7 @@ function ExamDescription({ exam, examResult }) {
   const timeStart = formatDateFull(exam?.TimeStart);
   const timeStartDate = new Date(timeStart);
 
+  const isExam = localStorage.getItem("startExam");
   const AccessTimedOut = formatDateFull(
     new Date(timeStartDate.getTime() + 30 * 60 * 1000)
   );
@@ -214,7 +212,7 @@ function ExamDescription({ exam, examResult }) {
             }}
             className="font-medium bg-indigo-600 text-white focus:outline-none disabled:opacity-20 disabled:cursor-no-drop"
           >
-            Bắt đầu
+            {isExam ? "Tiếp tục" : "Bắt đầu"}
           </button>
         ) : (
           <img className=" h-10" src={Completed} alt="" />

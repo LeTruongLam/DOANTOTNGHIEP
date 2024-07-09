@@ -1,30 +1,33 @@
 import { Fragment, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../context/authContext";
+import axios from "axios";
+import { message } from "antd";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function ViewAEditDropdown({ examId }) {
-  const { fetchExamById } = useContext(AuthContext);
-
+export default function ViewAEditDropdown({ examId, fetchData }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
   const handleViewExam = () => {
-    fetchExamById(examId);
     navigate(`/teacher/courses/${courseId}/exams/${examId}`);
   };
 
   const handleEditExam = () => {
     // Handle edit logic
   };
-
-  const handleDeleteExam = () => {
-    // Handle delete logic
+  const handleDeleteExam = async () => {
+    try {
+      await axios.delete(`http://localhost:8800/api/questions/exam/${examId}`);
+      message.success("Xóa bài thi thành công");
+      fetchData();
+    } catch (error) {
+      message.error("Xóa bài thi thất bại");
+      console.log(error);
+    }
   };
 
   return (
@@ -68,7 +71,7 @@ export default function ViewAEditDropdown({ examId }) {
                     "block px-4 py-2 text-sm w-full font-semibold text-left" // Thêm lớp CSS text-left
                   )}
                 >
-                  View
+                  Xem chi tiết
                 </button>
               )}
             </Menu.Item>
@@ -81,7 +84,7 @@ export default function ViewAEditDropdown({ examId }) {
                     "block px-4 py-2 text-sm w-full font-semibold text-left" // Thêm lớp CSS text-left
                   )}
                 >
-                  Edit
+                  Sửa
                 </button>
               )}
             </Menu.Item>
@@ -94,7 +97,7 @@ export default function ViewAEditDropdown({ examId }) {
                     "block px-4 py-2 text-sm w-full font-semibold text-left" // Thêm lớp CSS text-left
                   )}
                 >
-                  Delete
+                  Xóa
                 </button>
               )}
             </Menu.Item>

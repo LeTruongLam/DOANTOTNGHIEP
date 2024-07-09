@@ -111,9 +111,7 @@ const TheHeader = () => {
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
                   >
-                    <Avatar sx={{ width: 32, height: 32 }}>
-                      {currentUser?.UserName}
-                    </Avatar>
+                    <Avatar src={currentUser?.Img} />
                   </IconButton>
                 </Tooltip>
               </Box>

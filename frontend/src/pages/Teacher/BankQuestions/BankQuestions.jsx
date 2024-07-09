@@ -14,17 +14,8 @@ export default function BankQuestions() {
   return (
     <div className="px-5 h-screen" style={{ backgroundColor: "#F5F5F5" }}>
       <div className="flex justify-between items-center">
-        <span className="text-3xl font-bold">Ngân hàng câu hỏi</span>
-        <div className="my-4 flex gap-3 ">
-          <input
-            type="text"
-            name="search-course"
-            id="search-course"
-            autoComplete="given-name"
-            placeholder="Search course"
-            className=" outline-none block w-80 rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
-          />
-        </div>
+        <span className="text-3xl py-3 font-bold">Ngân hàng câu hỏi</span>
+      
       </div>
       <div className="grid grid-cols-4 gap-6">
         {courses.map((course) => (

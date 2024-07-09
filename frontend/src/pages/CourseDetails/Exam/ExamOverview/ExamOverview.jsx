@@ -11,7 +11,7 @@ import ExamDescription from "./Tabs/ExamDescription";
 function ExamOverview() {
   const [value, setValue] = React.useState(0);
 
-  const { examId } = useParams();
+  const { examId, courseId } = useParams();
   const [exam, setExam] = useState();
   const [examResult, setExamResult] = useState();
   const navigate = useNavigate();
@@ -94,7 +94,8 @@ function ExamOverview() {
       <span
         className="text-gray-900 mb-3  w-max px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 hover:cursor-pointer text-sm font-medium opacity-85"
         onClick={() => {
-          navigate(-1);
+          navigate(`/courses/${courseId}`);
+
         }}
       >
         Quay lại

@@ -100,10 +100,10 @@ function BankQuestionView() {
           },
         }
       );
-      message.success("Questions added successfully.");
+      message.success("Thêm câu hỏi thành công");
       fetchQuestionListByChapterId();
     } catch (error) {
-      message.error("Question added error");
+      message.error("Thêm câu hỏi thất bại");
 
       console.log(error);
     }
@@ -117,7 +117,7 @@ function BankQuestionView() {
       setActiveStep(0);
     } else {
       if (!questionTitle) {
-        message.error("Question title cannot be empty");
+        message.error("Tiêu đề câu hỏi không được bỏ trống");
         return;
       }
       const newQuestion = {
@@ -197,11 +197,11 @@ function BankQuestionView() {
           },
         }
       );
-      message.success("Questions deleted successfully.");
+      message.success("Xóa câu hỏi thành công");
       setSelectedIds([]);
       fetchQuestionListByChapterId();
     } catch (error) {
-      message.error("Error deleting questions.");
+      message.error("Lỗi xóa câu hỏi");
       console.log(error);
     }
   };

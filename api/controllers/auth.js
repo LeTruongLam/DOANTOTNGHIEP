@@ -43,7 +43,6 @@ export const login = (req, res) => {
     const userData = { ...user };
     delete userData.Password; // Remove the Password field from userData
     delete userData.Email; // Remove the Password field from userData
-    delete userData.Img; // Remove the Password field from userData
     res.cookie("access_token", token, {
       httpOnly: true,
     });

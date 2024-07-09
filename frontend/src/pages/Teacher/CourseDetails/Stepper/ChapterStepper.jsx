@@ -4,9 +4,9 @@ import "../EditWrite.scss";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import ChapterDesc from "../CustomerChapter/ChapterDesc";
 import ChapterTitle from "../CustomerChapter/ChapterTitle";
-import CourseLesson from "../../../../components/Course/CourseLesson";
+import CourseLesson from "@/components/Course/CourseLesson";
 import { useNavigate } from "react-router-dom";
-import CourseMaterials from "../../../../components/Course/CourseMaterials";
+import CourseMaterials from "@/components/Course/CourseMaterials";
 const ChapterStepper = ({
   chapterId,
   handleBack,

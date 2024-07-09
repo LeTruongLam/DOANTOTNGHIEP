@@ -442,4 +442,36 @@ router.post("/questions/uploadImg", upload.single("image"), (req, res) => {
     });
   }
 });
+
+// upload anh avatar
+router.post("/avatar/uploadImg", upload.single("image"), (req, res) => {
+  if (req.file) {
+    cloudinary.uploader
+      .upload(req.file.path, {
+        folder: "Avatar",
+        resource_type: "image",
+      })
+      .then((result) => {
+        res.status(200).json({
+          success: true,
+          message: "Image uploaded successfully",
+          imageUrl: result.secure_url,
+        });
+      })
+      .catch((err) => {
+        console.log("Error uploading image:", err);
+        res.status(500).json({
+          success: false,
+          message: "Error uploading image",
+          error: err,
+        });
+      });
+  } else {
+    console.log("No image file provided.");
+    res.status(400).json({
+      success: false,
+      message: "No image file provided",
+    });
+  }
+});
 export default router;

@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { formattedDateTime } from "../../../../js/TAROHelper";
+import { Undo2 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
 function ExamTabs({
   time,
   setTime,
-  endTime,
   questions,
   activeTab,
   flaggedQuestions,
@@ -17,49 +15,27 @@ function ExamTabs({
   examTitle,
 }) {
   const navigate = useNavigate();
-  const handleSubmitExam = useCallback(() => {
-    // Your logic for handling form submission
-    handleFormSubmit();
-  }, []);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(interval);
-          handleSubmitExam(); // Call handleFormSubmit when time reaches 0
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [setTime, handleFormSubmit]);
+  const { examId, courseId } = useParams();
 
   const generateTabs = () => {
-    return questions.map((question, index) => {
+    return questions?.map((question, index) => {
       const answered = answers.find(
         (answer) => answer.questionId === question.QuestionId
       );
       return (
         <li
           key={index}
-          className={`rounded-md border border-blue-500 text-black flex`}
+          className={`rounded-md border border-blue-500 text-black flex ${
+            answered && "bg-green-700 text-white border-slate-200"
+          } ${activeTab === index + 1 && "bg-blue-600 text-white"}`}
         >
-          <button
-            className={`inline-flex items-center justify-center flex-grow px-1 py-2 rounded-md hover:text-gray-900 hover:outline-blue-600 hover:outline ${
-              answered && "bg-green-700 text-white border-slate-200"
-            } ${
-              activeTab === index + 1 &&
-              "bg-blue-600 focus:outline-blue-600 text-white"
-            }`}
+          <span
+            className="inline-flex items-center justify-center flex-grow px-1 py-2 rounded-md  hover:outline-blue-600 hover:outline"
             onClick={() => handleTabClick(question.QuestionId, index)}
           >
-            {flaggedQuestions.includes(question.QuestionId) && (
-              <span className="mr-1">🚩</span>
-            )}
+            {flaggedQuestions.includes(question.QuestionId) && <span>🚩</span>}
             {(index + 1).toString()}
-          </button>
+          </span>
         </li>
       );
     });
@@ -71,24 +47,11 @@ function ExamTabs({
         <div className="sticky mb-4 isolate flex flex-col items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
           <div className="flex w-full">
             <div className="flex items-center gap-2 px-3 py-2 hover:bg-slate-200 hover:cursor-pointer opacity-85 hover:opacity-100 rounded-md">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="black"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
-                />
-              </svg>
+              <Undo2 className="w-5 h-5" />
               <span
                 className="text-gray-900 text-sm font-medium opacity-85"
                 onClick={() => {
-                  navigate(-1);
+                  navigate(`/course/${courseId}/exams/${examId}/overview`);
                 }}
               >
                 Quay lại

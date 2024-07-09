@@ -1,7 +1,14 @@
 import { db } from "../../db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { v2 as cloudinary } from "cloudinary";
 
+cloudinary.config({
+  cloud_name: "ddwapzxdc",
+  api_key: "622526376528128",
+  api_secret: "hjuus8X3RczPHUlpy0RW46RtRFc",
+  secure: true,
+});
 export const authorize = (req, res, next) => {
   const token = req.cookies.access_token;
 
@@ -42,7 +49,6 @@ export const getAllStudent = (req, res) => {
 export const addUserAndStudent = async (req, res) => {
   try {
     const usersAndStudents = req.body;
-
     if (!Array.isArray(usersAndStudents) || usersAndStudents.length === 0) {
       return res.status(400).json({ error: "No data provided!" });
     }
@@ -72,7 +78,6 @@ export const addUserAndStudent = async (req, res) => {
 
     const addUser = async (user) => {
       const { UserName, Email, Password } = user;
-
       if (await checkUniqueFields(UserName, Email)) {
         throw {
           error: "User creation error",
@@ -95,7 +100,7 @@ export const addUserAndStudent = async (req, res) => {
         ]);
         return userResult.insertId;
       } catch (error) {
-        throw { error: "User creation error", details: error };
+        throw { error: "User creation error 3", details: error };
       }
     };
 
@@ -183,4 +188,104 @@ export const deleteAccountStudent = async (req, res) => {
       .status(500)
       .json({ error: "Internal server error", details: error });
   }
+};
+
+export const getStudentPersonalInformation = (req, res) => {
+  const userId = req.userInfo.id;
+  const query = `
+    SELECT *
+    FROM students S
+    JOIN Users U ON U.UserId = S.UserId
+    WHERE S.UserId = ?
+  `;
+
+  db.query(query, [userId], (err, data) => {
+    if (err) {
+      console.error("Error fetching student information:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+    return res.status(200).json(data);
+  });
+};
+export const uploadAvatarToCloudinary = async (req, res) => {
+  try {
+    // Check if an image file is provided
+    if (req.file) {
+      // Upload the image to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "Avatar",
+        resource_type: "image",
+      });
+
+      // Update User's image URL in the database
+      const updateUserQuery = "UPDATE Users SET Img = ? WHERE UserId = ?";
+      const userId = req.userInfo.id; // Ensure this is set correctly based on your authentication mechanism
+
+      db.query(
+        updateUserQuery,
+        [result.secure_url, userId],
+        (err, userData) => {
+          if (err) {
+            console.error("Error updating user image in database:", err);
+            return res.status(500).json({
+              success: false,
+              message: "Error updating user image in database",
+              error: err.message,
+            });
+          }
+          console.log("User image updated in Users table:", userData);
+
+          // Proceed to update Student's information in the database
+          updateStudentInfo(req, res, result.secure_url);
+        }
+      );
+    } else {
+      // No image file provided, only update other information
+      updateStudentInfo(req, res, null);
+    }
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error processing request",
+      error: error.message,
+    });
+  }
+};
+
+// Function to update student information in the database
+const updateStudentInfo = (req, res, imageUrl) => {
+  const { PhoneNo, BirthDate, Faculty, Adress } = req.body;
+  const userId = req.userInfo.id;
+
+  const updateStudentQuery = `
+    UPDATE Students 
+    SET PhoneNo = ?, BirthDate = ?, Faculty = ?, Adress = ?
+    WHERE UserId = ?
+  `;
+  db.query(
+    updateStudentQuery,
+    [PhoneNo, BirthDate, Faculty, Adress, userId],
+    (err, studentData) => {
+      if (err) {
+        console.error("Error updating student information in database:", err);
+        return res.status(500).json({
+          success: false,
+          message: "Error updating student information in database",
+          error: err.message,
+        });
+      }
+
+      console.log(
+        "Student information updated in Students table:",
+        studentData
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Information updated successfully",
+        imageUrl: imageUrl, // Return image URL if updated, otherwise null
+      });
+    }
+  );
 };
