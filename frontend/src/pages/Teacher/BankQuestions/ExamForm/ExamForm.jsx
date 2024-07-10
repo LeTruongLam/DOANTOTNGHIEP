@@ -5,10 +5,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import {
-  generateAccessCode,
-  formattedDateTime,
-} from "../../../../js/TAROHelper";
+import { generateAccessCode, formattedDateTime } from "@/js/TAROHelper";
 import React, { useState, Fragment, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
@@ -32,7 +29,9 @@ function ExamForm({ open, setOpen, chapters }) {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get(`http://localhost:8800/api/classes/${courseId}`);
+      const response = await axios.get(
+        `http://localhost:8800/api/classes/${courseId}`
+      );
       setClasses(response.data);
     } catch (error) {
       console.error(error);
@@ -138,7 +137,7 @@ function ExamForm({ open, setOpen, chapters }) {
             margin: "0 20px 4px 20px",
           }}
         >
-          Exam
+          Tạo bài thi
           <Button
             onClick={() => {
               setOpen(false);
@@ -156,7 +155,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Write exam title
+                  Tiêu đề bài thi
                   <span className="text-red-800 text-xl	">*</span>
                 </label>
                 <div className="mt-2">
@@ -176,7 +175,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Exam description test
+                  Mô tả bài thi
                 </label>
                 <div className="mt-2">
                   <textarea
@@ -209,7 +208,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Time limit
+                  Thời gian thi
                 </label>
                 <div className="mt-2 flex items-center justify-start gap-3">
                   <input
@@ -220,11 +219,13 @@ function ExamForm({ open, setOpen, chapters }) {
                     className="max-w-20 min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-center"
                   />
                   <span className="bg-white font-semibold text-gray-700 w-max min-h-10 border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                    Minutes
+                    Phút
                   </span>
                   <div>
                     <span className="text-gray-900 opacity-90 font-semibold text-sm">
-                      Time limit for this quiz. 0 means no time limit.
+                      Giới hạn thời gian cho bài kiểm tra này. 
+                      {/* 0 có nghĩa là
+                      không có giới hạn thời gian. */}
                     </span>
                   </div>
                 </div>
@@ -235,7 +236,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Number of questions
+                  Số câu hỏi
                 </label>
                 <span className="inline-flex items-center rounded-md bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
                   {renderQuestionCount()}
@@ -246,7 +247,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Applicable subjects
+                  Áp dụng cho
                 </label>
                 <div className="my-3 px-3 py-2 rounded-md bg-white">
                   <div className="pb-3 border-b border-slate-300 flex justify-between items-center    ">
@@ -296,7 +297,7 @@ function ExamForm({ open, setOpen, chapters }) {
                     htmlFor="about"
                     className="block text-sm font-medium leading-6 text-gray-900"
                   >
-                    Use the access code
+                    Sử dụng mã truy cập
                   </label>
                   <label className="inline-flex items-center cursor-pointer">
                     <input
@@ -314,15 +315,15 @@ function ExamForm({ open, setOpen, chapters }) {
                       type="text"
                       value={accessCode}
                       onChange={handleAccessCodeChange}
-                      placeholder="Enter access code"
+                      placeholder="Nhập mã truy cập"
                       className="w-full min-h-10  border border-blue-300 text-black text-sm rounded-md focus:outline-blue-500 focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     />
                     <button
-                      className="absolute top-0 right-0 h-full opacity-50 px-4 hover:opacity-100 "
-                      title="Generate Access Code"
+                      className="absolute top-0 right-0 h-full  opacity-50  hover:opacity-100 "
+                      title="Tạo mã truy cập"
                       onClick={handlegenerateAccessCode}
                     >
-                      <AutoAwesomeIcon color="primary" fontSize="small" />
+                      <AutoAwesomeIcon color="primary" className="" fontSize="small" />
                     </button>
                   </div>
                 )}
@@ -334,7 +335,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   htmlFor="about"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Questions
+                  Danh sách câu hỏi
                 </label>
                 <div className="mt-2">
                   <div className="bg-white  rounded-md">
@@ -355,17 +356,17 @@ function ExamForm({ open, setOpen, chapters }) {
         <div className="flex justify-between items-center mx-5 mt-4 ">
           <button
             type="button"
-            class="text-black bg-white border border-blue-500 focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-5 py-1.5 me-2 mb-2  "
+            className="text-black bg-white border border-blue-500 focus:outline-none hover:bg-slate-100  font-medium rounded-md text-sm px-5 py-1.5 me-2 mb-2  "
           >
-            Cancel
+            Hủy
           </button>
           <div className="flex gap-2">
             <button
               onClick={handleSave}
               type="button"
-              class="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              className="text-white border-blue-500 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-1.5  mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >
-              Save
+              Lưu
             </button>
           </div>
         </div>

@@ -65,6 +65,56 @@ export const addExam = (req, res) => {
     }
   );
 };
+export const editExam = (req, res) => {
+  const examId = req.params.examId;
+  const {
+    examTitle,
+    examDescription = "",
+    startTime,
+    timeLimit,
+    questionIds,
+    accessCode = "",
+  } = req.body;
+
+  // Update the exam details
+  let updateExamQuery = `UPDATE Exams SET ExamTitle = ?, ExamDescription = ?, TimeStart = ?, TimeLimit = ?, AccessCode = ? WHERE ExamId = ?`;
+
+  db.query(
+    updateExamQuery,
+    [examTitle, examDescription, startTime, timeLimit, accessCode, examId],
+    (err, data) => {
+      if (err) {
+        return res.status(500).json(err);
+      }
+
+      // Remove old questions
+      let deleteQuestionsQuery = `DELETE FROM ExamQuestions WHERE ExamId = ?`;
+      db.query(deleteQuestionsQuery, [examId], (err, result) => {
+        if (err) {
+          return res.status(500).json(err);
+        }
+
+        // Generate ExamQuestionId for each new entry
+        const examQuestions = questionIds.map((questionId) => [
+          uuidv4(), // Generate a new UUID for ExamQuestionId
+          examId,
+          questionId,
+        ]);
+
+        // Add new questions with ExamQuestionId
+        let insertQuestionsQuery = `INSERT INTO ExamQuestions (ExamQuestionId, ExamId, QuestionId) VALUES ?`;
+        db.query(insertQuestionsQuery, [examQuestions], (err, result) => {
+          if (err) {
+            return res.status(500).json(err);
+          }
+
+          res.status(200).json({ message: "Exam updated successfully" });
+        });
+      });
+    }
+  );
+};
+
 // Lay danh sach bai thi
 export const getExams = (req, res) => {
   const userInfo = req.userInfo;
@@ -287,6 +337,47 @@ export const getExamOverview = (req, res) => {
   db.query(q, [examId], (err, data) => {
     if (err) {
       res.status(500).json(err);
+    } else {
+      res.status(200).json(data);
+    }
+  });
+};
+
+export const getClassApplyWithExam = (req, res) => {
+  const examId = req.params.examId;
+  const query = `
+    SELECT c.ClassId, c.ClassCode
+    FROM Classes c
+    INNER JOIN examclasses ec ON c.ClassId = ec.ClassId
+    WHERE ec.ExamId = ?
+  `;
+
+  db.query(query, [examId], (err, data) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      res.status(200).json(data);
+    }
+  });
+};
+
+export const getStudentsWithoutResultsForExam = (req, res) => {
+  const { classId, examId } = req.params;
+
+  const query = `
+    SELECT s.StudentId, s.StudentName, s.StudentCode, r.*
+    FROM Students s
+    INNER JOIN class_student cs ON s.UserId = cs.UserId
+    INNER JOIN Classes c ON cs.ClassId = c.ClassId
+    LEFT JOIN resultexams r ON s.UserId = r.UserId AND r.ExamId = ?
+    WHERE c.ClassId = ? 
+  `;
+
+  db.query(query, [examId, classId], (err, data) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).json({ error: "Internal server error" });
     } else {
       res.status(200).json(data);
     }

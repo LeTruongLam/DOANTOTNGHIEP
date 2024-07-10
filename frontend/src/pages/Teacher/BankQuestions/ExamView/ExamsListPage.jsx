@@ -4,7 +4,7 @@ import axios from "axios";
 import ViewAEditDropdown from "@/components/Dropdowns/ViewAEditDropdown";
 import { formatDateString } from "@/js/TAROHelper";
 import { Undo2 } from "lucide-react";
-function ExamView() {
+function ExamsListPage() {
   const navigate = useNavigate();
   const { courseId } = useParams();
 
@@ -91,4 +91,4 @@ function ExamView() {
   );
 }
 
-export default ExamView;
+export default ExamsListPage;

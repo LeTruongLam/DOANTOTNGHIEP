@@ -17,7 +17,7 @@ export default function ViewAEditDropdown({ examId, fetchData }) {
   };
 
   const handleEditExam = () => {
-    // Handle edit logic
+    navigate(`/teacher/courses/${courseId}/exams/${examId}/edit`);
   };
   const handleDeleteExam = async () => {
     try {

@@ -7,8 +7,61 @@ function ExamQuestions({
   answers,
   setAnswers,
 }) {
-  useEffect(() => {}, [answers]);
+  useEffect(() => {
+    // Event listeners to prevent actions
+    const preventCopyPaste = (event) => {
+      if (
+        event.ctrlKey &&
+        (event.key === "c" || event.key === "v" || event.key === "a")
+      ) {
+        event.preventDefault();
+      }
+    };
 
+    const preventSearchAndScreenshot = (event) => {
+      if (
+        event.ctrlKey &&
+        (event.key === "f" || event.key === "p" || event.key === "s")
+      ) {
+        event.preventDefault();
+      }
+
+      if (event.key === "PrintScreen" || event.key === "F12") {
+        event.preventDefault();
+      }
+    };
+
+    // Attach event listeners
+    document.addEventListener("keydown", preventCopyPaste);
+    document.addEventListener("keydown", preventSearchAndScreenshot);
+
+    // Clean up event listeners
+    return () => {
+      document.removeEventListener("keydown", preventCopyPaste);
+      document.removeEventListener("keydown", preventSearchAndScreenshot);
+    };
+  }, []); // Empty dependency array ensures the effect runs only once on mount
+  useEffect(() => {
+    const preventContextMenu = (event) => {
+      event.preventDefault();
+    };
+
+    const preventRightClick = (event) => {
+      if (event.button === 2) {
+        event.preventDefault();
+      }
+    };
+
+    // Attach event listeners
+    document.addEventListener("contextmenu", preventContextMenu);
+    document.addEventListener("mousedown", preventRightClick);
+
+    // Clean up event listeners
+    return () => {
+      document.removeEventListener("contextmenu", preventContextMenu);
+      document.removeEventListener("mousedown", preventRightClick);
+    };
+  }, []); // Empty dependency array ensures the effect runs only once on mount
   const handleAnswerChange = (questionId, optionId, isMultipleChoice) => {
     setAnswers((prevAnswers) => {
       const existingAnswer = prevAnswers.find(

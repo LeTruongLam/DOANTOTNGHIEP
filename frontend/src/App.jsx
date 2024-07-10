@@ -23,8 +23,8 @@ import AssignmentView from "./pages/Teacher/TheAssignment/AssignmentsViewPage.js
 import AssignmentListStudent from "./pages/Teacher/TheAssignment/AssignmentClassPage.jsx";
 import BankQuestions from "./pages/Teacher/BankQuestions/BankQuestions.jsx";
 import BankQuestionView from "./pages/Teacher/BankQuestions/BankQuestionView.jsx";
-import ExamView from "./pages/Teacher/BankQuestions/ExamView/ExamView.jsx";
-import ExamViewDetail from "./pages/Teacher/BankQuestions/ExamView/ExamViewDetail/ExamViewDetail.jsx";
+import ExamsListPage from "./pages/Teacher/BankQuestions/ExamView/ExamsListPage.jsx";
+import ExamViewDetailPage from "./pages/Teacher/BankQuestions/ExamView/ExamViewDetail/ExamViewDetailPage.jsx";
 
 // Admin
 import ManageAccountsPage from "./pages/Admin/ManageAccounts/ManageAccountsPage.jsx";
@@ -41,6 +41,8 @@ import MainLayout from "@/layout/MainLayout.jsx";
 import TeacherLayout from "./layout/TeacherLayout.jsx";
 import ExamLayout from "./layout/ExamLayout.jsx";
 import ViewerLayout from "./layout/ViewerLayout.jsx";
+import ExamEditPage from "./pages/Teacher/BankQuestions/ExamView/ExamEdit/ExamEditPage.jsx";
+import ViewStudentResultsPage from "./pages/Teacher/BankQuestions/ViewStudentResult/ViewStudentResultsPage.jsx";
 const AdminRouter = [
   {
     path: "/admin/manage-accounts",
@@ -82,11 +84,20 @@ const TeacherRouter = [
   },
   {
     path: "/teacher/courses/:courseId/exams",
-    element: <ExamView />,
+    element: <ExamsListPage />,
   },
+
   {
     path: "/teacher/courses/:courseId/exams/:examId",
-    element: <ExamViewDetail />,
+    element: <ExamViewDetailPage />,
+  },
+  {
+    path: "/teacher/courses/:courseId/exams/:examId/edit",
+    element: <ExamEditPage />,
+  },
+  {
+    path: "/teacher/courses/:courseId/exams/:examId/result",
+    element: <ViewStudentResultsPage />,
   },
   {
     path: "/teacher/courses/:courseId/detail",

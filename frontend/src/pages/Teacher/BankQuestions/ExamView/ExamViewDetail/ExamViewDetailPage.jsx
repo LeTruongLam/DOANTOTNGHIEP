@@ -5,7 +5,7 @@ import ExamTabs from "./ExamTabs";
 import ExamQuestions from "./ExamQuestions";
 import { Undo2, Users } from "lucide-react";
 
-function ExamViewDetail() {
+function ExamViewDetailPage() {
   const { examId, courseId } = useParams();
   const navigate = useNavigate();
 
@@ -39,20 +39,9 @@ function ExamViewDetail() {
     }, 1000);
 
     // Handle window beforeunload event
-    const handleBeforeUnload = (event) => {
-      if (time > 0 || answers.length > 0 || flagged.length > 0) {
-        const message =
-          "Bạn đang có một bài thi đang diễn ra. Rời khỏi trang này sẽ mất toàn bộ tiến trình hiện tại. Bạn có chắc chắn muốn rời khỏi?";
-        event.returnValue = message;
-        return message;
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       clearInterval(intervalId);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [examId, time, answers, flagged]);
 
@@ -128,7 +117,9 @@ function ExamViewDetail() {
     localStorage.removeItem(`flags_${examId}`);
     navigate(`/teacher/courses/${courseId}/exams`); // Navigate back to the previous page
   };
-
+  const handleToResultClick = () => {
+    navigate(`/teacher/courses/${courseId}/exams/${examId}/result`); // Navigate back to the previous page
+  };
   return (
     <div ref={componentRef} className="flex py-5 flex-col px-5">
       <div className="">
@@ -142,9 +133,12 @@ function ExamViewDetail() {
               Quay lại
             </span>
           </div>
-          <button className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3 flex gap-1 hover:bg-green-600">
+          <button
+            onClick={handleToResultClick}
+            className="bg-blue-700 text-sm rounded-md font-semibold text-white py-2 px-3 flex gap-1 hover:bg-green-600"
+          >
             <Users className="w-5 h-5" />
-            <span>Danh sách dự thi</span>
+            <span>Kết quả sinh viên</span>
           </button>
         </div>
       </div>
@@ -170,4 +164,4 @@ function ExamViewDetail() {
   );
 }
 
-export default ExamViewDetail;
+export default ExamViewDetailPage;
