@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 
 import EditIcon from "@mui/icons-material/Edit";
@@ -8,14 +8,15 @@ import { message } from "antd";
 
 
 export default function CourseTitle({ title, subTitle }) {
-  const location = useLocation();
+
+  const {  courseId } = useParams();
   const [courseTitle, setCourseTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const fetchCourseTitle = async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:8800/api/courses/title/${location.state.CourseId}`,
+        `http://localhost:8800/api/courses/title/${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
@@ -44,7 +45,7 @@ export default function CourseTitle({ title, subTitle }) {
     const updatedTitle = courseTitle;
     try {
       await axios.put(
-        `http://localhost:8800/api/courses/title/${location.state.CourseId}`,
+        `http://localhost:8800/api/courses/title/${courseId}`,
         {
           title: updatedTitle,
         }

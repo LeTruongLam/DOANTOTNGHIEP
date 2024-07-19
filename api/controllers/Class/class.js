@@ -46,37 +46,39 @@ export const deleteClass = (req, res) => {
     return res.status(200).json({ message: "Class deleted successfully" });
   });
 };
+
 export const addClassCourse = (req, res) => {
-  const { classCode, teacherId } = req.body;
+  const { classCode } = req.body;  // Getting userId from request body
   const { courseId } = req.params;
   const classId = uuidv4();
-
-  // Query to check for duplicate ClassCode
-  const checkDuplicateQuery = `
-    SELECT COUNT(*) AS count
-    FROM classes
-    WHERE ClassCode = ?
-  `;
-
+  const userInfo = req.userInfo;
   // Query to insert new class
   const insertClassQuery = `
     INSERT INTO classes (ClassId, ClassCode, CourseId, TeacherId)
     VALUES (?, ?, ?, ?)
   `;
 
-  // Check if ClassCode already exists
-  db.query(checkDuplicateQuery, [classCode], (err, result) => {
+  // Query to get TeacherId from userId
+  const getTeacherIdQuery = `
+    SELECT TeacherId
+    FROM teachers
+    WHERE UserId = ?
+  `;
+
+  // First, get the TeacherId from the teachers table using userId
+  db.query(getTeacherIdQuery, [userInfo.id], (err, result) => {
     if (err) {
-      console.error("Error checking for duplicate class code:", err);
+      console.error("Error retrieving teacher ID:", err);
       return res.status(500).json({ error: "Database error", details: err });
     }
 
-    const isDuplicate = result[0].count > 0;
-    if (isDuplicate) {
-      return res.status(400).json({ message: "Class code already exists" });
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Teacher not found" });
     }
 
-    // Insert new class if no duplicate found
+    const teacherId = result[0].TeacherId;
+
+    // Insert new class
     db.query(
       insertClassQuery,
       [classId, classCode, courseId, teacherId],
@@ -94,6 +96,7 @@ export const addClassCourse = (req, res) => {
     );
   });
 };
+
 
 export const addClassStudent = (req, res) => {
   const { studentDatas } = req.body;
@@ -216,5 +219,27 @@ export const getClassStudentByClassCode = (req, res) => {
   db.query(q, [courseId, classCode], (err, data) => {
     if (err) return res.status(500).json(err);
     return res.status(200).json(data);
+  });
+};
+export const getClassById = (req, res) => {
+  const classId = req.params.classId;
+  const courseId = req.params.courseId;
+
+  const q = `
+    SELECT *
+    FROM classes
+    WHERE ClassId = ? AND CourseId = ?
+  `;
+
+  db.query(q, [classId, courseId], (err, data) => {
+    if (err) {
+      console.error("Database error:", err); // Log the error for debugging
+      return res.status(500).json({ error: "Internal server error" });
+    }
+    if (data.length === 0) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    console.log("Query successful, returning data:", data[0]); // Log the data being returned
+    return res.status(200).json(data[0]); // Assuming you want to return a single object, not an array
   });
 };

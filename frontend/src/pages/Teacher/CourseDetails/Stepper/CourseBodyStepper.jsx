@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
 import "../EditWrite.scss";
 import { message } from "antd";
 import DropFileInput from "@/components/DropFile/DropFileInput";
@@ -18,11 +17,9 @@ import { useNavigate } from "react-router-dom";
 import Dialog from "@/components/Dialogs/ShowDialog";
 
 const CourseBodyStepper = ({ courseId, handleNext, setSelectedChapterId }) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState("");
   const [open, setOpen] = useState(false);
-  console.log("hi", courseId);
   const onFileChange = (files) => {
     const formData = new FormData();
     formData.append("image", files);
@@ -47,7 +44,7 @@ const CourseBodyStepper = ({ courseId, handleNext, setSelectedChapterId }) => {
 
     try {
       await axios.delete(
-        `http://localhost:8800/api/courses/${location.state?.CourseId}`,
+        `http://localhost:8800/api/courses/${courseId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`, // Pass the token in the Authorization header

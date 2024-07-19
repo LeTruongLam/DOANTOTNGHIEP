@@ -302,52 +302,98 @@ function submitAssignment(
   res
 ) {
   const submissionId = uuidv4();
+  console.log(submissionFiles);
+  console.log(submittedFiles);
+  let combinedFiles = [...submissionFiles]; // Copy submissionFiles array initially
 
-  const combinedFiles = [
-    ...submissionFiles,
-    ...(submittedFiles ? JSON.parse(submittedFiles) : []),
-  ];
+  if (submittedFiles && typeof submittedFiles === "string") {
+    try {
+      const parsedFiles = JSON.parse(submittedFiles);
+      if (Array.isArray(parsedFiles)) {
+        combinedFiles = [...submissionFiles, ...parsedFiles];
+      } else {
+        console.error("Parsed JSON is not an array:", parsedFiles);
+        // Handle the case where parsedFiles is not an array as needed
+      }
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      // Handle JSON parsing error as needed
+    }
+  }
+  console.log(combinedFiles);
+
   const submissionFilesJson = JSON.stringify(combinedFiles);
 
-  let query;
-  let queryParams;
+  // Check if submission already exists
+  const checkSubmissionQuery =
+    "SELECT * FROM submissions WHERE AssignmentId = ? AND UserId = ?";
+  db.query(
+    checkSubmissionQuery,
+    [assignmentId, userId],
+    (err, existingSubmission) => {
+      if (err) {
+        console.error("Error checking for existing submission:", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "An error occurred" });
+      }
 
-  if (submittedFiles && JSON.parse(submittedFiles).length > 0) {
-    query = `UPDATE submissions SET SubmissionFiles = ? WHERE AssignmentId = ? AND UserId = ?`;
-    queryParams = [submissionFilesJson, assignmentId, userId];
-  } else {
-    query = `INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, ?, NOW(), ?);`;
-    queryParams = [
-      submissionId,
-      assignmentId,
-      userId,
-      chapterId,
-      courseId,
-      submissionFilesJson,
-    ];
-  }
+      if (existingSubmission.length > 0) {
+        // Update the existing submission
+        const updateQuery =
+          "UPDATE submissions SET SubmissionFiles = ? WHERE AssignmentId = ? AND UserId = ?";
+        db.query(
+          updateQuery,
+          [submissionFilesJson, assignmentId, userId],
+          (err, result) => {
+            if (err) {
+              console.error("Error updating submission data:", err);
+              return res
+                .status(500)
+                .json({ success: false, message: "An error occurred" });
+            }
 
-  db.query(query, queryParams, (err, result) => {
-    if (err) {
-      console.error(
-        "Error inserting or updating submission data into the database:",
-        err
-      );
-      res.status(500).json({
-        success: false,
-        message: "An error occurred",
-      });
-    } else {
-      console.log(
-        "Submission data has been inserted or updated into the database"
-      );
-      res.status(201).json({
-        success: true,
-        message: "Submission data has been inserted or updated!",
-        data: result,
-      });
+            console.log("Submission data has been updated in the database");
+            return res.status(200).json({
+              success: true,
+              message: "Submission data has been updated!",
+              data: result,
+            });
+          }
+        );
+      } else {
+        // Insert a new submission
+        const insertQuery =
+          "INSERT INTO submissions (SubmissionId, AssignmentId, UserId, ChapterId, CourseId, SubmissionDate, SubmissionFiles) VALUES (?, ?, ?, ?, ?, NOW(), ?)";
+        db.query(
+          insertQuery,
+          [
+            submissionId,
+            assignmentId,
+            userId,
+            chapterId,
+            courseId,
+            submissionFilesJson,
+          ],
+          (err, result) => {
+            if (err) {
+              console.error("Error inserting submission data:", err);
+              return res
+                .status(500)
+                .json({ success: false, message: "An error occurred" });
+            }
+
+            console.log("Submission data has been inserted into the database");
+            return res.status(201).json({
+              success: true,
+              message: "Submission data has been inserted!",
+              data: result,
+            });
+          }
+        );
+      }
     }
-  });
+  );
 }
 router.post(
   "/chapters/uploadAssignmentFile/:assignmentId/submission",

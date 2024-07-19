@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { AuthContext } from "@/context/authContext";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import TextField from "@mui/material/TextField";
@@ -11,7 +11,7 @@ import { arrayMoveImmutable as arrayMove } from "array-move";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
 
 export default function CourseChapter({ title, subTitle, handleEdit }) {
-  const location = useLocation();
+  const {  courseId } = useParams();
   const { fetchChapter } = useContext(AuthContext);
   const [chapterData, setChapterData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -41,7 +41,7 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
 
   const fetchData = async () => {
     try {
-      const data = await fetchChapter(location.state?.CourseId);
+      const data = await fetchChapter(courseId);
 
       setChapterData(data);
     } catch (error) {
@@ -51,7 +51,7 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [courseId]);
   const handleDelete = async (chapterId) => {
     try {
       await axios.delete(
@@ -107,7 +107,7 @@ export default function CourseChapter({ title, subTitle, handleEdit }) {
     try {
       await axios.post(`http://localhost:8800/api/courses/chapters/title`, {
         chapterTitle: chapterTitle,
-        courseId: location.state?.CourseId,
+        courseId: courseId,
       });
       message.success("Thêm thành công!");
     } catch (error) {

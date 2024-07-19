@@ -31,6 +31,7 @@ export const getCourses = (req, res) => {
       JOIN class_student ON classes.ClassId = class_student.ClassId
       JOIN students ON class_student.UserId = students.UserId
       WHERE students.UserId = ? 
+       GROUP BY courses.CourseId
      `;
   }
 
@@ -83,22 +84,39 @@ export const addCourse = (req, res) => {
 
     const teacherId = teacherData[0].TeacherId;
 
-    // Kiểm tra vai trò người dùng có quyền thêm khóa học hay không
-    const insertQuery =
-      "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?, ?, ?)";
-    const insertValues = [req.body.courseTitle, teacherId, req.body.courseCode];
+    // Check if course courseCode already exists
+    const existingCourseQuery = "SELECT * FROM courses WHERE CourseCode = ?";
+    db.query(
+      existingCourseQuery,
+      [req.body.courseCode],
+      (existingCourseErr, existingCourseData) => {
+        if (existingCourseErr) return res.status(500).json(existingCourseErr);
 
-    db.query(insertQuery, insertValues, (insertErr, insertData) => {
-      if (insertErr) return res.status(500).json(insertErr);
+        if (existingCourseData.length > 0) {
+          return res.status(400).json({ message: "Mã môn học đã tồn tại" });
+        }
 
-      const courseId = insertData.insertId; // Lấy courseId sau khi tạo thành công
-      return res
-        .status(201)
-        .json({ message: "Course has been created.", courseId: courseId });
-    });
+        // Insert new course
+        const insertQuery =
+          "INSERT INTO courses(`title`, `TeacherId`, `CourseCode`) VALUES (?, ?, ?)";
+        const insertValues = [
+          req.body.courseTitle,
+          teacherId,
+          req.body.courseCode,
+        ];
+
+        db.query(insertQuery, insertValues, (insertErr, insertData) => {
+          if (insertErr) return res.status(500).json(insertErr);
+
+          const courseId = insertData.insertId; // Lấy courseId sau khi tạo thành công
+          return res
+            .status(201)
+            .json({ message: "Tạo môn học thành công", courseId: courseId });
+        });
+      }
+    );
   });
 };
-
 export const deleteCourse = (req, res) => {
   const courseId = req.params.id;
 
@@ -215,13 +233,36 @@ export const getCourseDesc = (req, res) => {
 };
 export const updateCourseCode = (req, res) => {
   const courseId = req.params.id;
+  const newCourseCode = req.body.courseCode;
 
-  const q = "UPDATE courses SET `CourseCode`=? WHERE `courseId` = ? ";
-  const values = [req.body.courseCode, courseId];
-
-  db.query(q, values, (err, data) => {
+  // First, check if the course exists
+  const checkCourseQuery = "SELECT * FROM courses WHERE `courseId` = ?";
+  db.query(checkCourseQuery, [courseId], (err, courseData) => {
     if (err) return res.status(500).json(err);
-    return res.json("Course code has been updated.");
+    if (courseData.length === 0) {
+      return res.status(404).json("Course not found");
+    }
+
+    // Check if the new course code already exists
+    const checkCodeQuery = "SELECT * FROM courses WHERE `CourseCode` = ?";
+    db.query(checkCodeQuery, [newCourseCode], (err, codeData) => {
+      if (err) return res.status(500).json(err);
+      if (codeData.length > 0) {
+        return res.status(400).json("Course code already exists");
+      }
+
+      // Update the course code
+      const updateQuery = "UPDATE courses SET `CourseCode`=? WHERE `courseId` = ?";
+      const values = [newCourseCode, courseId];
+
+      db.query(updateQuery, values, (err, result) => {
+        if (err) return res.status(500).json(err);
+        if (result.affectedRows === 0) {
+          return res.status(404).json("Course not found");
+        }
+        return res.json("Course code has been updated.");
+      });
+    });
   });
 };
 

@@ -194,7 +194,7 @@ function ExamForm({ open, setOpen, chapters }) {
                   <DemoContainer
                     components={["DateTimePicker", "MobileDateTimePicker"]}
                   >
-                    <DemoItem label="Start time">
+                    <DemoItem label="Thời gian bắt đầu">
                       <MobileDateTimePicker
                         value={startTime}
                         onChange={(date) => setStartTime(date)}
@@ -266,7 +266,7 @@ function ExamForm({ open, setOpen, chapters }) {
                       }}
                     />
                     <label className=" text-sm font-medium text-gray-900">
-                      <span>Select all</span>
+                      <span>Chọn tất cả</span>
                     </label>
                   </div>
 

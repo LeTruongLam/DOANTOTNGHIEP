@@ -210,7 +210,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
                   htmlFor="questionCountInput"
                   className="block mb-1  text-sm font-medium text-gray-900"
                 >
-                  Choose questions at random:
+                  Chọn ngẫu nhiên câu hỏi:
                 </label>
 
                 <div className="flex justify-between items-center">
@@ -231,7 +231,7 @@ function QuestionsList({ chapters, questionList, setQuestionList }) {
                     className=" flex justify-center items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600"
                   >
                     <AutoAwesomeIcon fontSize="small" />
-                    Get Random
+                    Lấy ngẫu nhiên
                   </button>
                 </div>
               </div>

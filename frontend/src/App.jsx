@@ -43,6 +43,7 @@ import ExamLayout from "./layout/ExamLayout.jsx";
 import ViewerLayout from "./layout/ViewerLayout.jsx";
 import ExamEditPage from "./pages/Teacher/BankQuestions/ExamView/ExamEdit/ExamEditPage.jsx";
 import ViewStudentResultsPage from "./pages/Teacher/BankQuestions/ViewStudentResult/ViewStudentResultsPage.jsx";
+import StudentListPage from "./pages/Teacher/CourseDetails/StudentList/StudentListPage.jsx";
 const AdminRouter = [
   {
     path: "/admin/manage-accounts",
@@ -57,6 +58,10 @@ const TeacherRouter = [
   {
     path: "/teacher/courses/:courseId/assignments",
     element: <AssignmentView />,
+  },
+  {
+    path: "/teacher/courses/:courseId/classes/:classId",
+    element: <StudentListPage />,
   },
   {
     path: "/teacher/courses/:courseId/assignments/:assignmentId/classrooms",

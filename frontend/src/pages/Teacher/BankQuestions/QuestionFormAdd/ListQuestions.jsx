@@ -86,7 +86,7 @@ function StepperFirst({ questions, setQuestions, handleBack }) {
           <div
             onClick={handleBack}
             className="flex mt-4 w-max items-center gap-1 px-2 py-1 border rounded-md hover:cursor-pointer border-blue-600"
-          >
+          >Lưu
             <AddBoxIcon style={{ color: "rgb(37 99 235)" }} />
             <span className="text-blue-600 text-sm font-semibold">
               Thêm câu hỏi

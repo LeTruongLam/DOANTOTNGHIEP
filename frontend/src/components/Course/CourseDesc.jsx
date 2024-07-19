@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import DOMPurify from "dompurify";
@@ -8,13 +8,14 @@ import { message } from "antd";
 import EditIcon from "@mui/icons-material/Edit";
 
 export default function CourseDesc({ title, subTitle }) {
+  const {  courseId } = useParams();
   const location = useLocation();
   const [courseDesc, setCourseDesc] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const fetchCourseDesc = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8800/api/courses/desc/${location.state.CourseId}`
+        `http://localhost:8800/api/courses/desc/${courseId}`
       );
       setCourseDesc(res.data.courseDesc);
     } catch (error) {
@@ -36,7 +37,7 @@ export default function CourseDesc({ title, subTitle }) {
   const handleSaveClick = async () => {
     try {
       await axios.put(
-        `http://localhost:8800/api/courses/desc/${location.state.CourseId}`,
+        `http://localhost:8800/api/courses/desc/${courseId}`,
         {
           desc: courseDesc,
         }

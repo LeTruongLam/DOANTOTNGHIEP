@@ -20,12 +20,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!inputs.username || !inputs.password) {
-      setError("Please enter both username and password");
+      setError("Vui lòng nhập cả tên người dùng và mật khẩu");
       return;
     }
-
+  
     try {
       const user = await login(inputs);
       if (user.Role !== "admin") {
@@ -35,12 +35,15 @@ const Login = () => {
       }
       message.success("Đăng nhập thành công!");
     } catch (err) {
-      message.error(err);
-
-      setError(err);
+      if (err.response && err.response.status === 404) {
+        message.error("Người dùng không tìm thấy");
+      } else if (err.response && err.response.status === 400) {
+        message.error("Tên người dùng hoặc mật khẩu không đúng");
+      } else {
+        message.error("Đăng nhập thất bại, vui lòng thử lại");
+      }
     }
   };
-
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">

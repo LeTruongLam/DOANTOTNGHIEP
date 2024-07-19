@@ -6,7 +6,6 @@ import Select from "@mui/material/Select";
 import { AuthContext } from "@/context/authContext";
 import Avatar from "@mui/material/Avatar";
 import axios from "axios";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 export default function ClassList({ courseId, classCodeStudent }) {
   const { currentUser } = useContext(AuthContext);
   const [classes, setClasses] = useState([]);
@@ -87,7 +86,7 @@ export default function ClassList({ courseId, classCodeStudent }) {
         <div className="class-container bg-white">
           <div className="class-wrapper">
             <div className="class-title">
-              Mã lớp học : {classCode || classCodeStudent}
+              Tên lớp học : {classCode || classCodeStudent}
             </div>
             <div className="class-header font-bold mt-3">
               <p>Danh sách lớp ({classStudent.length})</p>

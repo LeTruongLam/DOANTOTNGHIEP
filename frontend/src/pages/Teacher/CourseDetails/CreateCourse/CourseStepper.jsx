@@ -73,7 +73,40 @@ export default function CourseStepper() {
       }));
       message.success(response.data.message);
     } catch (error) {
-      message.error(error.message);
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            message.error("Mã môn học đã tồn tại");
+            handleBack();
+
+            break;
+          case 401:
+            // Unauthorized, the user is not authenticated
+            message.error("You are not authorized to create a course.");
+            break;
+          case 403:
+            // Forbidden, the user is not allowed to perform this action
+            message.error("You are not allowed to create a course.");
+            break;
+          case 500:
+            // Internal server error
+            message.error(
+              "An error occurred on the server. Please try again later."
+            );
+            break;
+          default:
+            message.error(
+              "An unexpected error occurred. Please try again later."
+            );
+            break;
+        }
+      } else if (error.request) {
+        message.error(
+          "Unable to connect to the server. Please check your network connection."
+        );
+      } else {
+        message.error("An unexpected error occurred. Please try again later.");
+      }
     }
   };
   const handleEdit = async () => {

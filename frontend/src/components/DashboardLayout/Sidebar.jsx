@@ -6,12 +6,7 @@ import { AdminLinks, TeacherLinks } from "@/constants";
 import { AuthContext } from "@/context/authContext";
 
 const Container = styled.div`
-  .active {
-    border-right-width: 2px;
-    --tw-border-opacity: 1;
-    border-color: rgb(37 99 235 / var(--tw-border-opacity));
-    color: rgb(147 51 234);
-  }
+ 
 `;
 
 const SlickBar = styled.ul`
@@ -50,15 +45,15 @@ const Sidebar = () => {
   const location = useLocation();
   const links = currentUser?.Role === "admin" ? AdminLinks : TeacherLinks;
 
-  const isActiveLink = (linkRoute) => {
-    if (linkRoute.includes("assignments") && location.pathname.includes("assignments")) {
-      return true;
-    }
-    if (linkRoute.includes("bankquestions") && location.pathname.includes("bankquestions")) {
-      return true;
-    }
-    return location.pathname === linkRoute;
-  };
+  // const isActiveLink = (linkRoute) => {
+  //   if (linkRoute.includes("assignments") && location.pathname.includes("assignments")) {
+  //     return true;
+  //   }
+  //   if (linkRoute.includes("bankquestions") && location.pathname.includes("bankquestions")) {
+  //     return true;
+  //   }
+  //   return location.pathname === linkRoute;
+  // };
 
   return (
     <div className="min-w-[250px] border-r h-[100vh] border-slate-300 flex flex-col justify-between">
@@ -77,7 +72,7 @@ const Sidebar = () => {
             <Item
               key={index}
               to={link.route}
-              className={`hover:bg-slate-200 ${isActiveLink(link.route) ? "active" : ""}`}
+              className={`hover:bg-slate-200 }`}
             >
               {link.icon}
               <Text>{link.label}</Text>

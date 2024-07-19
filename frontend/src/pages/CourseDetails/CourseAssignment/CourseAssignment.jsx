@@ -43,12 +43,6 @@ CustomTabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
 
 export default function CourseAssignment() {
   const { currentUser } = useContext(AuthContext);
@@ -62,7 +56,6 @@ export default function CourseAssignment() {
   const [submissionStatus, setSubmissionStatus] = useState();
   const [assignmentId, setAssignmentId] = useState();
   const [congratulation, setCongratulation] = useState(false);
-  const [value, setValue] = useState(0);
   const [selectedDoc, setSelectedDoc] = useState({});
   const { courseId, chapterId } = useParams();
 
@@ -484,8 +477,8 @@ export default function CourseAssignment() {
                                 <ReviewsIcon />
                                 <span className=" font-semibold">Nhận xét</span>
                               </div>
-                              <p className="mt-1">
-                                {assignmentSubmitted?.Review}
+                              <p className="mt-1 bg-white w-full py-4 px-3 rounded-md text-gray-500">
+                                {getText(assignmentSubmitted?.Review)}
                               </p>
                             </div>
                           </p>
